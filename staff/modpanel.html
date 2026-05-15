@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mod Panel · Vexis</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#111;--surf:#191919;--raise:#212121;--raise2:#2a2a2a;--bdr:#2c2c2c;--bdrhi:#383838;--dim:#7a7a7a;--muted:#4a4a4a;--text:#c8c8c8;--bright:#ececec;--white:#f5f5f5;--accent:#7aa0ff;--danger:#f85149;--success:#56d364;--r:10px}
+html,body{height:100%;overflow:hidden;font-family:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--bdrhi);border-radius:4px}
+
+/* ── LAYOUT ── */
+.app{display:flex;flex-direction:column;height:100%}
+
+/* ── HEADER ── */
+.header{background:var(--surf);border-bottom:1px solid var(--bdr);padding:14px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.header-icon{width:32px;height:32px;border-radius:9px;background:rgba(122,160,255,.12);border:1px solid rgba(122,160,255,.25);display:flex;align-items:center;justify-content:center;color:var(--accent);flex-shrink:0}
+.header-title{font-size:.92rem;font-weight:700;color:var(--white)}
+.header-sub{font-size:.64rem;color:var(--dim);margin-top:1px}
+.badge{padding:3px 9px;border-radius:20px;font-size:.6rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;background:rgba(122,160,255,.12);border:1px solid rgba(122,160,255,.3);color:var(--accent);margin-left:auto;flex-shrink:0}
+
+/* ── TABS ── */
+.tabs{display:flex;gap:2px;padding:10px 16px 0;background:var(--surf);border-bottom:1px solid var(--bdr);flex-shrink:0}
+.tab{padding:7px 16px;border-radius:7px 7px 0 0;font-size:.74rem;font-weight:500;color:var(--dim);cursor:pointer;border:1px solid transparent;border-bottom:none;transition:all .14s;white-space:nowrap}
+.tab:hover{color:var(--text);background:rgba(255,255,255,.04)}
+.tab.active{color:var(--white);background:var(--bg);border-color:var(--bdr);border-bottom-color:var(--bg)}
+
+/* ── BODY ── */
+.body{flex:1;overflow-y:auto;padding:16px}
+.section{display:none}.section.active{display:block}
+
+/* ── TOOLBAR ── */
+.toolbar{display:flex;gap:8px;margin-bottom:14px}
+.search{flex:1;background:var(--surf);border:1px solid var(--bdr);border-radius:8px;padding:8px 12px;font-size:.76rem;color:var(--white);outline:none;font-family:inherit;transition:border-color .15s}
+.search:focus{border-color:var(--bdrhi)}
+.search::placeholder{color:var(--muted)}
+.btn{padding:0 16px;height:36px;border-radius:8px;font-size:.74rem;font-weight:600;cursor:pointer;border:none;font-family:inherit;transition:all .14s;flex-shrink:0}
+.btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{filter:brightness(1.12)}
+.btn-secondary{background:var(--raise2);color:var(--text);border:1px solid var(--bdr)}.btn-secondary:hover{border-color:var(--bdrhi);color:var(--white)}
+
+/* ── EMPTY ── */
+.empty{text-align:center;padding:48px 20px;color:var(--dim)}
+.empty-ico{font-size:2rem;margin-bottom:10px;opacity:.4}
+.empty-text{font-size:.76rem}
+
+/* ── REPORT CARD ── */
+.report-card{background:var(--surf);border:1px solid var(--bdr);border-radius:10px;padding:14px 16px;margin-bottom:8px;transition:border-color .14s}
+.report-card:hover{border-color:var(--bdrhi)}
+.report-card.resolved{opacity:.4;pointer-events:none}
+.report-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
+.report-status{padding:2px 8px;border-radius:5px;font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;flex-shrink:0;margin-top:2px}
+.report-status.pending{background:rgba(255,160,30,.1);border:1px solid rgba(255,160,30,.3);color:#ffb84a}
+.report-status.resolved{background:rgba(86,211,100,.1);border:1px solid rgba(86,211,100,.25);color:var(--success)}
+.report-who{font-size:.72rem;color:var(--text);flex:1;line-height:1.5}
+.report-who strong{color:var(--white)}
+.report-time{font-size:.62rem;color:var(--muted);flex-shrink:0}
+.report-msg{background:var(--bg);border:1px solid var(--bdr);border-radius:7px;padding:9px 12px;font-size:.74rem;color:var(--text);line-height:1.5;margin-bottom:10px;word-break:break-word}
+.report-actions{display:flex;gap:7px}
+.action-btn{padding:0 14px;height:30px;border-radius:6px;font-size:.7rem;font-weight:600;cursor:pointer;border:none;font-family:inherit;transition:all .14s}
+.action-btn:disabled{opacity:.4;cursor:not-allowed}
+.action-btn.dismiss{background:var(--raise2);color:var(--text);border:1px solid var(--bdr)}.action-btn.dismiss:not(:disabled):hover{border-color:var(--bdrhi);color:var(--white)}
+.action-btn.danger{background:rgba(248,81,73,.1);color:var(--danger);border:1px solid rgba(248,81,73,.25)}.action-btn.danger:not(:disabled):hover{background:rgba(248,81,73,.2)}
+
+/* ── CHAT MOD ── */
+.msg-card{background:var(--surf);border:1px solid var(--bdr);border-radius:9px;padding:11px 14px;margin-bottom:6px;display:flex;align-items:flex-start;gap:12px;transition:border-color .14s}
+.msg-card:hover{border-color:var(--bdrhi)}
+.msg-info{flex:1;min-width:0}
+.msg-name{font-size:.7rem;font-weight:600;color:var(--white);margin-bottom:3px}
+.msg-text{font-size:.76rem;color:var(--text);line-height:1.45;word-break:break-word}
+.msg-time{font-size:.6rem;color:var(--muted);flex-shrink:0;margin-top:2px}
+.msg-del{background:none;border:none;cursor:pointer;color:var(--dim);padding:4px 8px;border-radius:5px;transition:all .13s;flex-shrink:0;font-size:1rem;line-height:1}
+.msg-del:hover{background:rgba(248,81,73,.1);color:var(--danger)}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--raise2);border:1px solid var(--bdrhi);border-radius:8px;padding:9px 18px;font-size:.76rem;color:var(--white);opacity:0;transition:all .2s;pointer-events:none;z-index:999;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── SPINNER ── */
+.spin{width:18px;height:18px;border:2px solid var(--bdr);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite;margin:0 auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── SECTION LABEL ── */
+.section-label{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);margin-bottom:10px}
+
+/* ── COUNT PILL ── */
+.count-pill{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;border-radius:9px;font-size:.6rem;font-weight:700;padding:0 5px;background:rgba(248,81,73,.15);color:var(--danger);border:1px solid rgba(248,81,73,.25);margin-left:6px;vertical-align:middle}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-icon">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    </div>
+    <div>
+      <div class="header-title">Mod Panel</div>
+      <div class="header-sub">Reports and chat moderation</div>
+    </div>
+    <span class="badge">Moderator</span>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <div class="tab active" id="tab-reports" onclick="switchTab('reports')">
+      Reports <span class="count-pill" id="reportCount" style="display:none">0</span>
+    </div>
+    <div class="tab" id="tab-chat" onclick="switchTab('chat')">Chat Mod</div>
+  </div>
+
+  <!-- BODY -->
+  <div class="body">
+
+    <!-- REPORTS -->
+    <div class="section active" id="sec-reports">
+      <div class="section-label">Pending Reports</div>
+      <div id="reportsList">
+        <div style="text-align:center;padding:32px"><div class="spin"></div></div>
+      </div>
+    </div>
+
+    <!-- CHAT MOD -->
+    <div class="section" id="sec-chat">
+      <div class="toolbar">
+        <input class="search" id="chatSearch" placeholder="Search by keyword or @username…" onkeydown="if(event.key==='Enter')searchChat()">
+        <button class="btn btn-primary" onclick="searchChat()">Search</button>
+      </div>
+      <div id="chatResults">
+        <div class="empty"><div class="empty-text">Enter a keyword or username and press Search.</div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey:"AIzaSyCR8I5eOiZbHzVZJDEQHYpyxXbcClk_rxA",
+  authDomain:"goon-7ddc3.firebaseapp.com",
+  projectId:"goon-7ddc3",
+  storageBucket:"goon-7ddc3.firebasestorage.app",
+  messagingSenderId:"117099331820",
+  appId:"1:117099331820:web:3af984b15a843d3d7b65c9"
+});
+const db = firebase.firestore();
+const auth = firebase.auth();
+const FS = firebase.firestore;
+let me = null;
+let _tab = 'reports';
+
+/* ── AUTH CHECK ── */
+auth.onAuthStateChanged(async user => {
+  if (!user) { document.body.innerHTML = '<div style="text-align:center;padding:60px;color:#555;font-family:sans-serif">Not signed in.</div>'; return; }
+  const snap = await db.collection('users').doc(user.uid).get();
+  const role = snap.data()?.role || 'user';
+  if (role !== 'moderator' && role !== 'owner') {
+    document.body.innerHTML = '<div style="text-align:center;padding:60px;color:#555;font-family:sans-serif">Access denied.</div>';
+    return;
+  }
+  me = user;
+  loadReports();
+});
+
+/* ── TABS ── */
+function switchTab(tab) {
+  _tab = tab;
+  ['reports','chat'].forEach(t => {
+    document.getElementById('tab-' + t).classList.toggle('active', t === tab);
+    document.getElementById('sec-' + t).classList.toggle('active', t === tab);
+  });
+  if (tab === 'reports') loadReports();
+}
+
+/* ── REPORTS ── */
+async function loadReports() {
+  const el = document.getElementById('reportsList');
+  el.innerHTML = '<div style="text-align:center;padding:32px"><div class="spin"></div></div>';
+  try {
+    const snap = await db.collection('reports').orderBy('timestamp','desc').limit(80).get();
+    const docs = snap.docs.map(d => ({id:d.id,...d.data()}));
+    const pending = docs.filter(r => r.status !== 'resolved');
+    const pill = document.getElementById('reportCount');
+    if (pending.length > 0) { pill.textContent = pending.length; pill.style.display = ''; }
+    else pill.style.display = 'none';
+    if (!docs.length) { el.innerHTML = '<div class="empty"><div class="empty-ico">✓</div><div class="empty-text">No reports yet — everything looks clean.</div></div>'; return; }
+    el.innerHTML = '';
+    docs.forEach(r => el.appendChild(buildReportCard(r)));
+  } catch(e) { el.innerHTML = `<div class="empty"><div class="empty-text">Error: ${esc(e.message)}</div></div>`; }
+}
+
+function buildReportCard(r) {
+  const card = document.createElement('div');
+  card.className = 'report-card' + (r.status === 'resolved' ? ' resolved' : '');
+  card.id = 'rc-' + r.id;
+  const ts = r.timestamp?.toDate ? r.timestamp.toDate() : (r.timestamp ? new Date(r.timestamp) : null);
+  const time = ts ? ts.toLocaleString([],{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
+  const isResolved = r.status === 'resolved';
+  card.innerHTML = `
+    <div class="report-top">
+      <span class="report-status ${r.status||'pending'}">${r.status||'pending'}</span>
+      <div class="report-who">
+        Reported by <strong>${esc(r.reportedByName||'?')}</strong> — targeting <strong>${esc(r.reportedDisplayName||'?')}</strong>
+      </div>
+      <span class="report-time">${time}</span>
+    </div>
+    <div class="report-msg">${esc(r.messageText||'[no message content]')}</div>
+    <div class="report-actions">
+      <button class="action-btn dismiss" ${isResolved?'disabled':''} onclick="resolveReport('${r.id}',this)">
+        ${isResolved ? 'Resolved' : 'Dismiss'}
+      </button>
+      <button class="action-btn danger" ${isResolved?'disabled':''} onclick="deleteReportedMsg('${r.id}','${r.messageId||''}',this)">
+        Delete Message
+      </button>
+    </div>`;
+  return card;
+}
+
+async function resolveReport(id, btn) {
+  btn.disabled = true; btn.textContent = 'Resolving…';
+  try {
+    await db.collection('reports').doc(id).update({ status:'resolved', resolvedBy: me.uid });
+    const card = document.getElementById('rc-' + id);
+    if (card) { card.classList.add('resolved'); card.querySelectorAll('.action-btn').forEach(b=>b.disabled=true); card.querySelector('.report-status').className='report-status resolved'; card.querySelector('.report-status').textContent='resolved'; }
+    toast('Report dismissed');
+  } catch(e) { toast('Error: ' + e.message); btn.disabled=false; btn.textContent='Dismiss'; }
+}
+
+async function deleteReportedMsg(reportId, msgId, btn) {
+  if (!msgId) { toast('No message ID on this report'); return; }
+  if (!confirm('Delete this message from chat? Cannot be undone.')) return;
+  btn.disabled = true; btn.textContent = 'Deleting…';
+  try {
+    try { await db.collection('socialMessages').doc(msgId).delete(); } catch(e) {}
+    await db.collection('reports').doc(reportId).update({ status:'resolved', resolvedBy: me.uid });
+    const card = document.getElementById('rc-' + reportId);
+    if (card) { card.classList.add('resolved'); card.querySelectorAll('.action-btn').forEach(b=>b.disabled=true); card.querySelector('.report-status').className='report-status resolved'; card.querySelector('.report-status').textContent='resolved'; }
+    toast('Message deleted');
+  } catch(e) { toast('Error: ' + e.message); btn.disabled=false; btn.textContent='Delete Message'; }
+}
+
+/* ── CHAT MOD ── */
+async function searchChat() {
+  const q = document.getElementById('chatSearch').value.trim();
+  const el = document.getElementById('chatResults');
+  if (!q) return;
+  el.innerHTML = '<div style="text-align:center;padding:24px"><div class="spin"></div></div>';
+  try {
+    const snap = await db.collection('socialMessages').orderBy('timestamp','desc').limit(300).get();
+    const lq = q.toLowerCase().replace(/^@/,'');
+    const results = snap.docs.map(d=>({id:d.id,...d.data()}))
+      .filter(d => (d.text||'').toLowerCase().includes(lq) || (d.displayName||'').toLowerCase().includes(lq))
+      .slice(0,50);
+    if (!results.length) { el.innerHTML = '<div class="empty"><div class="empty-text">No messages matched.</div></div>'; return; }
+    el.innerHTML = '';
+    results.forEach(m => {
+      const ts = m.timestamp?.toDate ? m.timestamp.toDate() : (m.timestamp ? new Date(m.timestamp) : null);
+      const time = ts ? ts.toLocaleString([],{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
+      const card = document.createElement('div');
+      card.className = 'msg-card';
+      card.id = 'mc-' + m.id;
+      card.innerHTML = `
+        <div class="msg-info">
+          <div class="msg-name">${esc(m.displayName||'?')}</div>
+          <div class="msg-text">${esc(m.text||'[no text]')}</div>
+        </div>
+        <span class="msg-time">${time}</span>
+        <button class="msg-del" title="Delete message" onclick="deleteChatMsg('${m.id}',this)">🗑</button>`;
+      el.appendChild(card);
+    });
+  } catch(e) { el.innerHTML = `<div class="empty"><div class="empty-text">Error: ${esc(e.message)}</div></div>`; }
+}
+
+async function deleteChatMsg(id, btn) {
+  if (!confirm('Delete this message?')) return;
+  btn.disabled = true;
+  try {
+    await db.collection('socialMessages').doc(id).delete();
+    document.getElementById('mc-' + id)?.remove();
+    toast('Message deleted');
+  } catch(e) { toast('Error: ' + e.message); btn.disabled=false; }
+}
+
+/* ── UTILS ── */
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+let _toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
+}
+</script>
+</body>
+</html>
