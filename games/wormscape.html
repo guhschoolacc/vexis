@@ -1,0 +1,896 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Wormscape</title>
+<style>
+  :root{ --bg:#07101a; --accent:#6ee7b7; --muted:rgba(255,255,255,0.65); }
+  html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:var(--bg); color:#e6eef6; overflow:hidden;}
+  canvas{display:block;width:100vw;height:100vh;background:transparent;}
+  #menuWrap{ position:fixed; inset:0; display:flex; align-items:flex-start; justify-content:center; z-index:400; pointer-events:auto; }
+  #menu{ width:min(980px,94vw); margin-top:-40vh; transform:translateY(-40vh); transition:transform 520ms cubic-bezier(.2,.9,.2,1), opacity 420ms; opacity:0; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:12px; padding:18px; box-shadow:0 30px 80px rgba(0,0,0,0.6); }
+  #menu.show{ transform:translateY(0); opacity:1; margin-top:8vh; }
+  .menuRow{ display:flex; gap:18px; align-items:flex-start; }
+  .left{ flex:1; }
+  .title{ font-size:44px; color:var(--accent); margin:0 0 6px 0; font-weight:800; }
+  .muted{ color:var(--muted); font-size:13px; margin-bottom:12px; }
+  .playBtn{ background:linear-gradient(180deg,#fff,#e6f7f0); color:#07101a; padding:12px 20px; border-radius:10px; border:none; font-weight:800; cursor:pointer; }
+  .panel{ background:rgba(255,255,255,0.02); padding:10px; border-radius:10px; color:#eafaf0; }
+  .skinGrid{ display:flex; gap:8px; flex-wrap:wrap; }
+  .skinTile{ width:84px; height:36px; border-radius:18px; cursor:pointer; border:2px solid transparent; box-shadow:0 8px 20px rgba(0,0,0,0.45); }
+  .skinTile.sel{ outline:3px solid rgba(255,255,255,0.06); transform:translateY(-6px); }
+  .deviceRow{ display:flex; gap:8px; margin-top:6px; }
+  .deviceBtn{ padding:8px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.06); background:transparent; color:var(--muted); cursor:pointer; }
+  .deviceBtn.active{ color:#fff; outline:2px solid rgba(255,255,255,0.06); }
+  .inputRow{ display:flex; gap:8px; align-items:center; margin-top:8px; }
+  input[type="text"]{ padding:8px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.06); background:transparent; color:#fff; width:220px; }
+  .small{ font-size:12px; opacity:0.95; }
+  .blurred{ filter: blur(8px) saturate(0.9); transition:filter 420ms ease; }
+  #mobileControls{ position:fixed; left:12px; bottom:12px; z-index:350; display:none; pointer-events:none; }
+  .joystick{ width:110px; height:110px; border-radius:55px; background:rgba(255,255,255,0.03); pointer-events:auto; touch-action:none; }
+  #sprintBtn{ position:fixed; right:12px; bottom:12px; z-index:350; display:none; pointer-events:auto; padding:10px 14px; border-radius:10px; background:linear-gradient(180deg,#fff,#e6f7f0); color:#07101a; font-weight:700; }
+  @media (max-width:900px){ .title{ font-size:34px; } .menuRow{ flex-direction:column; } input[type="text"]{ width:100%; } }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<div id="menuWrap">
+  <div id="menu" role="dialog" aria-label="Main menu">
+    <div class="menuRow">
+      <div class="left">
+        <h1 class="title">Wormscape</h1>
+        <div class="muted">Eat fruit • Grow • Outsmart other worms</div>
+
+        <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px;">
+          <button id="playBtn" class="playBtn">Play</button>
+          <div style="color:var(--muted);font-size:13px;">Bots: <span id="botCountLabel">25</span></div>
+        </div>
+
+        <div class="panel" style="margin-top:8px;">
+          <div style="font-weight:700;margin-bottom:8px;">Presets</div>
+          <div class="skinGrid" id="skinGrid"></div>
+
+          <div class="inputRow" style="margin-top:12px;">
+            <label for="playerName" class="small" style="min-width:64px;color:var(--muted);">Name</label>
+            <input id="playerName" type="text" maxlength="20" placeholder="Enter name (saved)" />
+            <button id="saveName" class="playBtn" style="padding:8px 12px;font-size:13px;">Save</button>
+          </div>
+          <div style="margin-top:8px;color:var(--muted);font-size:12px;">Pick a name and it will be remembered locally.</div>
+        </div>
+      </div>
+
+      <div style="width:320px; display:flex; flex-direction:column; gap:10px;">
+        <div class="panel">
+          <div style="font-weight:700;margin-bottom:8px;">Device</div>
+          <div class="deviceRow">
+            <button class="deviceBtn" id="deviceAuto">Auto</button>
+            <button class="deviceBtn" id="deviceDesktop">Desktop</button>
+            <button class="deviceBtn" id="deviceMobile">Mobile</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div style="font-weight:700;margin-bottom:8px;">Performance</div>
+          <div style="font-size:13px;color:var(--muted);">LOD and lazy loading reduce lag when you grow. Bot count below.</div>
+          <div style="display:flex;gap:8px;margin-top:8px;align-items:center;">
+            <input id="botCount" type="range" min="8" max="40" value="25" />
+            <div style="width:36px;text-align:center;color:var(--muted);" id="botCountVal">25</div>
+          </div>
+        </div>
+
+        <div class="panel" style="text-align:center;color:var(--muted);font-size:12px;">
+          Tip: Some bots start large to simulate an ongoing match.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="mobileControls"><div class="joystick" id="joystick"></div></div>
+<button id="sprintBtn">Sprint</button>
+
+<div id="hud">
+  <div class="panel small">
+    <div>Players: <span id="players">—</span></div>
+    <div id="leaderboard" class="small">
+      <strong>Leaderboard</strong>
+      <ol id="leaders" style="padding-left:18px;margin:6px 0 0 0;"></ol>
+    </div>
+  </div>
+</div>
+
+<script>
+/* Complete, corrected Wormscape single-file build
+   - Fixed ordering and undefined references
+   - Bots with varied sizes and random names
+   - Player name input + save/load
+   - LOD, spawn ring, camera clamping
+*/
+
+(() => {
+  /* ---------- DOM refs ---------- */
+  const canvas = document.getElementById('c');
+  const ctx = canvas.getContext('2d', { alpha: false });
+  const menu = document.getElementById('menu');
+  const menuWrap = document.getElementById('menuWrap');
+  const playBtn = document.getElementById('playBtn');
+  const skinGrid = document.getElementById('skinGrid');
+  const botCountRange = document.getElementById('botCount');
+  const botCountVal = document.getElementById('botCountVal');
+  const botCountLabel = document.getElementById('botCountLabel');
+  const deviceAutoBtn = document.getElementById('deviceAuto');
+  const deviceDesktopBtn = document.getElementById('deviceDesktop');
+  const deviceMobileBtn = document.getElementById('deviceMobile');
+  const mobileControls = document.getElementById('mobileControls');
+  const sprintBtn = document.getElementById('sprintBtn');
+  const joystickEl = document.getElementById('joystick');
+  const playerNameInput = document.getElementById('playerName');
+  const saveNameBtn = document.getElementById('saveName');
+
+  /* ---------- Canvas sizing ---------- */
+  let W = canvas.width = innerWidth;
+  let H = canvas.height = innerHeight;
+  addEventListener('resize', () => { W = canvas.width = innerWidth; H = canvas.height = innerHeight; if(!state.running) drawMenuBackground(); });
+
+  /* ---------- Utilities ---------- */
+  const rand = (a,b) => Math.random()*(b-a)+a;
+  const clamp = (v,a,b) => Math.max(a,Math.min(b,v));
+  const lerp = (a,b,t) => a + (b-a)*t;
+  function angleDiff(a,b){ let d=b-a; while(d>Math.PI)d-=Math.PI*2; while(d<-Math.PI)d+=Math.PI*2; return d; }
+
+  /* ---------- World & grid ---------- */
+  const world = { width: 16000, height: 12000 };
+  const GRID_SIZE = 220;
+  const gridCols = Math.ceil(world.width / GRID_SIZE);
+  const gridRows = Math.ceil(world.height / GRID_SIZE);
+  function makeGrid(){ const g = new Array(gridCols * gridRows); for(let i=0;i<g.length;i++) g[i] = { fruits: [], segments: [] }; return g; }
+  function gridIndex(x,y){ const cx = Math.floor(x / GRID_SIZE); const cy = Math.floor(y / GRID_SIZE); if(cx < 0 || cy < 0 || cx >= gridCols || cy >= gridRows) return -1; return cy * gridCols + cx; }
+
+  /* ---------- Preset skins ---------- */
+  const PRESET_SKINS = [
+    { id:'classic', primary:'#6ee7b7', secondary:'#2bb673', eye:'#ffffff' },
+    { id:'red', primary:'#ff9aa2', secondary:'#b30000', eye:'#ffffff' },
+    { id:'blue', primary:'#9ad0ff', secondary:'#0b4f8a', eye:'#ffffff' },
+    { id:'earth', primary:'#c9b89b', secondary:'#6b4f2b', eye:'#ffffff' },
+    { id:'neon', primary:'#7dffea', secondary:'#3bff7a', eye:'#000000' },
+    { id:'sunset', primary:'#ffd36b', secondary:'#ff6b9a', eye:'#000000' },
+    { id:'violet', primary:'#d6a6ff', secondary:'#6b4fbd', eye:'#ffffff' },
+    { id:'ocean', primary:'#7fbfff', secondary:'#0b6b8a', eye:'#ffffff' },
+    { id:'sand', primary:'#f2e1b3', secondary:'#c9b89b', eye:'#000000' },
+    { id:'mint', primary:'#b8ffd6', secondary:'#2bb673', eye:'#000000' }
+  ];
+
+  /* ---------- Bot name generator ---------- */
+  const BOT_SYLLABLES = ['ka','zu','mi','ra','lo','ve','xi','ta','no','ri','sa','bo','ki','nu','pe','jo','la','fi','do','se'];
+  function randomBotName(){
+    const parts = Math.floor(rand(2,4));
+    let name = '';
+    for(let i=0;i<parts;i++){
+      name += BOT_SYLLABLES[Math.floor(rand(0,BOT_SYLLABLES.length))];
+    }
+    name = name.charAt(0).toUpperCase() + name.slice(1);
+    if(Math.random() < 0.28) name += Math.floor(rand(2,999));
+    return name;
+  }
+
+  /* ---------- State ---------- */
+  const state = {
+    worms: [],
+    fruits: new Map(),
+    fruitData: [],
+    player: null,
+    cam: { x:0, y:0, scale:1 },
+    running: false,
+    grid: makeGrid()
+  };
+
+  /* ---------- Persistence helpers ---------- */
+  function safeLoad(key){ try{ return JSON.parse(localStorage.getItem(key)); }catch(e){return null;} }
+  function safeSave(key,val){ try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){} }
+
+  /* ---------- Color helpers ---------- */
+  function hexToRgb(hex){ hex=hex.replace('#',''); const bigint=parseInt(hex,16); return {r:(bigint>>16)&255,g:(bigint>>8)&255,b:bigint&255}; }
+  function lerpColor(a,b,t){ const A=hexToRgb(a),B=hexToRgb(b); const r=Math.round(lerp(A.r,B.r,t)), g=Math.round(lerp(A.g,B.g,t)), bl=Math.round(lerp(A.b,B.b,t)); return `rgb(${r},${g},${bl})`; }
+
+  /* ---------- Constants for spawn/LOD behavior ---------- */
+  const BASE_LOAD_RADIUS = 1600;
+  const MIN_SPAWN_DIST = 220;
+  const AVOID_FRONT_ANGLE = 0.6;
+  const AVOID_FRONT_DIST = 420;
+
+  /* ---------- Fruit class ---------- */
+  class Fruit {
+    constructor(rec){
+      this.x = rec.x; this.y = rec.y; this.type = rec.type || 'normal';
+      this.size = (this.type === 'big') ? 12 : 7;
+      this.color = rec.color || '#fff';
+      this.id = rec.id || Math.random().toString(36).slice(2,9);
+      this._gridIndex = -1;
+    }
+    draw(ctx, cam, cheap=false){
+      const sx = (this.x - cam.x) * cam.scale + W/2;
+      const sy = (this.y - cam.y) * cam.scale + H/2;
+      if(sx < -40 || sx > W+40 || sy < -40 || sy > H+40) return;
+      ctx.save(); ctx.translate(sx,sy);
+      if(cheap){
+        ctx.fillStyle = this.color;
+        ctx.beginPath(); ctx.arc(0,0, Math.max(1, this.size*0.6*cam.scale), 0, Math.PI*2); ctx.fill();
+      } else {
+        const g = ctx.createRadialGradient(0,0,this.size*0.1,0,0,this.size*1.8);
+        g.addColorStop(0, this.color);
+        g.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(0,0,this.size*1.6,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#fff';
+        ctx.beginPath(); ctx.arc(0,0,this.size*0.6,0,Math.PI*2); ctx.fill();
+      }
+      ctx.restore();
+    }
+  }
+
+  /* ---------- Worm class ---------- */
+  class Worm {
+    constructor(opts){
+      this.id = opts.id || Math.random().toString(36).slice(2,9);
+      this.name = opts.name || 'Worm';
+      this.x = opts.x || rand(0, world.width);
+      this.y = opts.y || rand(0, world.height);
+      this.angle = opts.angle || rand(0,Math.PI*2);
+      this.speed = opts.speed || 0;
+      this.baseSpeed = opts.baseSpeed || 1.45;
+      this.turnSpeed = opts.turnSpeed || 0.06;
+      this.segments = [];
+      this.segmentSpacing = 10;
+      this.length = opts.length || 20;
+      this.colorStops = opts.colorStops || ['#6ee7b7','#2bb673'];
+      this.eyeColor = opts.eyeColor || '#fff';
+      this.isBot = !!opts.isBot;
+      this.target = null;
+      this.alive = true;
+      this.score = opts.score || 0;
+      this.skin = opts.skin || 'classic';
+      this.headRadius = 12;
+      this.growQueue = 0;
+      this.maxSpeed = opts.maxSpeed || 4.2;
+      this.minSpeed = 0.5;
+      this.sprintAvailable = 1.0;
+      this.sprinting = false;
+      for(let i=0;i<this.length;i++){
+        this.segments.push({x:this.x - Math.cos(this.angle)*i*this.segmentSpacing, y:this.y - Math.sin(this.angle)*i*this.segmentSpacing});
+      }
+    }
+    update(dt, input, worldState){
+      if(!this.alive) return;
+      if(!this.isBot){
+        const desired = input.desiredAngle;
+        const d = angleDiff(this.angle, desired);
+        this.angle += clamp(d, -this.turnSpeed*dt*60, this.turnSpeed*dt*60);
+        const sprinting = input.sprint && this.sprintAvailable > 0.05;
+        const accel = input.accelerate ? 0.06 : 0.02;
+        const sprintMult = sprinting ? 1.9 : 1.0;
+        this.speed = clamp(this.speed + accel*dt*60, this.minSpeed, this.maxSpeed * sprintMult);
+        if(sprinting) this.sprintAvailable = clamp(this.sprintAvailable - dt * 0.6, 0, 1);
+        else this.sprintAvailable = clamp(this.sprintAvailable + dt * 0.25, 0, 1);
+      } else {
+        this.botAI(dt, worldState);
+      }
+      this.x += Math.cos(this.angle) * this.speed * dt * 60;
+      this.y += Math.sin(this.angle) * this.speed * dt * 60;
+      this.x = (this.x + world.width) % world.width;
+      this.y = (this.y + world.height) % world.height;
+      this.segments.unshift({x:this.x, y:this.y});
+      while(this.segments.length > this.length + this.growQueue) this.segments.pop();
+      if(this.growQueue>0){ this.length += 1; this.growQueue -= 1; this.score += 1; }
+    }
+    botAI(dt, worldState){
+      if(Math.random() < 0.02) this.target = null;
+      if(!this.target){
+        if(Math.random() < 0.6){
+          const nearby = queryFruitRecsInRadius(this.x, this.y, 700);
+          if(nearby.length) this.target = nearby[Math.floor(rand(0, nearby.length))];
+        } else {
+          this.angle += rand(-0.6,0.6) * dt;
+        }
+      }
+      if(this.target){
+        const desired = Math.atan2(this.target.y - this.y, this.target.x - this.x);
+        const d = angleDiff(this.angle, desired);
+        this.angle += clamp(d, -this.turnSpeed*dt*30, this.turnSpeed*dt*30);
+        const dlen = Math.hypot(this.target.x - this.x, this.target.y - this.y);
+        this.speed = clamp(lerp(this.speed, this.baseSpeed + (dlen>200?0.8:0.2), 0.02*dt*60), this.minSpeed, this.maxSpeed);
+      }
+      for(const other of worldState.worms){
+        if(other===this||!other.alive) continue;
+        const d = Math.hypot(other.x-this.x, other.y-this.y);
+        if(d<60){ const away = Math.atan2(this.y-other.y, this.x-other.x); const dd = angleDiff(this.angle, away); this.angle += clamp(dd, -this.turnSpeed*dt*40, this.turnSpeed*dt*40); }
+      }
+    }
+    grow(amount=3){ this.growQueue += amount; }
+    draw(ctx, cam){
+      if(!this.alive) return;
+      for(let i=this.segments.length-1;i>=0;i--){
+        const s=this.segments[i]; const t=i/Math.max(1,this.segments.length-1);
+        const px=(s.x-cam.x)*cam.scale+W/2; const py=(s.y-cam.y)*cam.scale+H/2;
+        if(px < -40 || px > W+40 || py < -40 || py > H+40) continue;
+        const segRadius=this.headRadius*(1-0.5*t)*cam.scale;
+        const col=this.getSegmentColor(t);
+        ctx.beginPath(); ctx.fillStyle=col; ctx.shadowColor='rgba(0,0,0,0.18)'; ctx.shadowBlur=4*cam.scale; ctx.arc(px,py,segRadius,0,Math.PI*2); ctx.fill(); ctx.shadowBlur=0;
+        ctx.beginPath(); ctx.fillStyle=this.getStripeColor(t); ctx.ellipse(px-segRadius*0.2,py-segRadius*0.2,segRadius*0.6,segRadius*0.35,0,0,Math.PI*2); ctx.fill();
+      }
+      const head=this.segments[0]; const hx=(head.x-cam.x)*cam.scale+W/2; const hy=(head.y-cam.y)*cam.scale+H/2; const hr=this.headRadius*cam.scale;
+      if(!(hx < -80 || hx > W+80 || hy < -80 || hy > H+80)){
+        const g=ctx.createRadialGradient(hx-hr*0.3,hy-hr*0.3,hr*0.1,hx,hy,hr*1.6); g.addColorStop(0,this.colorStops[0]); g.addColorStop(1,this.colorStops[1]);
+        ctx.fillStyle=g; ctx.beginPath(); ctx.ellipse(hx,hy,hr*1.2,hr,this.angle,0,Math.PI*2); ctx.fill();
+        const eyeOffset=hr*0.6; const eyeSize=Math.max(2,hr*0.25);
+        const leftEyeX=hx+Math.cos(this.angle+Math.PI/2)*eyeOffset; const leftEyeY=hy+Math.sin(this.angle+Math.PI/2)*eyeOffset;
+        const rightEyeX=hx+Math.cos(this.angle-Math.PI/2)*eyeOffset; const rightEyeY=hy+Math.sin(this.angle-Math.PI/2)*eyeOffset;
+        ctx.fillStyle=this.eyeColor; ctx.beginPath(); ctx.arc(leftEyeX,leftEyeY,eyeSize,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(rightEyeX,rightEyeY,eyeSize,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle='#000'; const pupilOffset=hr*0.08; ctx.beginPath(); ctx.arc(leftEyeX+Math.cos(this.angle)*pupilOffset,leftEyeY+Math.sin(this.angle)*pupilOffset,eyeSize*0.45,0,Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(rightEyeX+Math.cos(this.angle)*pupilOffset,rightEyeY+Math.sin(this.angle)*pupilOffset,eyeSize*0.45,0,Math.PI*2); ctx.fill();
+        ctx.strokeStyle='rgba(0,0,0,0.28)'; ctx.lineWidth=Math.max(1,hr*0.08); ctx.beginPath(); ctx.moveTo(hx+Math.cos(this.angle-0.2)*hr*0.2,hy+Math.sin(this.angle-0.2)*hr*0.2); ctx.lineTo(hx+Math.cos(this.angle+0.2)*hr*0.2,hy+Math.sin(this.angle+0.2)*hr*0.2); ctx.stroke();
+      }
+    }
+    getSegmentColor(t){ return lerpColor(this.colorStops[0], this.colorStops[1], t); }
+    getStripeColor(t){ return 'rgba(255,255,255,0.06)'; }
+  }
+
+  /* ---------- Grid helpers for fruits ---------- */
+  function addFruitObjToGrid(f){
+    const idx = gridIndex(f.x, f.y);
+    if(idx >= 0){
+      const cell = state.grid[idx];
+      const CELL_CAP = 36;
+      if(cell.fruits.length >= CELL_CAP) return false;
+      cell.fruits.push(f);
+      f._gridIndex = idx;
+      return true;
+    }
+    return false;
+  }
+  function removeFruitObjFromGrid(f){
+    const idx = f._gridIndex;
+    if(idx >= 0){
+      const arr = state.grid[idx].fruits;
+      const i = arr.indexOf(f);
+      if(i>=0) arr.splice(i,1);
+      f._gridIndex = -1;
+    }
+  }
+
+  /* ---------- LOD & lazy load ---------- */
+  function getLoadRadius(){
+    const s = state.cam.scale || 1;
+    const mult = lerp(0.6, 1.2, (s - 0.45) / (1 - 0.45));
+    return BASE_LOAD_RADIUS * mult;
+  }
+
+  function lazyLoadFruitsAround(camX, camY){
+    const LOAD_RADIUS = getLoadRadius();
+    const player = state.player;
+    for(let i=0;i<state.fruitData.length;i++){
+      const rec = state.fruitData[i];
+      const dx = Math.abs(rec.x - camX);
+      const dy = Math.abs(rec.y - camY);
+      const wx = Math.min(dx, world.width - dx);
+      const wy = Math.min(dy, world.height - dy);
+      const d = Math.hypot(wx, wy);
+      if(d <= LOAD_RADIUS){
+        if(!state.fruits.has(rec.id)){
+          if(player){
+            const pdx = Math.abs(rec.x - player.x);
+            const pdy = Math.abs(rec.y - player.y);
+            const pwx = Math.min(pdx, world.width - pdx);
+            const pwy = Math.min(pdy, world.height - pdy);
+            const pdist = Math.hypot(pwx, pwy);
+            if(pdist < MIN_SPAWN_DIST) continue;
+            const angleToFruit = Math.atan2(rec.y - player.y, rec.x - player.x);
+            const aDiff = Math.abs(angleDiff(player.angle, angleToFruit));
+            if(aDiff < AVOID_FRONT_ANGLE && pdist < AVOID_FRONT_DIST) continue;
+          }
+          const f = new Fruit(rec);
+          if(addFruitObjToGrid(f)) state.fruits.set(rec.id, f);
+        }
+      } else {
+        if(state.fruits.has(rec.id)){
+          const fobj = state.fruits.get(rec.id);
+          removeFruitObjFromGrid(fobj);
+          state.fruits.delete(rec.id);
+        }
+      }
+    }
+  }
+
+  function queryFruitRecsInRadius(x,y,radius){
+    const results = [];
+    const r2 = radius*radius;
+    for(const rec of state.fruitData){
+      const dx = Math.abs(rec.x - x);
+      const dy = Math.abs(rec.y - y);
+      const wx = Math.min(dx, world.width - dx);
+      const wy = Math.min(dy, world.height - dy);
+      if(wx*wx + wy*wy <= r2) results.push(rec);
+    }
+    return results;
+  }
+  function queryFruitObjsInRadius(x,y,radius){
+    const results = [];
+    const minX = Math.floor((x - radius) / GRID_SIZE);
+    const maxX = Math.floor((x + radius) / GRID_SIZE);
+    const minY = Math.floor((y - radius) / GRID_SIZE);
+    const maxY = Math.floor((y + radius) / GRID_SIZE);
+    for(let gx = minX; gx <= maxX; gx++){
+      for(let gy = minY; gy <= maxY; gy++){
+        if(gx < 0 || gy < 0 || gx >= gridCols || gy >= gridRows) continue;
+        const idx = gy * gridCols + gx;
+        const cell = state.grid[idx];
+        for(const f of cell.fruits) results.push(f);
+      }
+    }
+    return results;
+  }
+
+  /* ---------- Persistent fruit records ---------- */
+  function addFruitRecord(x,y,type){
+    const id = Math.random().toString(36).slice(2,9);
+    const color = PRESET_SKINS[Math.floor(rand(0,PRESET_SKINS.length))].primary;
+    const rec = { x, y, type, id, color };
+    state.fruitData.push(rec);
+    safeSave('wormscape_fruits_v4', state.fruitData);
+    const camX = state.cam.x, camY = state.cam.y;
+    const dx = Math.abs(x - camX), dy = Math.abs(y - camY);
+    const wx = Math.min(dx, world.width - dx), wy = Math.min(dy, world.height - dy);
+    if(Math.hypot(wx,wy) <= getLoadRadius()){
+      const f = new Fruit(rec);
+      if(addFruitObjToGrid(f)) state.fruits.set(rec.id, f);
+    }
+  }
+
+  function spawnNearPlayerRing(count, minDist=220, maxDist=700){
+    if(!state.player) return;
+    const p = state.player;
+    for(let i=0;i<count;i++){
+      let tries = 0;
+      while(tries++ < 12){
+        const angle = rand(0, Math.PI*2);
+        const forwardBias = Math.abs(angleDiff(angle, p.angle)) < 0.6 ? 0.9 : 1.0;
+        const dist = rand(minDist * forwardBias, maxDist);
+        const x = (p.x + Math.cos(angle)*dist + world.width) % world.width;
+        const y = (p.y + Math.sin(angle)*dist + world.height) % world.height;
+        addFruitRecord(x,y, Math.random() < 0.08 ? 'big' : 'normal');
+        break;
+      }
+    }
+  }
+
+  /* ---------- Segment grid rebuild ---------- */
+  function rebuildSegmentGrid(){
+    for(let i=0;i<state.grid.length;i++) state.grid[i].segments.length = 0;
+    for(const w of state.worms){
+      if(!w.alive) continue;
+      const step = Math.max(1, Math.floor(w.segments.length / 100));
+      for(let i=0;i<w.segments.length;i+=step){
+        const s = w.segments[i];
+        const idx = gridIndex(s.x, s.y);
+        if(idx >= 0) state.grid[idx].segments.push({x:s.x, y:s.y, owner:w});
+      }
+    }
+  }
+
+  /* ---------- Create player & bots ---------- */
+  function applySkinToWorm(w, spec){
+    w.colorStops = [spec.primary, spec.secondary || spec.primary];
+    w.eyeColor = spec.eye || '#fff';
+    w.skin = spec.id || 'preset';
+  }
+  function createPlayer(spec, name){
+    const p = new Worm({ id:'player', name: name || 'You', x:world.width/2, y:world.height/2, length:28, baseSpeed:1.45, skin:spec.id || 'custom' });
+    applySkinToWorm(p, spec);
+    p.isBot = false;
+    state.player = p;
+    state.worms.push(p);
+    return p;
+  }
+  function createBot(name){
+    const pick = PRESET_SKINS[Math.floor(rand(0,PRESET_SKINS.length))];
+    const r = Math.random();
+    let length;
+    if(r < 0.45) length = Math.floor(rand(10,26));
+    else if(r < 0.78) length = Math.floor(rand(26,48));
+    else if(r < 0.95) length = Math.floor(rand(48,92));
+    else length = Math.floor(rand(92,160));
+    const score = Math.floor(length * rand(0.6,1.2));
+    const b = new Worm({ name:name || randomBotName(), x:rand(0,world.width), y:rand(0,world.height), length: length, isBot:true, baseSpeed:1.05 + Math.max(0, (40-length)/200), maxSpeed:3.2, score: score });
+    applySkinToWorm(b, pick);
+    for(let i=0;i<b.segments.length;i++){
+      b.segments[i].x += rand(-b.segmentSpacing*2, b.segmentSpacing*2);
+      b.segments[i].y += rand(-b.segmentSpacing*2, b.segmentSpacing*2);
+    }
+    state.worms.push(b);
+    return b;
+  }
+
+  /* ---------- Input ---------- */
+  const input = { mouseX: W/2, mouseY: H/2, desiredAngle: 0, accelerate:false, sprint:false };
+  window.addEventListener('mousemove', (e)=>{ input.mouseX = e.clientX; input.mouseY = e.clientY; updateDesiredAngle(); });
+  window.addEventListener('touchmove', (e)=>{ const t = e.touches[0]; if(t){ input.mouseX = t.clientX; input.mouseY = t.clientY; updateDesiredAngle(); } }, {passive:false});
+  window.addEventListener('keydown', (e)=>{ if(e.key === 'w' || e.key === 'ArrowUp') input.accelerate = true; if(e.key === 's' || e.key === 'ArrowDown') input.accelerate = false; if(e.key === 'Shift') input.sprint = true; if(e.key === 'r') respawnPlayer(); });
+  window.addEventListener('keyup', (e)=>{ if(e.key === 'w' || e.key === 'ArrowUp') input.accelerate = false; if(e.key === 'Shift') input.sprint = false; });
+
+  function updateDesiredAngle(){
+    const cam = state.cam;
+    const worldX = cam.x + (input.mouseX - W/2)/cam.scale;
+    const worldY = cam.y + (input.mouseY - H/2)/cam.scale;
+    if(state.player) input.desiredAngle = Math.atan2(worldY - state.player.y, worldX - state.player.x);
+  }
+
+  /* ---------- Joystick (basic) ---------- */
+  let joystickActive = false, joyPointerId = null;
+  function enableJoystick(){
+    if(joystickEl){
+      mobileControls.style.display = 'block';
+      sprintBtn.style.display = 'block';
+      joystickEl.addEventListener('touchstart', onJoyStart, {passive:false});
+      joystickEl.addEventListener('touchmove', onJoyMove, {passive:false});
+      joystickEl.addEventListener('touchend', onJoyEnd, {passive:false});
+      joystickEl.addEventListener('mousedown', onJoyMouseStart);
+      window.addEventListener('mousemove', onJoyMouseMove);
+      window.addEventListener('mouseup', onJoyMouseEnd);
+    }
+  }
+  function disableJoystick(){
+    if(joystickEl){
+      mobileControls.style.display = 'none';
+      sprintBtn.style.display = 'none';
+      joystickEl.removeEventListener('touchstart', onJoyStart);
+      joystickEl.removeEventListener('touchmove', onJoyMove);
+      joystickEl.removeEventListener('touchend', onJoyEnd);
+      joystickEl.removeEventListener('mousedown', onJoyMouseStart);
+      window.removeEventListener('mousemove', onJoyMouseMove);
+      window.removeEventListener('mouseup', onJoyMouseEnd);
+    }
+  }
+  function onJoyStart(e){ e.preventDefault(); const t = e.changedTouches[0]; joyPointerId = t.identifier; joystickActive = true; input.accelerate = true; }
+  function onJoyMove(e){ e.preventDefault(); if(!joystickActive) return; for(const t of e.changedTouches){ if(t.identifier === joyPointerId){ const cam = state.cam; const worldX = cam.x + (t.clientX - W/2)/cam.scale; const worldY = cam.y + (t.clientY - H/2)/cam.scale; if(state.player) input.desiredAngle = Math.atan2(worldY - state.player.y, worldX - state.player.x); break; } } }
+  function onJoyEnd(e){ e.preventDefault(); joystickActive = false; joyPointerId = null; input.accelerate = false; }
+  function onJoyMouseStart(e){ joystickActive = true; input.accelerate = true; }
+  function onJoyMouseMove(e){ if(!joystickActive) return; const cam = state.cam; const worldX = cam.x + (e.clientX - W/2)/cam.scale; const worldY = cam.y + (e.clientY - H/2)/cam.scale; if(state.player) input.desiredAngle = Math.atan2(worldY - state.player.y, worldX - state.player.x); }
+  function onJoyMouseEnd(e){ joystickActive = false; input.accelerate = false; }
+
+  /* ---------- Game loop & rendering ---------- */
+  function rebuildSegmentGrid(){
+    for(let i=0;i<state.grid.length;i++) state.grid[i].segments.length = 0;
+    for(const w of state.worms){
+      if(!w.alive) continue;
+      const step = Math.max(1, Math.floor(w.segments.length / 100));
+      for(let i=0;i<w.segments.length;i+=step){
+        const s = w.segments[i];
+        const idx = gridIndex(s.x, s.y);
+        if(idx >= 0) state.grid[idx].segments.push({x:s.x, y:s.y, owner:w});
+      }
+    }
+  }
+
+  function gameTick(dt){
+    lazyLoadFruitsAround(state.cam.x, state.cam.y);
+    for(const w of state.worms) w.update(dt, input, state);
+    rebuildSegmentGrid();
+
+    // eat fruits
+    for(const w of state.worms){
+      if(!w.alive) continue;
+      const nearby = queryFruitObjsInRadius(w.x, w.y, 80);
+      for(let i=nearby.length-1;i>=0;i--){
+        const f = nearby[i];
+        if(Math.hypot(f.x - w.x, f.y - w.y) < (w.headRadius + f.size)){
+          removeFruitObjFromGrid(f);
+          state.fruits.delete(f.id);
+          removeFruitRecordById(f.id);
+          w.grow(f.type==='big'?6:2);
+          w.score += (f.type==='big'?6:2);
+        }
+      }
+    }
+
+    // collisions (nearby cells only)
+    for(const w of state.worms){
+      if(!w.alive) continue;
+      const hx = w.x, hy = w.y;
+      const cx = Math.floor(hx / GRID_SIZE), cy = Math.floor(hy / GRID_SIZE);
+      let died = false;
+      for(let gx = cx-1; gx <= cx+1 && !died; gx++){
+        for(let gy = cy-1; gy <= cy+1 && !died; gy++){
+          if(gx < 0 || gy < 0 || gx >= gridCols || gy >= gridRows) continue;
+          const cell = state.grid[gy * gridCols + gx];
+          for(const seg of cell.segments){
+            if(seg.owner === w) continue;
+            const d = Math.hypot(hx - seg.x, hy - seg.y);
+            if(d < seg.owner.headRadius * 0.9){
+              w.alive = false;
+              spawnOrbsFromBody(w);
+              if(w.id === 'player') onPlayerDeath();
+              died = true;
+              break;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  function spawnOrbsFromBody(w){
+    const count = Math.min(100, Math.floor(w.segments.length/1.0));
+    for(let j=0;j<count;j++){
+      const idx = Math.floor(rand(0, w.segments.length));
+      const seg = w.segments[idx];
+      const nx = (seg.x + rand(-18,18) + world.width) % world.width;
+      const ny = (seg.y + rand(-18,18) + world.height) % world.height;
+      const type = Math.random() < 0.12 ? 'big' : 'normal';
+      addFruitRecord(nx, ny, type);
+    }
+  }
+
+  function onPlayerDeath(){
+    state.running = false;
+    canvas.classList.add('blurred');
+    setTimeout(()=>{
+      menu.classList.add('show');
+      menuWrap.style.pointerEvents = 'auto';
+      canvas.style.pointerEvents = 'none';
+    }, 220);
+  }
+
+  function updateCamera(dt){
+    const p = state.player;
+    if(!p) return;
+    const maxMove = 120 * dt * 60;
+    const desiredX = p.x;
+    const desiredY = p.y;
+    const dx = desiredX - state.cam.x;
+    const dy = desiredY - state.cam.y;
+    const dist = Math.hypot(dx, dy);
+    if(dist > maxMove){
+      state.cam.x += dx / dist * maxMove;
+      state.cam.y += dy / dist * maxMove;
+    } else {
+      state.cam.x = lerp(state.cam.x, desiredX, 0.08);
+      state.cam.y = lerp(state.cam.y, desiredY, 0.08);
+    }
+
+    const viewHalfDiag = Math.hypot(W/2, H/2) / state.cam.scale;
+    const loadR = getLoadRadius();
+    const margin = 160;
+    if(viewHalfDiag > loadR - margin){
+      const targetScale = Math.hypot(W/2, H/2) / Math.max(1, loadR - margin);
+      state.cam.scale = Math.max(state.cam.scale, targetScale);
+    }
+
+    const halfW = (W/2) / state.cam.scale;
+    const halfH = (H/2) / state.cam.scale;
+    state.cam.x = clamp(state.cam.x, halfW, world.width - halfW);
+    state.cam.y = clamp(state.cam.y, halfH, world.height - halfH);
+  }
+
+  function drawBackground(ctx, cam){
+    ctx.fillStyle = '#07101a'; ctx.fillRect(0,0,W,H);
+    ctx.save(); ctx.globalAlpha = 0.12; ctx.fillStyle = '#0f2a3a';
+    const step = 160 * cam.scale; const ox = (cam.x % step); const oy = (cam.y % step);
+    for(let x=-step;x<W+step;x+=step){ for(let y=-step;y<H+step;y+=step){ ctx.beginPath(); ctx.arc(x+ox,y+oy,1.2,0,Math.PI*2); ctx.fill(); } }
+    ctx.restore();
+  }
+
+  function render(){
+    ctx.clearRect(0,0,W,H);
+    const cam = state.cam;
+    drawBackground(ctx, cam);
+
+    const cheap = cam.scale < 0.65;
+    const MAX_DRAWN_ORBS = cheap ? 600 : 1200;
+    let drawn = 0;
+    const renderRadius = getLoadRadius() * (cheap ? 0.9 : 1.2);
+
+    for(const f of state.fruits.values()){
+      if(drawn >= MAX_DRAWN_ORBS) break;
+      const dx = Math.abs(f.x - cam.x);
+      const dy = Math.abs(f.y - cam.y);
+      const wx = Math.min(dx, world.width - dx);
+      const wy = Math.min(dy, world.height - dy);
+      const d = Math.hypot(wx, wy);
+      if(d > renderRadius) continue;
+      f.draw(ctx, cam, cheap);
+      drawn++;
+    }
+
+    const sorted = [...state.worms].sort((a,b)=> (a.length - b.length));
+    for(const w of sorted) w.draw(ctx, cam);
+
+    ctx.save(); ctx.translate(W/2, H/2); ctx.strokeStyle = 'rgba(255,255,255,0.06)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(0,0,6,0,Math.PI*2); ctx.stroke(); ctx.restore();
+  }
+
+  function drawMenuBackground(){
+    ctx.clearRect(0,0,W,H);
+    const g = ctx.createRadialGradient(W*0.1, H*0.1, 0, W/2, H/2, Math.max(W,H));
+    g.addColorStop(0, '#07101a');
+    g.addColorStop(0.4, '#04101a');
+    g.addColorStop(1, '#02040a');
+    ctx.fillStyle = g;
+    ctx.fillRect(0,0,W,H);
+  }
+
+  function updateUI(){
+    document.getElementById('players').textContent = state.worms.filter(w=>w.alive).length;
+    const leaders = [...state.worms].sort((a,b)=>b.score-a.score).slice(0,6);
+    const ol = document.getElementById('leaders'); ol.innerHTML='';
+    for(const l of leaders){ const li=document.createElement('li'); li.textContent=`${l.name} ${l.alive? '':'(dead)'} — ${Math.floor(l.score)}`; ol.appendChild(li); }
+  }
+
+  /* ---------- Loop ---------- */
+  let last = performance.now();
+  function loop(now){
+    const dt = Math.min(0.033, (now - last)/1000); last = now;
+    if(state.running){ gameTick(dt); updateCamera(dt); render(); } else { drawMenuBackground(); }
+    updateUI();
+    requestAnimationFrame(loop);
+  }
+
+  /* ---------- UI wiring ---------- */
+  PRESET_SKINS.forEach((s,idx)=>{
+    const el = document.createElement('div');
+    el.className = 'skinTile' + (idx===0? ' sel':'');
+    el.style.background = `linear-gradient(90deg, ${s.primary}, ${s.secondary || s.primary})`;
+    el.dataset.idx = idx;
+    el.addEventListener('click', ()=>{
+      document.querySelectorAll('.skinTile').forEach(x=>x.classList.remove('sel'));
+      el.classList.add('sel');
+      selectedSkin = s;
+    });
+    skinGrid.appendChild(el);
+  });
+  let selectedSkin = PRESET_SKINS[0];
+
+  function setDeviceMode(mode){
+    deviceMode = mode;
+    deviceAutoBtn.classList.toggle('active', mode==='auto');
+    deviceDesktopBtn.classList.toggle('active', mode==='desktop');
+    deviceMobileBtn.classList.toggle('active', mode==='mobile');
+    applyDeviceMode();
+  }
+  deviceAutoBtn.addEventListener('click', ()=> setDeviceMode('auto'));
+  deviceDesktopBtn.addEventListener('click', ()=> setDeviceMode('desktop'));
+  deviceMobileBtn.addEventListener('click', ()=> setDeviceMode('mobile'));
+  let deviceMode = 'auto';
+  function detectMobile(){ const ua = navigator.userAgent || navigator.vendor || window.opera; return /android|iphone|ipad|ipod|mobile/i.test(ua); }
+  function applyDeviceMode(){
+    const isMobile = (deviceMode === 'mobile') || (deviceMode === 'auto' && detectMobile());
+    if(isMobile){ mobileControls.style.display = 'block'; sprintBtn.style.display = 'block'; enableJoystick(); } else { mobileControls.style.display = 'none'; sprintBtn.style.display = 'none'; disableJoystick(); }
+  }
+  setDeviceMode('auto');
+
+  botCountRange.addEventListener('input', ()=>{
+    botCountVal.textContent = botCountRange.value;
+    botCountLabel.textContent = botCountRange.value;
+  });
+
+  /* ---------- Name save/load ---------- */
+  const NAME_KEY = 'wormscape_player_name_v1';
+  function loadSavedName(){
+    const n = safeLoad(NAME_KEY);
+    if(n && typeof n === 'string' && n.trim().length) {
+      playerNameInput.value = n;
+      return n;
+    }
+    playerNameInput.value = '';
+    return '';
+  }
+  function saveName(){
+    const v = (playerNameInput.value || '').trim().slice(0,20);
+    if(v.length === 0) { alert('Please enter a name.'); return; }
+    safeSave(NAME_KEY, v);
+    alert('Name saved: ' + v);
+  }
+  saveNameBtn.addEventListener('click', saveName);
+  loadSavedName();
+
+  /* ---------- Play button ---------- */
+  playBtn.addEventListener('click', ()=>{
+    menu.classList.remove('show');
+    menuWrap.style.pointerEvents = 'none';
+    canvas.classList.remove('blurred');
+    canvas.style.pointerEvents = 'auto';
+    state.running = true;
+    state.worms = [];
+    state.grid = makeGrid();
+    state.cam.x = world.width/2; state.cam.y = world.height/2; state.cam.scale = 1;
+    lazyLoadFruitsAround(state.cam.x, state.cam.y);
+
+    const botCount = parseInt(botCountRange.value,10) || 25;
+    for(let i=0;i<botCount;i++) createBot();
+
+    const saved = loadSavedName();
+    const playerName = saved || ('You' + Math.floor(rand(1,999)));
+    createPlayer(selectedSkin, playerName);
+    state.cam.x = state.player.x; state.cam.y = state.player.y;
+    updateDesiredAngle();
+  });
+
+  /* ---------- Spawners ---------- */
+  setInterval(()=>{
+    const cap = 3500;
+    if(state.fruitData.length >= cap) return;
+    const batch = 18;
+    for(let i=0;i<batch;i++){
+      const x = rand(0, world.width);
+      const y = rand(0, world.height);
+      const type = Math.random() < 0.08 ? 'big' : 'normal';
+      addFruitRecord(x,y,type);
+    }
+  }, 900);
+
+  setInterval(()=>{
+    if(!state.player) return;
+    spawnNearPlayerRing(6, MIN_SPAWN_DIST, 700);
+  }, 1200);
+
+  setInterval(()=> safeSave('wormscape_fruits_v4', state.fruitData), 5000);
+
+  /* ---------- Helpers ---------- */
+  function respawnPlayer(){
+    if(!state.player) return;
+    const p = state.player;
+    p.x = rand(0, world.width); p.y = rand(0, world.height);
+    p.segments = [];
+    p.length = 20;
+    for(let i=0;i<p.length;i++) p.segments.push({x:p.x - Math.cos(p.angle)*i*p.segmentSpacing, y:p.y - Math.sin(p.angle)*i*p.segmentSpacing});
+    p.alive = true; p.score = 0;
+  }
+
+  (function initFruitData(){
+    const loaded = safeLoad('wormscape_fruits_v4');
+    if(loaded && loaded.length >= 200) state.fruitData = loaded;
+    else {
+      const initial = [];
+      const initialCount = Math.max(600, 800);
+      for(let i=0;i<initialCount;i++){
+        const x = rand(0, world.width);
+        const y = rand(0, world.height);
+        const type = Math.random() < 0.06 ? 'big' : 'normal';
+        const id = Math.random().toString(36).slice(2,9);
+        const color = PRESET_SKINS[Math.floor(rand(0,PRESET_SKINS.length))].primary;
+        initial.push({x,y,type,id,color});
+      }
+      state.fruitData = initial;
+      safeSave('wormscape_fruits_v4', state.fruitData);
+    }
+  })();
+
+  /* ---------- Start ---------- */
+  drawMenuBackground();
+  menu.classList.add('show');
+  menuWrap.style.pointerEvents = 'auto';
+  canvas.style.pointerEvents = 'none';
+  requestAnimationFrame(loop);
+
+  /* ---------- Debug API ---------- */
+  window._wormscape = {
+    state,
+    addFruitRecord,
+    removeFruitRecordById,
+    createBot,
+    createPlayer,
+    saveName: () => saveName(),
+    loadSavedName: () => loadSavedName()
+  };
+
+  function removeFruitRecordById(id){
+    const idx = state.fruitData.findIndex(r => r.id === id);
+    if(idx >= 0){
+      state.fruitData.splice(idx,1);
+      safeSave('wormscape_fruits_v4', state.fruitData);
+    }
+  }
+
+})(); // 
+</script>
+</body>
+</html>

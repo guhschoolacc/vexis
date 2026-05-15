@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Bubble Shooter — Full Width Fixed</title>
+<style>
+  :root{--bg:#071022;--btn:#1f2937;--text:#e6eef8;}
+  html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text);}
+  .container{position:relative;width:100vw;height:100vh;overflow:hidden;}
+  .back-btn{position:absolute;left:12px;top:12px;background:var(--btn);color:var(--text);border:none;padding:8px 12px;border-radius:6px;cursor:pointer;font-weight:600;text-decoration:none;display:inline-flex;align-items:center;gap:8px;z-index:40;}
+  .hud{position:absolute;right:12px;top:12px;display:flex;gap:12px;align-items:center;z-index:40;}
+  .hud .box{background:rgba(255,255,255,0.03);padding:8px 12px;border-radius:8px;font-weight:700;color:var(--text);}
+  canvas{display:block;width:100vw;height:100vh;}
+  .controls{position:absolute;left:12px;bottom:12px;z-index:40;display:flex;gap:8px;align-items:center;}
+  .btn{background:var(--btn);color:var(--text);border:none;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:600;}
+  canvas, body { cursor: crosshair; }
+</style>
+</head>
+<body>
+  <div class="container" id="app">
+    
+    <div class="hud">
+      <div class="box">Score: <span id="score">0</span></div>
+      <div class="box">Bubbles: <span id="remaining">0</span></div>
+    </div>
+
+    <canvas id="game"></canvas>
+
+    <div class="controls">
+      <button id="restart" class="btn">Restart</button>
+      <div class="small">Aim with mouse, click or press Space to shoot</div>
+    </div>
+  </div>
+
+<script>
+/* Full-width Bubble Shooter — corrected initialization & DPI scaling */
+
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+const scoreEl = document.getElementById('score');
+const remainingEl = document.getElementById('remaining');
+const restartBtn = document.getElementById('restart');
+
+let DPR = Math.max(1, window.devicePixelRatio || 1);
+
+function setCanvasSize(){
+  DPR = Math.max(1, window.devicePixelRatio || 1);
+  const cssW = window.innerWidth;
+  const cssH = window.innerHeight;
+  canvas.style.width = cssW + 'px';
+  canvas.style.height = cssH + 'px';
+  canvas.width = Math.round(cssW * DPR);
+  canvas.height = Math.round(cssH * DPR);
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0); // draw in CSS pixels
+}
+setCanvasSize();
+window.addEventListener('resize', onResize);
+
+function onResize(){
+  setCanvasSize();
+  recalcLayout();
+  resetGame(true); // rebuild grid with new layout
+}
+
+/* Layout & grid parameters */
+const ROWS = 10;
+let COLS = 12;
+let R = 22; // will be recalculated
+const GAP = 2;
+let CELL_W = 0;
+let CELL_H = 0;
+let OFFSET_X = 40;
+let OFFSET_Y = 40;
+
+const COLORS = ['#ff6b6b','#ffd166','#6bcB77','#4d96ff','#b388eb','#ff9f1c'];
+let grid = [];
+let score = 0;
+
+let shooter = { x: null, y: null, angle: -Math.PI/2, speed: 900, ball: null, nextColor: undefined };
+let mouse = { x:0, y:0 };
+let particles = [];
+let fullscreenPulse = null;
+
+function recalcLayout(){
+  const cssW = window.innerWidth;
+  const cssH = window.innerHeight;
+  // scale radius to viewport but clamp
+  R = Math.max(10, Math.min(36, Math.floor(Math.min(cssW, cssH) / 40)));
+  CELL_W = R*2 + GAP;
+  CELL_H = Math.sqrt(3)*R + GAP*0.2;
+  // compute columns to fill width with a small margin
+  const margin = 80;
+  COLS = Math.max(6, Math.floor((cssW - margin) / CELL_W));
+  // center grid horizontally
+  const gridWidth = COLS * CELL_W;
+  OFFSET_X = Math.max(12, Math.floor((cssW - gridWidth) / 2));
+  // small top offset so bubbles are visible
+  OFFSET_Y = Math.max(12, Math.floor(cssH * 0.05));
+  // shooter position
+  shooter.x = Math.floor(cssW / 2);
+  shooter.y = Math.floor(cssH - Math.max(60, Math.floor(cssH * 0.08)));
+}
+
+// ensure layout is computed before grid init
+recalcLayout();
+
+function initGrid(){
+  grid = [];
+  for(let r=0;r<ROWS;r++){
+    grid[r] = [];
+    for(let c=0;c<COLS;c++){
+      // fill top rows with bubbles
+      if(r < 5){
+        grid[r][c] = Math.floor(Math.random()*COLORS.length);
+      } else {
+        grid[r][c] = null;
+      }
+    }
+  }
+  updateRemaining();
+}
+
+function updateRemaining(){
+  let count = 0;
+  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) if(grid[r][c] !== null) count++;
+  remainingEl.textContent = count;
+}
+
+function draw(){
+  // clear
+  ctx.clearRect(0,0,canvas.width/DPR,canvas.height/DPR);
+  // background
+  const g = ctx.createLinearGradient(0,0,0,canvas.height/DPR);
+  g.addColorStop(0,'#071022'); g.addColorStop(1,'#081226');
+  ctx.fillStyle = g;
+  ctx.fillRect(0,0,canvas.width/DPR,canvas.height/DPR);
+
+  // draw grid bubbles
+  for(let r=0;r<ROWS;r++){
+    for(let c=0;c<COLS;c++){
+      const col = grid[r][c];
+      if(col === null) continue;
+      const p = cellToPixel(r,c);
+      drawBubble(p.x, p.y, R, COLORS[col]);
+    }
+  }
+
+  // particles
+  for(const p of particles){
+    ctx.globalAlpha = p.alpha;
+    drawBubble(p.x, p.y, p.size, p.color);
+    ctx.globalAlpha = 1;
+  }
+
+  // fullscreen pulse
+  if(fullscreenPulse){
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.globalAlpha = fullscreenPulse.alpha;
+    const grad = ctx.createRadialGradient(fullscreenPulse.x, fullscreenPulse.y, fullscreenPulse.r*0.1, fullscreenPulse.x, fullscreenPulse.y, fullscreenPulse.r);
+    grad.addColorStop(0, lighten(fullscreenPulse.color, 0.25));
+    grad.addColorStop(1, fullscreenPulse.color);
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(fullscreenPulse.x, fullscreenPulse.y, fullscreenPulse.r, 0, Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // shooter aim line
+  ctx.save();
+  ctx.translate(shooter.x, shooter.y);
+  ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(0,0);
+  const aimX = Math.cos(shooter.angle)*2000;
+  const aimY = Math.sin(shooter.angle)*2000;
+  ctx.lineTo(aimX, aimY);
+  ctx.stroke();
+  ctx.restore();
+
+  // shooter ball
+  if(shooter.ball){
+    drawBubble(shooter.ball.x, shooter.ball.y, R, COLORS[shooter.ball.color]);
+  } else {
+    if(shooter.nextColor === undefined) shooter.nextColor = Math.floor(Math.random()*COLORS.length);
+    drawBubble(shooter.x, shooter.y, R+2, COLORS[shooter.nextColor]);
+  }
+}
+
+function drawBubble(x,y,r,color){
+  ctx.beginPath();
+  const g = ctx.createRadialGradient(x - r*0.35, y - r*0.35, Math.max(1,r*0.08), x, y, r);
+  g.addColorStop(0, lighten(color,0.18));
+  g.addColorStop(1, color);
+  ctx.fillStyle = g;
+  ctx.arc(x,y,r,0,Math.PI*2);
+  ctx.fill();
+  ctx.lineWidth = Math.max(1, r*0.06);
+  ctx.strokeStyle = 'rgba(0,0,0,0.25)';
+  ctx.stroke();
+}
+
+function lighten(hex, amt){
+  const c = hex.replace('#','');
+  const num = parseInt(c,16);
+  let r = (num>>16) + Math.round(255*amt);
+  let g = ((num>>8)&0x00FF) + Math.round(255*amt);
+  let b = (num&0x0000FF) + Math.round(255*amt);
+  r = Math.min(255, r); g = Math.min(255,g); b = Math.min(255,b);
+  return '#' + ((1<<24) + (r<<16) + (g<<8) + b).toString(16).slice(1);
+}
+
+function cellToPixel(r,c){
+  const offset = (r % 2 === 1) ? (CELL_W/2) : 0;
+  const x = OFFSET_X + c*CELL_W + offset + R;
+  const y = OFFSET_Y + r*CELL_H + R;
+  return { x, y };
+}
+
+function pixelToCell(x,y){
+  let best = null; let bestDist = Infinity;
+  for(let r=0;r<ROWS;r++){
+    for(let c=0;c<COLS;c++){
+      const p = cellToPixel(r,c);
+      const d = Math.hypot(p.x - x, p.y - y);
+      if(d < bestDist){ bestDist = d; best = {r,c,d}; }
+    }
+  }
+  return best;
+}
+
+function spawnBall(){
+  if(shooter.ball) return;
+  const color = shooter.nextColor !== undefined ? shooter.nextColor : Math.floor(Math.random()*COLORS.length);
+  shooter.nextColor = Math.floor(Math.random()*COLORS.length);
+  shooter.ball = { x: shooter.x, y: shooter.y, vx: Math.cos(shooter.angle)*shooter.speed, vy: Math.sin(shooter.angle)*shooter.speed, color };
+}
+
+function update(dt){
+  if(shooter.ball){
+    shooter.ball.x += shooter.ball.vx * dt;
+    shooter.ball.y += shooter.ball.vy * dt;
+    if(shooter.ball.x - R <= 0){ shooter.ball.x = R; shooter.ball.vx *= -1; }
+    else if(shooter.ball.x + R >= window.innerWidth){ shooter.ball.x = window.innerWidth - R; shooter.ball.vx *= -1; }
+    if(shooter.ball.y - R <= OFFSET_Y){
+      placeBallAt(shooter.ball.x, shooter.ball.y, shooter.ball.color);
+      shooter.ball = null; return;
+    }
+    for(let r=0;r<ROWS;r++){
+      for(let c=0;c<COLS;c++){
+        const col = grid[r][c]; if(col === null) continue;
+        const p = cellToPixel(r,c);
+        const d = Math.hypot(p.x - shooter.ball.x, p.y - shooter.ball.y);
+        if(d <= R*2 - 1){ placeBallAt(shooter.ball.x, shooter.ball.y, shooter.ball.color); shooter.ball = null; return; }
+      }
+    }
+    if(shooter.ball.y - R > window.innerHeight + 200) shooter.ball = null;
+  }
+
+  // particles
+  for(let i = particles.length - 1; i >= 0; i--){
+    const p = particles[i];
+    p.vy += 800 * dt * p.gravity;
+    p.x += p.vx * dt;
+    p.y += p.vy * dt;
+    p.alpha -= dt * p.fade;
+    p.size *= (1 - dt * 1.2);
+    p.life -= dt;
+    if(p.alpha <= 0 || p.life <= 0 || p.size <= 0.5) particles.splice(i,1);
+  }
+
+  // fullscreen pulse
+  if(fullscreenPulse){
+    fullscreenPulse.life -= dt;
+    fullscreenPulse.r += fullscreenPulse.growth * dt;
+    fullscreenPulse.alpha = Math.max(0, fullscreenPulse.life / fullscreenPulse.ttl);
+    if(fullscreenPulse.life <= 0) fullscreenPulse = null;
+  }
+}
+
+function placeBallAt(px,py,color){
+  const cell = pixelToCell(px,py);
+  if(!cell) return;
+  let {r,c} = cell;
+  c = Math.max(0, Math.min(COLS-1, c));
+  if(grid[r][c] !== null){
+    const neighbors = getNeighbors(r,c);
+    let placed = false;
+    for(const n of neighbors){
+      if(n.r>=0 && n.r<ROWS && n.c>=0 && n.c<COLS && grid[n.r][n.c] === null){ r = n.r; c = n.c; placed = true; break; }
+    }
+    if(!placed){
+      let best=null, bd=Infinity;
+      for(let rr=0;rr<ROWS;rr++) for(let cc=0;cc<COLS;cc++){
+        if(grid[rr][cc] === null){
+          const p = cellToPixel(rr,cc);
+          const d = Math.hypot(p.x - px, p.y - py);
+          if(d < bd){ bd = d; best = {rr,cc}; }
+        }
+      }
+      if(best){ r = best.rr; c = best.cc; }
+    }
+  }
+  grid[r][c] = color;
+  updateRemaining();
+  const cluster = floodFill(r,c,grid[r][c]);
+  if(cluster.length >= 3){
+    for(const cell of cluster) spawnPopParticles(cell.r, cell.c, COLORS[grid[cell.r][cell.c]]);
+    for(const cell of cluster) grid[cell.r][cell.c] = null;
+    score += cluster.length * 10; scoreEl.textContent = score;
+    const avg = cluster.reduce((acc,cur)=>{ const p=cellToPixel(cur.r,cur.c); acc.x+=p.x; acc.y+=p.y; return acc; }, {x:0,y:0});
+    avg.x /= cluster.length; avg.y /= cluster.length;
+    triggerFullscreenPulse(avg.x, avg.y, COLORS[color]);
+    removeFloating();
+  }
+  updateRemaining();
+}
+
+function getNeighbors(r,c){
+  const even = (r % 2 === 0);
+  const neighbors = [{r:r,c:c-1},{r:r,c:c+1},{r:r-1,c:c},{r:r+1,c:c}];
+  if(even) neighbors.push({r:r-1,c:c-1},{r:r+1,c:c-1});
+  else neighbors.push({r:r-1,c:c+1},{r:r+1,c:c+1});
+  return neighbors;
+}
+
+function floodFill(sr,sc,color){
+  const visited = {}; const stack = [{r:sr,c:sc}]; const out = [];
+  while(stack.length){
+    const cur = stack.pop(); const key = cur.r+','+cur.c;
+    if(visited[key]) continue; visited[key]=true;
+    if(cur.r<0||cur.r>=ROWS||cur.c<0||cur.c>=COLS) continue;
+    if(grid[cur.r][cur.c] !== color) continue;
+    out.push(cur);
+    const neigh = getNeighbors(cur.r,cur.c);
+    for(const n of neigh) stack.push(n);
+  }
+  return out;
+}
+
+function removeFloating(){
+  const connected = {}; const stack = [];
+  for(let c=0;c<COLS;c++) if(grid[0][c] !== null) stack.push({r:0,c});
+  while(stack.length){
+    const cur = stack.pop(); const key = cur.r+','+cur.c;
+    if(connected[key]) continue; connected[key]=true;
+    const neigh = getNeighbors(cur.r,cur.c);
+    for(const n of neigh){
+      if(n.r<0||n.r>=ROWS||n.c<0||n.c>=COLS) continue;
+      if(grid[n.r][n.c] !== null){
+        const k2 = n.r+','+n.c; if(!connected[k2]) stack.push(n);
+      }
+    }
+  }
+  let removed = 0;
+  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
+    if(grid[r][c] !== null){
+      const key = r+','+c;
+      if(!connected[key]){ spawnPopParticles(r,c, COLORS[grid[r][c]]); grid[r][c] = null; removed++; }
+    }
+  }
+  if(removed>0){ score += removed * 5; scoreEl.textContent = score; }
+}
+
+function spawnPopParticles(r,c,color){
+  const p = cellToPixel(r,c);
+  const count = 10 + Math.floor(Math.random()*8);
+  for(let i=0;i<count;i++){
+    const angle = Math.random()*Math.PI*2;
+    const speed = 60 + Math.random()*220;
+    particles.push({
+      x: p.x + (Math.random()-0.5)*6,
+      y: p.y + (Math.random()-0.5)*6,
+      vx: Math.cos(angle)*speed,
+      vy: Math.sin(angle)*speed,
+      size: R * (0.35 + Math.random()*0.9),
+      color: color,
+      alpha: 1,
+      life: 0.6 + Math.random()*0.8,
+      fade: 1.2 + Math.random()*2.0,
+      gravity: 0.6 + Math.random()*0.9
+    });
+  }
+}
+
+function triggerFullscreenPulse(x,y,color){
+  const dx = Math.max(x, window.innerWidth - x);
+  const dy = Math.max(y, window.innerHeight - y);
+  const maxR = Math.hypot(dx, dy) * 1.05;
+  fullscreenPulse = { x, y, r: 0, maxR, color, alpha: 0.9, life: 0.9, ttl: 0.9, growth: maxR / 0.9 };
+}
+
+let last = performance.now();
+function loop(now){
+  const dt = Math.min(0.05, (now - last)/1000); last = now;
+  const dx = mouse.x - shooter.x; const dy = mouse.y - shooter.y;
+  shooter.angle = Math.atan2(dy,dx);
+  const minAngle = -Math.PI + 0.2; const maxAngle = -0.2;
+  if(shooter.angle < minAngle) shooter.angle = minAngle;
+  if(shooter.angle > maxAngle) shooter.angle = maxAngle;
+  update(dt); draw(); requestAnimationFrame(loop);
+}
+
+canvas.addEventListener('mousemove', (e)=>{
+  const rect = canvas.getBoundingClientRect();
+  mouse.x = e.clientX - rect.left;
+  mouse.y = e.clientY - rect.top;
+});
+
+canvas.addEventListener('click', (e)=> spawnBall());
+window.addEventListener('keydown', (e)=>{
+  if(e.code === 'Space'){ e.preventDefault(); spawnBall(); }
+  else if(e.key === 'r' || e.key === 'R') resetGame();
+});
+restartBtn.addEventListener('click', resetGame);
+
+function resetGame(preserveLayout){
+  score = 0; scoreEl.textContent = score;
+  shooter.ball = null; shooter.nextColor = Math.floor(Math.random()*COLORS.length);
+  particles = []; fullscreenPulse = null;
+  if(!preserveLayout) recalcLayout();
+  initGrid();
+}
+
+function start(){
+  recalcLayout();
+  shooter.nextColor = Math.floor(Math.random()*COLORS.length);
+  initGrid();
+  last = performance.now();
+  requestAnimationFrame(loop);
+}
+
+start();
+</script>
+</body>
+</html>

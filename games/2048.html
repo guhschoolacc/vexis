@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>2048</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap');
+
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: #faf8ef;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      user-select: none;
+    }
+
+    h1 {
+      font-size: 4rem;
+      font-weight: 900;
+      color: #776e65;
+      margin: 0;
+      line-height: 1;
+    }
+
+    .score-box {
+      background: #bbada0;
+      border-radius: 6px;
+      padding: 8px 16px;
+      text-align: center;
+      min-width: 70px;
+      position: relative;
+      overflow: hidden;
+    }
+    .score-label {
+      font-size: 0.65rem;
+      color: #eee4da;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .score-value {
+      font-size: 1.4rem;
+      font-weight: 900;
+      color: #fff;
+    }
+    .score-bump { animation: scoreBump 0.25s ease forwards; }
+    @keyframes scoreBump {
+      0%   { transform: scale(1); }
+      40%  { transform: scale(1.35); }
+      100% { transform: scale(1); }
+    }
+    .score-delta {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.85rem;
+      font-weight: 900;
+      color: #fff;
+      pointer-events: none;
+      animation: floatUp 0.75s ease forwards;
+    }
+    @keyframes floatUp {
+      0%   { opacity: 1; bottom: 4px; }
+      100% { opacity: 0; bottom: 36px; }
+    }
+
+    .btn {
+      background: #8f7a66;
+      color: #f9f6f2;
+      border: none;
+      border-radius: 6px;
+      padding: 10px 20px;
+      font-size: 1rem;
+      font-weight: 800;
+      font-family: 'Nunito', sans-serif;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+    }
+    .btn:hover  { background: #7a6658; }
+    .btn:active { transform: scale(0.95); }
+
+    /* Board */
+    #board {
+      background: #bbada0;
+      border-radius: 10px;
+      padding: 12px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      width: min(500px, 96vw);
+      aspect-ratio: 1 / 1;
+      position: relative;
+    }
+    .cell {
+      background: rgba(238, 228, 218, 0.35);
+      border-radius: 6px;
+    }
+
+    /* Tile container */
+    #tile-container {
+      position: absolute;
+      top: 12px; left: 12px; right: 12px; bottom: 12px;
+      pointer-events: none;
+    }
+
+    /* Tiles — NO transition by default; we add .sliding to enable it */
+    .tile {
+      position: absolute;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      z-index: 10;
+      /* transition is off until .sliding is applied */
+    }
+    .tile.sliding {
+      transition: top  0.13s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                  left 0.13s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    /* Spawn */
+    @keyframes tileAppear {
+      0%   { transform: scale(0);    opacity: 0; }
+      60%  { transform: scale(1.12); opacity: 1; }
+      100% { transform: scale(1);    opacity: 1; }
+    }
+    .tile.anim-new {
+      animation: tileAppear 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+
+    /* Merge pop — runs AFTER slide */
+    @keyframes tileMerge {
+      0%   { transform: scale(1); }
+      40%  { transform: scale(1.22); }
+      70%  { transform: scale(0.93); }
+      100% { transform: scale(1); }
+    }
+    .tile.anim-merge {
+      animation: tileMerge 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+      z-index: 20;
+    }
+
+    /* Overlay */
+    #overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(238,228,218,0);
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.4s, background 0.4s;
+    }
+    #overlay.show {
+      opacity: 1;
+      background: rgba(238,228,218,0.78);
+      pointer-events: all;
+    }
+    #overlay h2 {
+      font-size: 3rem;
+      font-weight: 900;
+      color: #776e65;
+      margin-bottom: 16px;
+      transform: translateY(-20px);
+      opacity: 0;
+      transition: transform 0.35s 0.15s, opacity 0.35s 0.15s;
+    }
+    #overlay .btn {
+      transform: translateY(-20px);
+      opacity: 0;
+      transition: transform 0.35s 0.25s, opacity 0.35s 0.25s;
+    }
+    #overlay.show h2,
+    #overlay.show .btn { transform: translateY(0); opacity: 1; }
+
+    /* Tile colours */
+    .t2    { background:#eee4da; color:#776e65; }
+    .t4    { background:#ede0c8; color:#776e65; }
+    .t8    { background:#f2b179; color:#f9f6f2; }
+    .t16   { background:#f59563; color:#f9f6f2; }
+    .t32   { background:#f67c5f; color:#f9f6f2; }
+    .t64   { background:#f65e3b; color:#f9f6f2; }
+    .t128  { background:#edcf72; color:#f9f6f2; }
+    .t256  { background:#edcc61; color:#f9f6f2; }
+    .t512  { background:#edc850; color:#f9f6f2; }
+    .t1024 { background:#edc53f; color:#f9f6f2; }
+    .t2048 { background:#edc22e; color:#f9f6f2; box-shadow: 0 0 28px 8px rgba(237,194,46,0.5); }
+    .t-super { background:#3c3a32; color:#f9f6f2; }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div style="width:min(500px,96vw);display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+    <h1>2048</h1>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end;">
+      <div class="score-box" id="score-box">
+        <div class="score-label">Score</div>
+        <div class="score-value" id="score">0</div>
+      </div>
+      <div class="score-box" id="best-box">
+        <div class="score-label">Best</div>
+        <div class="score-value" id="best">0</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sub-header -->
+  <div style="width:min(500px,96vw);display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+    <p style="color:#776e65;font-size:0.95rem;font-weight:700;margin:0;">Join tiles, get to <strong>2048!</strong></p>
+    <button class="btn" onclick="newGame()">New Game</button>
+  </div>
+
+  <!-- Board -->
+  <div id="board">
+    <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+    <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+    <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+    <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+    <div id="tile-container"></div>
+    <div id="overlay">
+      <h2 id="overlay-msg">Game Over!</h2>
+      <button class="btn" onclick="newGame()">Try Again</button>
+    </div>
+  </div>
+
+  <p style="color:#776e65;font-size:0.85rem;font-weight:700;margin-top:18px;text-align:center;">
+    Arrow keys / WASD to move &nbsp;·&nbsp; Swipe on mobile
+  </p>
+
+<script>
+  /* ═══════════════════════════════════════════════════════
+     Constants & state
+  ═══════════════════════════════════════════════════════ */
+  const GRID     = 4;
+  const GAP      = 12;   // px gap between cells
+  const PAD      = 12;   // px board padding
+  const SLIDE_MS = 130;  // must match CSS transition duration
+
+  let board;          // GRID×GRID number array (source of truth)
+  let tiles;          // Map<id, {el, r, c, val}>  — live tile registry
+  let nextId = 0;     // ever-increasing tile id
+  let score, best;
+  let animating  = false;
+  let wonAlready = false;
+
+  /* ═══════════════════════════════════════════════════════
+     Layout helpers
+  ═══════════════════════════════════════════════════════ */
+  function cellSize() {
+    const inner = document.getElementById('board').clientWidth - PAD * 2;
+    return (inner - GAP * (GRID - 1)) / GRID;
+  }
+  function cellPx(idx) { return idx * (cellSize() + GAP); }
+
+  function applyPos(el, r, c) {
+    el.style.top  = cellPx(r) + 'px';
+    el.style.left = cellPx(c) + 'px';
+  }
+
+  function applySize(el, val) {
+    const sz = cellSize();
+    el.style.width    = sz + 'px';
+    el.style.height   = sz + 'px';
+    el.style.fontSize = fontSize(val, sz);
+  }
+
+  function tileClass(val) {
+    return 'tile ' + (val > 2048 ? 't-super' : 't' + val);
+  }
+
+  function fontSize(val, sz) {
+    const n = String(val).length;
+    const b = sz * 0.42;
+    if (n <= 2) return b + 'px';
+    if (n === 3) return b * 0.75 + 'px';
+    if (n === 4) return b * 0.60 + 'px';
+    return b * 0.48 + 'px';
+  }
+
+  /* ═══════════════════════════════════════════════════════
+     Tile DOM factory
+  ═══════════════════════════════════════════════════════ */
+  function createTileEl(val, r, c) {
+    const el = document.createElement('div');
+    el.className = tileClass(val);
+    applySize(el, val);
+    applyPos(el, r, c);
+    el.textContent = val;
+    return el;
+  }
+
+  /* ═══════════════════════════════════════════════════════
+     Full re-render  (new game / resize)
+  ═══════════════════════════════════════════════════════ */
+  function fullRender(animate) {
+    const container = document.getElementById('tile-container');
+    container.innerHTML = '';
+    tiles = new Map();
+
+    for (let r = 0; r < GRID; r++) {
+      for (let c = 0; c < GRID; c++) {
+        const val = board[r][c];
+        if (!val) continue;
+        const id = nextId++;
+        const el = createTileEl(val, r, c);
+        if (animate) el.classList.add('anim-new');
+        container.appendChild(el);
+        tiles.set(id, { el, r, c, val });
+      }
+    }
+  }
+
+  function repositionAll() {
+    if (!tiles) return;
+    for (const [, t] of tiles) {
+      applySize(t.el, t.val);
+      applyPos(t.el, t.r, t.c);
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════
+     Score UI
+  ═══════════════════════════════════════════════════════ */
+  function addScore(pts) {
+    if (!pts) return;
+    score += pts;
+    document.getElementById('score').textContent = score;
+
+    const box = document.getElementById('score-box');
+    box.classList.remove('score-bump');
+    void box.offsetWidth;
+    box.classList.add('score-bump');
+
+    const d = document.createElement('div');
+    d.className = 'score-delta';
+    d.textContent = '+' + pts;
+    box.appendChild(d);
+    d.addEventListener('animationend', () => d.remove(), { once: true });
+
+    if (score > best) {
+      best = score;
+      localStorage.setItem('2048best', best);
+      document.getElementById('best').textContent = best;
+      const bb = document.getElementById('best-box');
+      bb.classList.remove('score-bump');
+      void bb.offsetWidth;
+      bb.classList.add('score-bump');
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════
+     Core game logic
+     Returns { newBoard, actions, gained }
+     actions: array of { type, id, fromR, fromC, toR, toC, newVal }
+       type = 'move' | 'merge-primary' | 'merge-ghost'
+  ═══════════════════════════════════════════════════════ */
+  function computeMove(dir) {
+    // Build a fresh id→{val,r,c} map from the current tiles registry
+    // so we know which tile id lives where
+    const idGrid = Array.from({length: GRID}, () => Array(GRID).fill(null));
+    for (const [id, t] of tiles) idGrid[t.r][t.c] = id;
+
+    const newBoard = board.map(row => row.slice());
+    const actions  = [];
+    let gained     = 0;
+
+    for (let i = 0; i < GRID; i++) {
+      // Extract the line of {id, val} in movement order
+      const line = [];
+      for (let j = 0; j < GRID; j++) {
+        const { r, c } = lineCell(dir, i, j);
+        if (newBoard[r][c]) {
+          line.push({ id: idGrid[r][c], val: newBoard[r][c], r, c });
+          idGrid[r][c] = null;
+          newBoard[r][c] = 0;
+        }
+      }
+
+      // Merge adjacent equal values (only once each)
+      const result = [];
+      let k = 0;
+      while (k < line.length) {
+        if (k + 1 < line.length && line[k].val === line[k + 1].val) {
+          result.push({ primary: line[k], ghost: line[k + 1], merged: true, val: line[k].val * 2 });
+          gained += line[k].val * 2;
+          k += 2;
+        } else {
+          result.push({ primary: line[k], ghost: null, merged: false, val: line[k].val });
+          k++;
+        }
+      }
+
+      // Place results back, recording actions
+      for (let j = 0; j < result.length; j++) {
+        const { r: destR, c: destC } = lineCell(dir, i, j);
+        const item = result[j];
+
+        newBoard[destR][destC] = item.val;
+        idGrid[destR][destC]   = item.primary.id;
+
+        // Primary tile action
+        actions.push({
+          type:   item.merged ? 'merge-primary' : 'move',
+          id:     item.primary.id,
+          fromR:  item.primary.r,  fromC: item.primary.c,
+          toR:    destR,           toC:   destC,
+          newVal: item.val
+        });
+
+        // Ghost (eaten) tile action
+        if (item.ghost) {
+          actions.push({
+            type:   'merge-ghost',
+            id:     item.ghost.id,
+            fromR:  item.ghost.r,  fromC: item.ghost.c,
+            toR:    destR,         toC:   destC,
+            newVal: item.val
+          });
+        }
+      }
+    }
+
+    return { newBoard, actions, gained };
+  }
+
+  // Returns {r, c} for line i, position j given direction
+  function lineCell(dir, i, j) {
+    if (dir === 0) return { r: i,          c: j          }; // left
+    if (dir === 1) return { r: i,          c: GRID-1-j   }; // right
+    if (dir === 2) return { r: j,          c: i          }; // up
+                   return { r: GRID-1-j,   c: i          }; // down
+  }
+
+  /* ═══════════════════════════════════════════════════════
+     Animated move — the safe 3-phase approach
+     Phase 1: stamp every tile at its CURRENT pixel position (no transition)
+     Phase 2: enable transitions, move to destination
+     Phase 3 (after SLIDE_MS): clean up ghosts, pop merged, spawn new
+  ═══════════════════════════════════════════════════════ */
+  function doMove(dir) {
+    if (animating) return;
+
+    const { newBoard, actions, gained } = computeMove(dir);
+
+    // Did anything change?
+    let changed = false;
+    outer: for (let r = 0; r < GRID; r++)
+      for (let c = 0; c < GRID; c++)
+        if (newBoard[r][c] !== board[r][c]) { changed = true; break outer; }
+    if (!changed) return;
+
+    animating = true;
+
+    // ── Phase 1: freeze every tile at its current computed position
+    //    (removes any lingering CSS transition so the next update snaps)
+    for (const [, t] of tiles) {
+      t.el.classList.remove('sliding');
+    }
+
+    // Collect the DOM work we need to do
+    const toSlide   = []; // { el, toR, toC }
+    const toRemove  = []; // ghost elements to kill after slide
+    const toMerge   = []; // { el, newVal } to update after slide
+
+    for (const act of actions) {
+      const t = tiles.get(act.id);
+      if (!t) continue;
+
+      if (act.type === 'merge-ghost') {
+        // Ghost slides to merge target, then disappears
+        toSlide.push({ el: t.el, toR: act.toR, toC: act.toC });
+        toRemove.push(t.el);
+        tiles.delete(act.id);  // remove from registry immediately
+      } else {
+        // 'move' or 'merge-primary' — update registry destination
+        t.r = act.toR;
+        t.c = act.toC;
+        toSlide.push({ el: t.el, toR: act.toR, toC: act.toC });
+        if (act.type === 'merge-primary') {
+          t.val = act.newVal;
+          toMerge.push({ el: t.el, newVal: act.newVal });
+        }
+      }
+    }
+
+    // ── Phase 2: one rAF to let the browser register the un-transitioned state,
+    //    then enable transitions and set destination positions
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        // Enable slide transition and move
+        for (const { el, toR, toC } of toSlide) {
+          el.classList.add('sliding');
+          applyPos(el, toR, toC);
+        }
+
+        // ── Phase 3: after slide completes
+        setTimeout(() => {
+          // Remove ghost tiles
+          for (const el of toRemove) el.remove();
+
+          // Update merged tile appearance + pop animation
+          const sz = cellSize();
+          for (const { el, newVal } of toMerge) {
+            el.className = tileClass(newVal);
+            el.classList.add('sliding'); // keep sliding class (for next move)
+            el.textContent = newVal;
+            el.style.fontSize = fontSize(newVal, sz);
+            applySize(el, newVal);
+            // Trigger pop — add class, remove on end
+            requestAnimationFrame(() => {
+              el.classList.add('anim-merge');
+              el.addEventListener('animationend', () => el.classList.remove('anim-merge'), { once: true });
+            });
+          }
+
+          // Commit board
+          board = newBoard;
+          addScore(gained);
+
+          // Spawn new tile
+          spawnRandom();
+
+          animating = false;
+          checkState();
+
+        }, SLIDE_MS + 15);
+      });
+    });
+  }
+
+  /* ═══════════════════════════════════════════════════════
+     Spawn a random tile, animate it in
+  ═══════════════════════════════════════════════════════ */
+  function spawnRandom() {
+    const empty = [];
+    for (let r = 0; r < GRID; r++)
+      for (let c = 0; c < GRID; c++)
+        if (!board[r][c]) empty.push([r, c]);
+    if (!empty.length) return;
+
+    const [r, c] = empty[Math.floor(Math.random() * empty.length)];
+    const val = Math.random() < 0.9 ? 2 : 4;
+    board[r][c] = val;
+
+    const id = nextId++;
+    const el = createTileEl(val, r, c);
+    el.classList.add('anim-new');
+    el.addEventListener('animationend', () => el.classList.remove('anim-new'), { once: true });
+    document.getElementById('tile-container').appendChild(el);
+    tiles.set(id, { el, r, c, val });
+  }
+
+  /* ═══════════════════════════════════════════════════════
+     Win / Game Over
+  ═══════════════════════════════════════════════════════ */
+  function checkState() {
+    // Win
+    if (!wonAlready) {
+      for (let r = 0; r < GRID; r++)
+        for (let c = 0; c < GRID; c++)
+          if (board[r][c] === 2048) {
+            wonAlready = true;
+            showOverlay('You Win! 🎉');
+            return;
+          }
+    }
+
+    // Game over — no empty cells and no adjacent equal pairs
+    for (let r = 0; r < GRID; r++)
+      for (let c = 0; c < GRID; c++) {
+        if (!board[r][c]) return;
+        if (c < GRID - 1 && board[r][c] === board[r][c + 1]) return;
+        if (r < GRID - 1 && board[r][c] === board[r + 1][c]) return;
+      }
+    showOverlay('Game Over!');
+  }
+
+  function showOverlay(msg) {
+    document.getElementById('overlay-msg').textContent = msg;
+    const ov = document.getElementById('overlay');
+    void ov.offsetWidth;
+    ov.classList.add('show');
+  }
+
+  function hideOverlay() {
+    document.getElementById('overlay').classList.remove('show');
+  }
+
+  /* ═══════════════════════════════════════════════════════
+     New Game
+  ═══════════════════════════════════════════════════════ */
+  function newGame() {
+    board      = Array.from({length: GRID}, () => Array(GRID).fill(0));
+    score      = 0;
+    nextId     = 0;
+    animating  = false;
+    wonAlready = false;
+    document.getElementById('score').textContent = '0';
+    hideOverlay();
+
+    // Place two starting tiles
+    placeRandom();
+    placeRandom();
+    fullRender(true);
+  }
+
+  function placeRandom() {
+    const empty = [];
+    for (let r = 0; r < GRID; r++)
+      for (let c = 0; c < GRID; c++)
+        if (!board[r][c]) empty.push([r, c]);
+    if (!empty.length) return;
+    const [r, c] = empty[Math.floor(Math.random() * empty.length)];
+    board[r][c] = Math.random() < 0.9 ? 2 : 4;
+  }
+
+  /* ═══════════════════════════════════════════════════════
+     Input
+  ═══════════════════════════════════════════════════════ */
+  const KEY_MAP = {
+    ArrowLeft:0, a:0, A:0,
+    ArrowRight:1, d:1, D:1,
+    ArrowUp:2, w:2, W:2,
+    ArrowDown:3, s:3, S:3
+  };
+
+  document.addEventListener('keydown', e => {
+    if (KEY_MAP[e.key] !== undefined) {
+      e.preventDefault();
+      doMove(KEY_MAP[e.key]);
+    }
+  });
+
+  let touchX, touchY;
+  document.addEventListener('touchstart', e => {
+    touchX = e.touches[0].clientX;
+    touchY = e.touches[0].clientY;
+  }, { passive: true });
+
+  document.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - touchX;
+    const dy = e.changedTouches[0].clientY - touchY;
+    if (Math.abs(dx) < 12 && Math.abs(dy) < 12) return;
+    doMove(Math.abs(dx) > Math.abs(dy) ? (dx < 0 ? 0 : 1) : (dy < 0 ? 2 : 3));
+  }, { passive: true });
+
+  window.addEventListener('resize', () => {
+    if (animating) return;
+    repositionAll();
+  });
+
+  /* ═══════════════════════════════════════════════════════
+     Boot
+  ═══════════════════════════════════════════════════════ */
+  best = parseInt(localStorage.getItem('2048best') || '0');
+  document.getElementById('best').textContent = best;
+  newGame();
+</script>
+</body>
+</html>
