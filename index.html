@@ -1225,6 +1225,37 @@
   .staff-tabs { overflow-x: auto; flex-wrap: nowrap; }
   .staff-tabs::-webkit-scrollbar { height: 0; }
   .staff-tab { white-space: nowrap; }
+
+  /* ═══════════════ RESPONSIVE / CHROMEBOOK ═══════════════ */
+  @media (max-width: 1100px) {
+    .item-grid { grid-template-columns: repeat(auto-fill, minmax(140px,1fr)); }
+  }
+  @media (max-width: 900px) {
+    .tab-strip { padding: 7px 8px 0; gap: 1px; }
+    .tab { height: 30px; padding: 0 9px; font-size: .66rem; max-width: 150px; }
+    .omnibar-row { padding: 4px 8px 7px; gap: 4px; }
+    .omnibar { height: 30px; padding: 0 9px; font-size: .78rem; }
+    .nav-btn { width: 26px; height: 26px; }
+    .cr-btn  { width: 26px; height: 26px; }
+    .user-chip { height: 26px; padding: 0 8px; font-size: .67rem; }
+    .inner { padding: 16px 14px 50px; }
+    .item-grid { grid-template-columns: repeat(auto-fill, minmax(130px,1fr)); gap: 8px; }
+    .item-card { padding: 14px 12px; }
+    .item-card-ico { width: 30px; height: 30px; margin-bottom: 9px; }
+    .home-time { font-size: 3rem; }
+    .nav-circles { gap: 18px; }
+    .nav-circle { width: 46px; height: 46px; }
+    .panel { padding: 14px; }
+    .page-title { font-size: .9rem; }
+  }
+  @media (max-width: 700px) {
+    .tab { max-width: 110px; font-size: .62rem; padding: 0 7px; }
+    .item-grid { grid-template-columns: repeat(auto-fill, minmax(120px,1fr)); gap: 7px; }
+    .home-time { font-size: 2.4rem; }
+    .nav-circle { width: 40px; height: 40px; }
+    .nav-circles { gap: 14px; }
+    .inner { padding: 12px 10px 50px; }
+  }
 </style>
 </head>
 <body style="display:flex;flex-direction:column;height:100%">
@@ -1930,9 +1961,6 @@
       setUserRole: async (uid, role) => {
         await fsUpdate(fsDoc(fdb,'users',uid), { role });
       },
-      adjustCoins: async (uid, amount) => {
-        await fsUpdate(fsDoc(fdb,'users',uid), { coins: fsInc(amount) });
-      },
       resetDisplayName: async (uid, name) => {
         await fsUpdate(fsDoc(fdb,'users',uid), { displayName: name });
       },
@@ -2027,7 +2055,7 @@
           fsGetAll(fsQuery(fsCol(fdb,'socialMessages'), fsWhere('userId','==',uid), fsLimit(500))),
         ]);
         const userData = userSnap.data() || {};
-        return { messages: msgSnap.size, coins: userData.coins ?? undefined };
+        return { messages: msgSnap.size };
       },
     };
 
@@ -2049,6 +2077,10 @@
         try {
           const snap = await fsGet(fsDoc(fdb, 'users', user.uid));
           window._userRole = snap.data()?.role || 'user';
+          if (window._userRole === 'banned') {
+            window.location.href = 'banned.html';
+            return;
+          }
         } catch(e) { window._userRole = 'user'; }
         window.onFirebaseLogin(user);
         loadSiteConfig();
@@ -2508,7 +2540,7 @@ function buildGrid(category) {
   const baseLen = category === 'social' ? SOCIAL_FIXED.length : (BASE_ITEMS[category]||[]).length;
 
   const cards = items.map((item, idx) => {
-    const isCustom = !item.fixed && idx >= baseLen;
+    const isCustom = !item.fixed && !item._fromOwner && idx >= baseLen;
     const esc = s => s == null ? 'null' : JSON.stringify(s).replace(/"/g, '&quot;');
     const clickAction = `openItemInPage(event, ${esc(item.name)}, ${esc(item.url)}, '${category}')`;
     const delBtn = isCustom
@@ -2606,12 +2638,6 @@ async function buildStats() {
       msgBox.className = 'stat-box';
       msgBox.innerHTML = `<div class="stat-n">Messages</div><div class="stat-v">${snap.messages}</div><div class="stat-s">sent in global chat</div>`;
       document.getElementById('statsBoxes').appendChild(msgBox);
-      if (snap.coins !== undefined) {
-        const coinBox = document.createElement('div');
-        coinBox.className = 'stat-box';
-        coinBox.innerHTML = `<div class="stat-n">Coins</div><div class="stat-v">${snap.coins}</div><div class="stat-s">vexis currency</div>`;
-        document.getElementById('statsBoxes').appendChild(coinBox);
-      }
     } catch(e) {}
   }
 }
@@ -2637,10 +2663,10 @@ function buildUserMenu(user) {
     {icon:'user',   label:'Profile',  cb:"openProfile();toggleUser()"},
     {icon:'gear',   label:'Settings', cb:"openSettings();toggleUser()"},
   ];
-  if ((role === 'moderator' || role === 'owner') && !isGuest) {
+  if ((role === 'moderator' || role === 'owner' || role === 'main_owner') && !isGuest) {
     items.push({icon:'shield', label:'Mod Panel', cb:"openIframe('Mod Panel','staff/modpanel.html',_currentPage);toggleUser()", accent:'#7aa0ff'});
   }
-  if (role === 'owner' && !isGuest) {
+  if ((role === 'owner' || role === 'main_owner') && !isGuest) {
     items.push({icon:'star', label:'Owner Panel', cb:"openIframe('Owner Panel','staff/ownerpanel.html',_currentPage);toggleUser()", accent:'#ffb84a'});
   }
   items.push({icon:'signout', label: isGuest ? 'Exit Guest' : 'Sign out', cb:"doSignOut()", dim:true});
@@ -4021,7 +4047,7 @@ const _ALL_TABS   = ['reports','chat',..._OWNER_TABS];
 
 function openStaffPanel(mode) {
   const role = window._userRole || 'user';
-  if (role !== 'moderator' && role !== 'owner') { toast('Access denied'); return; }
+  if (role !== 'moderator' && role !== 'owner' && role !== 'main_owner') { toast('Access denied'); return; }
 
   // mode='owner' shows full owner panel; anything else shows the mod view
   const showOwner = mode === 'owner' && role === 'owner';
@@ -4226,7 +4252,6 @@ function buildUserRow(u, myUid) {
           : `<button class="user-action-btn promote" onclick="staffSetRole('${u.uid}','moderator',this)">Make Mod</button>`
       }
       ${!isBanned ? `<button class="user-action-btn danger" onclick="staffSetRole('${u.uid}','banned',this)">Ban</button>` : ''}
-      <button class="user-action-btn" onclick="staffAdjustCoins('${u.uid}',this)" title="Adjust coins">Coins</button>
       <button class="user-action-btn" onclick="staffResetName('${u.uid}','${_esc(u.displayName||'').replace(/'/g,"\\'")}',this)" title="Reset display name">Rename</button>
     </div>`;
 
@@ -4239,20 +4264,6 @@ function buildUserRow(u, myUid) {
     <span class="user-row-role ${role}">${role}</span>
     ${actions}`;
   return row;
-}
-
-async function staffAdjustCoins(uid, btn) {
-  const input = prompt('Enter coin amount to add (use negative to subtract):');
-  if (input === null) return;
-  const amount = parseInt(input);
-  if (isNaN(amount)) { toast('Invalid number'); return; }
-  if (!window._fb?.ready) return;
-  btn.disabled = true;
-  try {
-    await window._fb.adjustCoins(uid, amount);
-    toast(`${amount >= 0 ? '+' : ''}${amount} coins applied`);
-  } catch(e) { toast('Error: ' + e.message); }
-  finally { btn.disabled = false; }
 }
 
 async function staffResetName(uid, currentName, btn) {
@@ -4675,7 +4686,7 @@ async function loadSiteConfig() {
     if (cfg.items) {
       ['games','apps','tools'].forEach(cat => {
         if (Array.isArray(cfg.items[cat])) {
-          CUSTOM[cat] = cfg.items[cat].map(it => ({icon:'custom', name:it.name, desc:it.url, url:it.url}));
+          CUSTOM[cat] = cfg.items[cat].map(it => ({icon:'custom', name:it.name, desc:it.url, url:it.url, _fromOwner:true}));
         }
       });
       ['games','apps','tools'].forEach(buildGrid);
