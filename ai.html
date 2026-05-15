@@ -399,7 +399,7 @@ async function sendAI() {
 
   try {
     // Try the parent Vexis OS server first, then fall back to a direct OpenAI call
-    const res = await fetch(AI_SERVER + '/api/ai/chat', {
+    const res = await fetch(AI_SERVER + '/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ messages: _aiHistory })
@@ -542,7 +542,7 @@ async function generateImagePollinations(prompt) {
 }
 
 async function generateImageDalle(prompt) {
-  const res = await fetch(AI_SERVER + '/api/ai/image', {
+  const res = await fetch(AI_SERVER + '/api/imagine', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ prompt, model: 'dall-e-3', size: '1024x1024' })
