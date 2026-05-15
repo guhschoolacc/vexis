@@ -1939,11 +1939,11 @@
 
       // ── Site config ─────────────────────────────
       getSiteConfig: async () => {
-        const snap = await fsGet(fsDoc(fdb,'siteConfig','main'));
+        const snap = await fsGet(fsDoc(fdb,'siteSettings','main'));
         return snap.exists() ? snap.data() : {};
       },
       setSiteConfig: async (data) => {
-        await fsSet(fsDoc(fdb,'siteConfig','main'), data, { merge: true });
+        await fsSet(fsDoc(fdb,'siteSettings','main'), data, { merge: true });
       },
 
       // ── Bug reports ──────────────────────────────
@@ -1968,16 +1968,16 @@
 
       // ── Analytics ────────────────────────────────
       getAnalytics: async () => {
-        const [uSnap, mSnap, rSnap, bSnap] = await Promise.all([
+        // Run counts in parallel; keep message sample small
+        const [uSnap, rSnap, bSnap] = await Promise.all([
           fsGetAll(fsCol(fdb,'users')),
-          fsGetAll(fsQuery(fsCol(fdb,'socialMessages'), fsOrder('timestamp','desc'), fsLimit(1000))),
-          fsGetAll(fsQuery(fsCol(fdb,'reports'), fsWhere('status','==','pending'))),
+          fsGetAll(fsQuery(fsCol(fdb,'reports'),   fsWhere('status','==','pending'))),
           fsGetAll(fsQuery(fsCol(fdb,'bugReports'), fsWhere('status','==','open'))),
         ]);
-        return { users: uSnap.size, messages: mSnap.size, openReports: rSnap.size, openBugs: bSnap.size };
+        return { users: uSnap.size, openReports: rSnap.size, openBugs: bSnap.size };
       },
       getTopUsers: async () => {
-        const snap = await fsGetAll(fsQuery(fsCol(fdb,'socialMessages'), fsOrder('timestamp','desc'), fsLimit(300)));
+        const snap = await fsGetAll(fsQuery(fsCol(fdb,'socialMessages'), fsOrder('timestamp','desc'), fsLimit(100)));
         const counts = {};
         snap.docs.forEach(d => {
           const data = d.data();
@@ -3943,8 +3943,16 @@ async function sendLocalAI() {
 /* ══════════════════════════════════════════════
    STAFF PANEL
 ══════════════════════════════════════════════ */
-let _staffTab  = 'reports';
-let _allUsers  = [];
+let _staffTab     = 'reports';
+let _allUsers     = [];
+const _staffCache = {};          // tab → timestamp of last load
+const STAFF_TTL   = 60_000;      // re-fetch after 60 s
+
+function _staffStale(tab) {
+  return !_staffCache[tab] || Date.now() - _staffCache[tab] > STAFF_TTL;
+}
+function _staffMarkFresh(tab) { _staffCache[tab] = Date.now(); }
+function _staffInvalidate(tab) { delete _staffCache[tab]; }
 
 const _OWNER_TABS = ['bugs','users','announce','analytics','platform'];
 const _ALL_TABS   = ['reports','chat',..._OWNER_TABS];
@@ -3953,13 +3961,14 @@ function openStaffPanel(mode) {
   const role = window._userRole || 'user';
   if (role !== 'moderator' && role !== 'owner') { toast('Access denied'); return; }
 
-  const isOwner = role === 'owner';
+  // mode='owner' shows full owner panel; anything else shows the mod view
+  const showOwner = mode === 'owner' && role === 'owner';
 
   const icon  = document.getElementById('staffHeaderIcon');
   const title = document.getElementById('staffPanelTitle');
   const badge = document.getElementById('staffRoleBadge');
 
-  if (isOwner) {
+  if (showOwner) {
     icon.className    = 'staff-header-icon own';
     title.textContent = 'Owner Panel';
     badge.className   = 'staff-badge own';
@@ -3971,10 +3980,10 @@ function openStaffPanel(mode) {
     badge.textContent = 'Moderator';
   }
 
-  // Show/hide owner-only tabs
+  // Show/hide owner-only tabs based on the view mode, not just the role
   _OWNER_TABS.forEach(t => {
     const btn = document.getElementById('stab-' + t);
-    if (btn) btn.style.display = isOwner ? '' : 'none';
+    if (btn) btn.style.display = showOwner ? '' : 'none';
   });
 
   document.getElementById('staffPanel').classList.add('open');
@@ -4002,7 +4011,8 @@ function switchStaffTab(tab) {
   if (tab === 'platform')  loadStaffPlatform();
 }
 
-async function loadStaffReports() {
+async function loadStaffReports(force) {
+  if (!force && !_staffStale('reports')) return;
   const body = document.getElementById('staffBody-reports');
   body.innerHTML = '<div class="staff-empty"><div class="staff-empty-ico" style="font-size:1.4rem">⏳</div><div class="staff-empty-text">Loading reports…</div></div>';
 
@@ -4013,6 +4023,7 @@ async function loadStaffReports() {
 
   try {
     const reports = await window._fb.getReports();
+    _staffMarkFresh('reports');
     if (!reports.length) {
       body.innerHTML = '<div class="staff-empty"><div class="staff-empty-ico" style="opacity:.3">✓</div><div class="staff-empty-text">No reports yet. Everything is clean.</div></div>';
       return;
@@ -4058,6 +4069,7 @@ async function staffResolve(reportId, btn) {
   btn.disabled = true; btn.textContent = 'Resolving…';
   try {
     await window._fb.resolveReport(reportId);
+    _staffInvalidate('reports');
     const card = document.getElementById('rcard-' + reportId);
     if (card) {
       card.classList.add('resolved');
@@ -4075,6 +4087,7 @@ async function staffDeleteMsg(reportId, messageId, btn) {
   btn.disabled = true; btn.textContent = 'Deleting…';
   try {
     await window._fb.deleteReportedMessage(reportId, messageId);
+    _staffInvalidate('reports');
     const card = document.getElementById('rcard-' + reportId);
     if (card) {
       card.classList.add('resolved');
@@ -4086,7 +4099,8 @@ async function staffDeleteMsg(reportId, messageId, btn) {
   } catch(e) { toast('Error: ' + e.message); btn.disabled = false; btn.textContent = 'Delete Message'; }
 }
 
-async function loadStaffUsers() {
+async function loadStaffUsers(force) {
+  if (!force && !_staffStale('users') && _allUsers.length) { renderStaffUsers(_allUsers); return; }
   const list = document.getElementById('staffUsersList');
   list.innerHTML = '<div class="staff-empty"><div class="staff-empty-ico" style="font-size:1.4rem">⏳</div><div class="staff-empty-text">Loading users…</div></div>';
 
@@ -4101,6 +4115,7 @@ async function loadStaffUsers() {
 
   try {
     _allUsers = await window._fb.getUsers();
+    _staffMarkFresh('users');
     renderStaffUsers(_allUsers);
   } catch(e) {
     list.innerHTML = `<div class="staff-empty"><div class="staff-empty-text">Error: ${e.message}</div></div>`;
@@ -4211,12 +4226,14 @@ async function staffSetRole(uid, newRole, btn) {
 }
 
 /* ── Bugs tab ── */
-async function loadStaffBugs() {
+async function loadStaffBugs(force) {
+  if (!force && !_staffStale('bugs')) return;
   const body = document.getElementById('staffBody-bugs');
   body.innerHTML = '<div class="staff-empty"><div class="staff-empty-ico" style="font-size:1.4rem">⏳</div><div class="staff-empty-text">Loading bug reports…</div></div>';
   if (!window._fb?.ready) { body.innerHTML = '<div class="staff-empty"><div class="staff-empty-text">Firebase not connected.</div></div>'; return; }
   try {
     const bugs = await window._fb.getBugs();
+    _staffMarkFresh('bugs');
     if (!bugs.length) {
       body.innerHTML = '<div class="staff-empty"><div class="staff-empty-ico" style="opacity:.3">✓</div><div class="staff-empty-text">No bug reports yet.</div></div>';
       return;
@@ -4255,6 +4272,7 @@ async function staffResolveBug(bugId, btn) {
   btn.disabled = true; btn.textContent = 'Resolving…';
   try {
     await window._fb.resolveBug(bugId);
+    _staffInvalidate('bugs');
     const card = document.getElementById('bcard-' + bugId);
     if (card) {
       card.classList.add('resolved');
@@ -4266,12 +4284,14 @@ async function staffResolveBug(bugId, btn) {
 }
 
 /* ── Announcements tab ── */
-async function loadStaffAnnouncements() {
+async function loadStaffAnnouncements(force) {
+  if (!force && !_staffStale('announce')) return;
   const el = document.getElementById('announceHistory');
   el.innerHTML = '<div class="staff-empty"><div class="staff-empty-text">Loading…</div></div>';
   if (!window._fb?.ready) return;
   try {
     const list = await window._fb.getAnnouncements();
+    _staffMarkFresh('announce');
     if (!list.length) { el.innerHTML = '<div class="staff-empty"><div class="staff-empty-text">No announcements yet.</div></div>'; return; }
     el.innerHTML = '';
     list.forEach(a => {
@@ -4296,27 +4316,31 @@ async function sendAnnouncement() {
   btn.disabled = true; btn.textContent = 'Sending…';
   try {
     await window._fb.sendAnnouncement(text, pinned);
+    _staffInvalidate('announce');
     document.getElementById('announceText').value = '';
     document.getElementById('announcePinned').checked = false;
     toast('Announcement sent!');
-    loadStaffAnnouncements();
+    loadStaffAnnouncements(true);
   } catch(e) { toast('Error: ' + e.message); }
   finally { btn.disabled = false; btn.textContent = 'Send'; }
 }
 
 /* ── Analytics tab ── */
-async function loadStaffAnalytics() {
+async function loadStaffAnalytics(force) {
+  if (!force && !_staffStale('analytics')) return;
   if (!window._fb?.ready) return;
+  const grid = document.getElementById('analyticsGrid');
+  const topEl = document.getElementById('analyticsTopUsers');
+  topEl.innerHTML = '<div class="staff-empty" style="padding:12px 0"><div class="staff-empty-text">Loading…</div></div>';
   try {
     const [stats, top] = await Promise.all([window._fb.getAnalytics(), window._fb.getTopUsers()]);
-    const grid = document.getElementById('analyticsGrid');
+    _staffMarkFresh('analytics');
     const vals = grid.querySelectorAll('.analytics-box-val');
     vals[0].textContent = stats.users;
-    vals[1].textContent = stats.messages;
+    vals[1].textContent = '—';
     vals[2].textContent = stats.openReports;
     vals[3].textContent = stats.openBugs;
 
-    const topEl = document.getElementById('analyticsTopUsers');
     if (!top.length) { topEl.innerHTML = '<div class="staff-empty" style="padding:12px 0"><div class="staff-empty-text">No messages yet.</div></div>'; return; }
     topEl.innerHTML = '';
     top.forEach((u, i) => {
@@ -4327,17 +4351,28 @@ async function loadStaffAnalytics() {
         <span class="analytics-user-count">${u.count} msg${u.count===1?'':'s'}</span>`;
       topEl.appendChild(row);
     });
-  } catch(e) { toast('Analytics error: ' + e.message); }
+  } catch(e) {
+    topEl.innerHTML = `<div class="staff-empty" style="padding:12px 0"><div class="staff-empty-text">Error: ${e.message}</div></div>`;
+  }
 }
 
 /* ── Platform tab ── */
 let _siteConfig = {};
 let _automodWords = [];
 
-async function loadStaffPlatform() {
+async function loadStaffPlatform(force) {
+  if (!force && !_staffStale('platform') && Object.keys(_siteConfig).length) {
+    renderFeatureFlags(_siteConfig.flags || {});
+    renderAutomodTags();
+    renderPlatformItems(_siteConfig.items || { games:[], apps:[], tools:[] });
+    document.getElementById('motdInput').value   = _siteConfig.motd    || '';
+    document.getElementById('bannerInput').value = _siteConfig.bannerText || '';
+    return;
+  }
   if (!window._fb?.ready) return;
   try {
     _siteConfig = await window._fb.getSiteConfig();
+    _staffMarkFresh('platform');
     // MOTD
     const motd = _siteConfig.motd || '';
     document.getElementById('motdInput').value = motd;
