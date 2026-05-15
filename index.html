@@ -506,262 +506,6 @@
     cursor: pointer;
   }
 
-  /* ═══════════════ VEXIS AI ═══════════════ */
-  .vexis-ai-bar {
-    display: flex; align-items: center; gap: 10px;
-    margin-top: 40px;
-    width: 340px; max-width: 90vw;
-    background: var(--surf); border: 1px solid var(--bdrhi);
-    border-radius: 12px; padding: 11px 16px;
-    cursor: pointer; transition: all .2s ease;
-    box-shadow: 0 4px 20px rgba(0,0,0,.3);
-    animation: up .5s ease .18s both;
-  }
-  .vexis-ai-bar:hover {
-    background: var(--raise); border-color: var(--muted);
-    transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,0,0,.4);
-  }
-  .vai-icon {
-    width: 28px; height: 28px; border-radius: 8px;
-    background: linear-gradient(135deg, var(--raise2), var(--muted));
-    border: 1px solid var(--bdrhi);
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-  }
-  .vai-icon svg { color: var(--bright); }
-  .vai-text {
-    flex: 1; font-size: .75rem; color: var(--muted);
-    font-family: 'DM Sans', sans-serif;
-  }
-  .vai-badge {
-    font-family: 'DM Mono', monospace; font-size: .55rem;
-    color: var(--dim); background: var(--raise2);
-    border: 1px solid var(--bdr); border-radius: 5px;
-    padding: 2px 7px; flex-shrink: 0;
-  }
-
-  /* AI Chat Panel */
-  #aiPanel {
-    position: fixed; inset: 0; z-index: 450;
-    background: rgba(0,0,0,.65); backdrop-filter: blur(8px);
-    display: flex; align-items: center; justify-content: center;
-    padding: 24px; opacity: 0; pointer-events: none;
-    transition: opacity .2s;
-  }
-  #aiPanel.open { opacity: 1; pointer-events: all; }
-
-  .ai-sheet {
-    width: 100%; max-width: 680px;
-    background: var(--surf); border: 1px solid var(--bdrhi);
-    border-radius: 18px;
-    box-shadow: 0 24px 80px rgba(0,0,0,.7), 0 0 0 1px rgba(255,255,255,.04);
-    display: flex; flex-direction: column;
-    height: 78vh; max-height: 700px;
-    transform: scale(.96) translateY(-10px); transition: transform .22s cubic-bezier(.34,1.3,.64,1);
-  }
-  #aiPanel.open .ai-sheet { transform: scale(1) translateY(0); }
-
-  .ai-header {
-    display: flex; align-items: center; gap: 10px;
-    padding: 14px 18px; border-bottom: 1px solid var(--bdr);
-    flex-shrink: 0;
-  }
-  .ai-header-icon {
-    width: 30px; height: 30px; border-radius: 9px;
-    background: linear-gradient(135deg, var(--raise2), var(--muted));
-    border: 1px solid var(--bdrhi);
-    display: flex; align-items: center; justify-content: center;
-  }
-  .ai-header-icon svg { color: var(--bright); }
-  .ai-header-info { flex: 1; }
-  .ai-header-name { font-size: .8rem; font-weight: 600; color: var(--white); }
-  .ai-header-sub  { font-size: .6rem; color: var(--dim); margin-top: 1px; }
-  .ai-close {
-    width: 26px; height: 26px; border-radius: 7px;
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; transition: background .12s;
-    border: 1px solid transparent;
-  }
-  .ai-close:hover { background: var(--raise2); border-color: var(--bdr); }
-  .ai-close svg { color: var(--dim); }
-
-  .ai-messages {
-    flex: 1; overflow-y: auto; padding: 16px 18px;
-    display: flex; flex-direction: column; gap: 12px;
-  }
-
-  .ai-msg {
-    display: flex; gap: 10px; max-width: 88%;
-    animation: up .2s ease both;
-  }
-  .ai-msg.user { align-self: flex-end; flex-direction: row-reverse; }
-  .ai-msg.ai   { align-self: flex-start; }
-
-  .ai-bubble {
-    padding: 9px 13px; border-radius: 12px;
-    font-size: .76rem; line-height: 1.6; color: var(--text);
-    word-break: break-word;
-  }
-  .ai-msg.user  .ai-bubble { background: var(--raise2); border: 1px solid var(--bdrhi); border-radius: 12px 12px 3px 12px; color: var(--bright); }
-  .ai-msg.ai    .ai-bubble { background: var(--bg); border: 1px solid var(--bdr); border-radius: 12px 12px 12px 3px; }
-
-  .ai-avatar {
-    width: 26px; height: 26px; border-radius: 8px;
-    background: linear-gradient(135deg, var(--raise2), var(--muted));
-    border: 1px solid var(--bdr);
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0; margin-top: 2px;
-  }
-  .ai-avatar svg { color: var(--dim); }
-
-  .ai-typing {
-    display: flex; gap: 4px; align-items: center; padding: 4px 0;
-  }
-  .ai-typing span {
-    width: 5px; height: 5px; border-radius: 50%;
-    background: var(--muted); animation: aiPulse 1.2s ease infinite;
-  }
-  .ai-typing span:nth-child(2) { animation-delay: .2s; }
-  .ai-typing span:nth-child(3) { animation-delay: .4s; }
-  @keyframes aiPulse { 0%,80%,100%{opacity:.3;transform:scale(.8)} 40%{opacity:1;transform:scale(1)} }
-
-  .ai-input-row {
-    display: flex; align-items: flex-end; gap: 8px;
-    padding: 12px 18px 16px; border-top: 1px solid var(--bdr);
-    flex-shrink: 0;
-  }
-  .ai-textarea {
-    flex: 1; background: var(--bg); border: 1px solid var(--bdr);
-    border-radius: 10px; padding: 9px 13px;
-    font-family: 'DM Sans', sans-serif; font-size: .78rem;
-    color: var(--white); outline: none; resize: none;
-    line-height: 1.5; max-height: 110px; overflow-y: auto;
-    transition: border-color .18s, box-shadow .18s;
-  }
-  .ai-textarea:focus { border-color: var(--bdrhi); box-shadow: 0 0 0 3px rgba(255,255,255,.03); }
-  .ai-textarea::placeholder { color: var(--muted); }
-  .ai-send {
-    width: 36px; height: 36px; border-radius: 9px;
-    background: var(--raise2); border: 1px solid var(--bdrhi);
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; flex-shrink: 0;
-    transition: all .15s;
-  }
-  .ai-send:hover { background: var(--muted); border-color: var(--dim); }
-  .ai-send svg { color: var(--bright); }
-  .ai-send:disabled { opacity: .4; cursor: not-allowed; }
-
-  .ai-empty {
-    flex: 1; display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    gap: 8px; color: var(--muted); padding: 20px;
-  }
-  .ai-empty-ico { font-size: 1.8rem; opacity: .4; }
-  .ai-empty-text { font-size: .72rem; text-align: center; line-height: 1.6; color: var(--dim); }
-
-  /* ═══════════════ AI MODE TABS ═══════════════ */
-  .ai-mode-tabs {
-    display: flex; gap: 3px; padding: 10px 18px;
-    border-bottom: 1px solid var(--bdr); flex-shrink: 0;
-  }
-  .ai-mode-tab {
-    padding: 4px 13px; border-radius: 7px; font-family: 'DM Sans', sans-serif;
-    font-size: .67rem; font-weight: 600; color: var(--dim); cursor: pointer;
-    background: transparent; border: 1px solid transparent; transition: all .14s;
-  }
-  .ai-mode-tab:hover { color: var(--text); background: var(--raise); }
-  .ai-mode-tab.active { color: var(--white); background: var(--raise2); border-color: var(--bdrhi); }
-
-  /* ═══════════════ AI IMAGE SETTINGS BAR ═══════════════ */
-  .ai-img-settings {
-    display: flex; gap: 8px; flex-wrap: wrap; flex-shrink: 0;
-  }
-  .ai-img-setting-group { display: flex; flex-direction: column; gap: 4px; }
-  .ai-img-setting-label {
-    font-size: .58rem; font-weight: 600; text-transform: uppercase;
-    letter-spacing: .09em; color: var(--muted);
-  }
-  .ai-img-select {
-    background: var(--bg); border: 1px solid var(--bdr);
-    border-radius: 7px; padding: 5px 9px;
-    font-family: 'DM Sans', sans-serif; font-size: .72rem;
-    color: var(--text); outline: none; transition: border-color .15s; cursor: pointer;
-  }
-  .ai-img-select:focus { border-color: var(--bdrhi); }
-
-  /* ═══════════════ AI IMAGE MODE ═══════════════ */
-  .ai-img-body {
-    flex: 1; overflow-y: auto; padding: 16px 18px;
-    display: flex; flex-direction: column; gap: 14px;
-  }
-  .ai-img-result {
-    flex: 1; border-radius: 12px; overflow: hidden;
-    background: var(--raise); border: 1px solid var(--bdr);
-    display: flex; align-items: center; justify-content: center;
-    min-height: 220px; position: relative;
-  }
-  .ai-img-result img { width: 100%; height: auto; display: block; border-radius: 11px; }
-  .ai-img-placeholder {
-    display: flex; flex-direction: column; align-items: center;
-    gap: 8px; color: var(--muted); padding: 24px; text-align: center;
-  }
-  .ai-img-placeholder-ico { font-size: 2rem; opacity: .3; }
-  .ai-img-placeholder-text { font-size: .7rem; line-height: 1.6; color: var(--dim); }
-  .ai-img-download {
-    position: absolute; bottom: 10px; right: 10px;
-    padding: 5px 11px; border-radius: 7px;
-    background: rgba(0,0,0,.75); border: 1px solid var(--bdrhi);
-    color: var(--white); font-family: 'DM Sans', sans-serif;
-    font-size: .67rem; font-weight: 500; cursor: pointer;
-    transition: all .14s; display: none;
-    text-decoration: none;
-  }
-  .ai-img-download:hover { background: rgba(0,0,0,.92); }
-  .ai-img-prompt-row {
-    display: flex; align-items: flex-end; gap: 8px;
-    padding: 12px 18px 16px; border-top: 1px solid var(--bdr); flex-shrink: 0;
-  }
-  .ai-img-spin {
-    width: 100%; height: 100%; position: absolute; inset: 0;
-    display: flex; align-items: center; justify-content: center;
-    background: var(--raise);
-  }
-
-  /* ═══════════════ AI LOCAL MODE ═══════════════ */
-  .ai-local-body {
-    flex: 1; overflow-y: auto; padding: 18px 18px 0;
-    display: flex; flex-direction: column; gap: 14px;
-  }
-  .ai-local-label {
-    font-size: .6rem; font-weight: 600; text-transform: uppercase;
-    letter-spacing: .1em; color: var(--muted); margin-bottom: 5px;
-  }
-  .ai-model-select {
-    background: var(--bg); border: 1px solid var(--bdr);
-    border-radius: 8px; padding: 9px 12px; width: 100%;
-    font-family: 'DM Sans', sans-serif; font-size: .76rem;
-    color: var(--white); outline: none; transition: border-color .18s;
-  }
-  .ai-model-select:focus { border-color: var(--bdrhi); }
-  .ai-progress-wrap {
-    background: var(--raise); border-radius: 6px; height: 5px;
-    overflow: hidden; display: none; margin-top: 6px;
-  }
-  .ai-progress-bar { height: 100%; background: var(--dim); border-radius: 6px; transition: width .4s; width: 0%; }
-  .ai-local-status { font-size: .69rem; color: var(--dim); line-height: 1.55; }
-  .ai-local-note {
-    font-size: .65rem; color: var(--muted); line-height: 1.6;
-    background: var(--raise); border: 1px solid var(--bdr);
-    border-radius: 8px; padding: 10px 13px;
-  }
-  .ai-local-messages {
-    flex: 1; overflow-y: auto; padding: 14px 18px;
-    display: flex; flex-direction: column; gap: 10px;
-  }
-  .ai-local-input-row {
-    display: flex; align-items: flex-end; gap: 8px;
-    padding: 12px 18px 16px; border-top: 1px solid var(--bdr); flex-shrink: 0;
-  }
 
   .theme-swatch-space   { background: linear-gradient(135deg, #000010 0%, #0a0020 40%, #000510 100%); }
   .theme-swatch-aurora  { background: linear-gradient(135deg, #001a10 0%, #002a20 50%, #001530 100%); }
@@ -1382,20 +1126,11 @@
       <div class="home-motd" id="homeMOTD"></div>
       <div class="nav-circles" id="navCircles"></div>
 
-      <!-- Vexis AI Quick-Access Bar -->
-      <div class="vexis-ai-bar" onclick="openAI()">
-        <div class="vai-icon">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a9 9 0 0 1 9 9c0 3.18-1.65 5.97-4.13 7.56L16 21H8l-.87-2.44A9 9 0 0 1 12 2z"/><path d="M9 12h6M9 8h6"/></svg>
-        </div>
-        <span class="vai-text">Ask Vexis AI anything…</span>
-        <span class="vai-badge">GPT-4o</span>
-      </div>
     </div>
   </div>
 
-  <!-- VEXIS AI CHAT PANEL -->
-  <div id="aiPanel" onclick="if(event.target===this)closeAI()">
-    <div class="ai-sheet">
+  <!-- VEXIS AI moved to ai.html -->
+  <div id="aiPanel" style="display:none"><div class="ai-sheet">
       <div class="ai-header">
         <div class="ai-header-icon">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a9 9 0 0 1 9 9c0 3.18-1.65 5.97-4.13 7.56L16 21H8l-.87-2.44A9 9 0 0 1 12 2z"/><path d="M9 12h6M9 8h6"/></svg>
@@ -2193,7 +1928,10 @@ const BASE_ITEMS = {
     
     
   ],
-  apps:   [{icon:'bolt',   name:'Example App',   desc:'Click to open. Add your own apps below.',    url:null}],
+  apps:   [
+    {icon:'bolt',   name:'Vexis AI',    desc:'Chat, image generation & local AI', url:'ai.html', fixed:true},
+    
+  ],
   tools:  [
     {icon:'code',   name:'Calculator',  desc:'calc for short🤓',    url:'tools/calculator.html'},
     {icon:'code',   name:'Clock',     desc:'An advanced clock with timezone support and schedule management', url:'tools/clock.html'},
