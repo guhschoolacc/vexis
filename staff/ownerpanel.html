@@ -131,8 +131,12 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',-apple-system,BlinkM
 .item-url{font-size:.62rem;color:var(--muted);font-family:monospace;flex:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .item-del{background:none;border:none;cursor:pointer;color:var(--dim);padding:3px 7px;border-radius:5px;transition:all .12s;font-size:.9rem}
 .item-del:hover{background:rgba(248,81,73,.1);color:var(--danger)}
-.add-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px}
-.add-grid .btn-accent{grid-column:1/-1;height:32px;font-size:.72rem}
+.add-grid{display:grid;grid-template-columns:1fr;gap:6px;margin-top:6px}
+.add-grid .btn-accent{height:32px;font-size:.72rem}
+.add-grid .html-ta{background:var(--bg);border:1px solid var(--bdr);border-radius:8px;padding:8px 12px;font-size:.7rem;color:var(--white);outline:none;width:100%;font-family:'DM Mono',monospace;resize:vertical;min-height:72px;max-height:200px;line-height:1.45;transition:border-color .15s}
+.add-grid .html-ta:focus{border-color:var(--bdrhi)}
+.add-grid .html-ta::placeholder{color:var(--muted)}
+.item-html{font-size:.6rem;color:var(--muted);font-family:monospace;flex:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;opacity:.7}
 
 /* ── CHAT MOD ── */
 .msg-card{background:var(--surf);border:1px solid var(--bdr);border-radius:9px;padding:11px 14px;display:flex;align-items:flex-start;gap:12px;margin-bottom:6px;transition:border-color .14s}
@@ -164,8 +168,7 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',-apple-system,BlinkM
   .stat-grid{grid-template-columns:repeat(2,1fr)}
   .stat-val{font-size:1.2rem}
   .drawer{width:min(300px,92vw)}
-  .add-grid{grid-template-columns:1fr}
-  .add-grid .btn-accent{grid-column:1}
+  .add-grid .html-ta{min-height:60px}
 }
 @media(max-width:600px){
   .header{padding:10px 12px}
@@ -945,14 +948,18 @@ function renderItems(items) {
   ['games','apps','tools'].forEach(cat=>{
     const list=items[cat]||[];
     const sec=document.createElement('div'); sec.style.marginBottom='20px';
+    const singular=cat.slice(0,-1);
     sec.innerHTML=`<div class="sec-label" style="margin-top:0">${cat.charAt(0).toUpperCase()+cat.slice(1)}</div>
       <div id="pi-${cat}">
-        ${list.map((item,i)=>`<div class="item-row"><span class="item-name">${esc(item.name)}</span><span class="item-url">${esc(item.url)}</span><button class="item-del" onclick="removeItem('${cat}',${i})">✕</button></div>`).join('')||'<div style="font-size:.68rem;color:var(--muted);padding:4px 0">No items yet.</div>'}
+        ${list.map((item,i)=>{
+          const preview=esc((item.html||item.url||'').replace(/\s+/g,' ').trim().substring(0,52));
+          return `<div class="item-row"><span class="item-name">${esc(item.name)}</span><span class="item-html" title="${esc(item.html||item.url||'')}">${preview}${(item.html||item.url||'').length>52?'…':''}</span><button class="item-del" onclick="removeItem('${cat}',${i})">✕</button></div>`;
+        }).join('')||'<div style="font-size:.68rem;color:var(--muted);padding:4px 0">No items yet.</div>'}
       </div>
       <div class="add-grid">
-        <input class="inp" id="pn-${cat}" placeholder="Name" style="font-size:.72rem;padding:7px 10px">
-        <input class="inp" id="pu-${cat}" placeholder="URL (https://…)" style="font-size:.72rem;padding:7px 10px">
-        <button class="btn btn-accent" onclick="addItem('${cat}')">Add ${cat.slice(0,-1)}</button>
+        <input class="inp" id="pn-${cat}" placeholder="${singular.charAt(0).toUpperCase()+singular.slice(1)} name" style="font-size:.72rem;padding:7px 10px">
+        <textarea class="html-ta" id="ph-${cat}" placeholder="Paste the HTML code for this ${singular}…&#10;&#10;Example: &lt;iframe src=&quot;https://…&quot; width=&quot;100%&quot; height=&quot;100%&quot;&gt;&lt;/iframe&gt;"></textarea>
+        <button class="btn btn-accent" onclick="addItem('${cat}')">Add ${singular}</button>
       </div>`;
     el.appendChild(sec);
   });
@@ -960,10 +967,14 @@ function renderItems(items) {
 
 async function addItem(cat) {
   const name=document.getElementById('pn-'+cat).value.trim();
-  const url=document.getElementById('pu-'+cat).value.trim();
-  if(!name||!url){toast('Name and URL required');return;}
+  const html=document.getElementById('ph-'+cat).value.trim();
+  if(!name){toast('Name is required');return;}
+  if(!html){toast('HTML code is required');return;}
+  if(!html.includes('<')&&!html.includes('>')){toast('That doesn\'t look like HTML — paste valid HTML code');return;}
   const items=_siteConfig.items||{games:[],apps:[],tools:[]};
-  items[cat]=[...(items[cat]||[]),{name,url}]; _siteConfig.items=items;
+  items[cat]=[...(items[cat]||[]),{name,html}]; _siteConfig.items=items;
+  document.getElementById('pn-'+cat).value='';
+  document.getElementById('ph-'+cat).value='';
   await savePlatform({items}); toast('Added'); renderItems(items);
 }
 async function removeItem(cat,idx) {
