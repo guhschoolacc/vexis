@@ -659,6 +659,93 @@
   .ai-empty-ico { font-size: 1.8rem; opacity: .4; }
   .ai-empty-text { font-size: .72rem; text-align: center; line-height: 1.6; color: var(--dim); }
 
+  /* ═══════════════ AI MODE TABS ═══════════════ */
+  .ai-mode-tabs {
+    display: flex; gap: 3px; padding: 10px 18px;
+    border-bottom: 1px solid var(--bdr); flex-shrink: 0;
+  }
+  .ai-mode-tab {
+    padding: 4px 13px; border-radius: 7px; font-family: 'DM Sans', sans-serif;
+    font-size: .67rem; font-weight: 600; color: var(--dim); cursor: pointer;
+    background: transparent; border: 1px solid transparent; transition: all .14s;
+  }
+  .ai-mode-tab:hover { color: var(--text); background: var(--raise); }
+  .ai-mode-tab.active { color: var(--white); background: var(--raise2); border-color: var(--bdrhi); }
+
+  /* ═══════════════ AI IMAGE MODE ═══════════════ */
+  .ai-img-body {
+    flex: 1; overflow-y: auto; padding: 16px 18px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .ai-img-result {
+    flex: 1; border-radius: 12px; overflow: hidden;
+    background: var(--raise); border: 1px solid var(--bdr);
+    display: flex; align-items: center; justify-content: center;
+    min-height: 220px; position: relative;
+  }
+  .ai-img-result img { width: 100%; height: auto; display: block; border-radius: 11px; }
+  .ai-img-placeholder {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 8px; color: var(--muted); padding: 24px; text-align: center;
+  }
+  .ai-img-placeholder-ico { font-size: 2rem; opacity: .3; }
+  .ai-img-placeholder-text { font-size: .7rem; line-height: 1.6; color: var(--dim); }
+  .ai-img-download {
+    position: absolute; bottom: 10px; right: 10px;
+    padding: 5px 11px; border-radius: 7px;
+    background: rgba(0,0,0,.75); border: 1px solid var(--bdrhi);
+    color: var(--white); font-family: 'DM Sans', sans-serif;
+    font-size: .67rem; font-weight: 500; cursor: pointer;
+    transition: all .14s; display: none;
+    text-decoration: none;
+  }
+  .ai-img-download:hover { background: rgba(0,0,0,.92); }
+  .ai-img-prompt-row {
+    display: flex; align-items: flex-end; gap: 8px;
+    padding: 12px 18px 16px; border-top: 1px solid var(--bdr); flex-shrink: 0;
+  }
+  .ai-img-spin {
+    width: 100%; height: 100%; position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--raise);
+  }
+
+  /* ═══════════════ AI LOCAL MODE ═══════════════ */
+  .ai-local-body {
+    flex: 1; overflow-y: auto; padding: 18px 18px 0;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .ai-local-label {
+    font-size: .6rem; font-weight: 600; text-transform: uppercase;
+    letter-spacing: .1em; color: var(--muted); margin-bottom: 5px;
+  }
+  .ai-model-select {
+    background: var(--bg); border: 1px solid var(--bdr);
+    border-radius: 8px; padding: 9px 12px; width: 100%;
+    font-family: 'DM Sans', sans-serif; font-size: .76rem;
+    color: var(--white); outline: none; transition: border-color .18s;
+  }
+  .ai-model-select:focus { border-color: var(--bdrhi); }
+  .ai-progress-wrap {
+    background: var(--raise); border-radius: 6px; height: 5px;
+    overflow: hidden; display: none; margin-top: 6px;
+  }
+  .ai-progress-bar { height: 100%; background: var(--dim); border-radius: 6px; transition: width .4s; width: 0%; }
+  .ai-local-status { font-size: .69rem; color: var(--dim); line-height: 1.55; }
+  .ai-local-note {
+    font-size: .65rem; color: var(--muted); line-height: 1.6;
+    background: var(--raise); border: 1px solid var(--bdr);
+    border-radius: 8px; padding: 10px 13px;
+  }
+  .ai-local-messages {
+    flex: 1; overflow-y: auto; padding: 14px 18px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .ai-local-input-row {
+    display: flex; align-items: flex-end; gap: 8px;
+    padding: 12px 18px 16px; border-top: 1px solid var(--bdr); flex-shrink: 0;
+  }
+
   .theme-swatch-space   { background: linear-gradient(135deg, #000010 0%, #0a0020 40%, #000510 100%); }
   .theme-swatch-aurora  { background: linear-gradient(135deg, #001a10 0%, #002a20 50%, #001530 100%); }
   .theme-swatch-sunset  { background: linear-gradient(135deg, #1a0510 0%, #2a0a00 50%, #1a0800 100%); }
@@ -963,25 +1050,83 @@
         </div>
         <div class="ai-header-info">
           <div class="ai-header-name">Vexis AI</div>
-          <div class="ai-header-sub">Powered by GPT-4o · Connected to server</div>
+          <div class="ai-header-sub" id="aiHeaderSub">Powered by GPT-4o · Connected to server</div>
         </div>
         <div class="ai-close" onclick="closeAI()">
           <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="1" y1="1" x2="9" y2="9"/><line x1="9" y1="1" x2="1" y2="9"/></svg>
         </div>
       </div>
 
+      <!-- Mode tabs -->
+      <div class="ai-mode-tabs">
+        <button class="ai-mode-tab active" id="aiModeChat" onclick="switchAIMode('chat')">Chat</button>
+        <button class="ai-mode-tab" id="aiModeImage" onclick="switchAIMode('image')">Image</button>
+        <button class="ai-mode-tab" id="aiModeLocal" onclick="switchAIMode('local')">Local AI</button>
+      </div>
+
+      <!-- ── CHAT MODE ── -->
       <div class="ai-messages" id="aiMessages">
         <div class="ai-empty" id="aiEmptyState">
           <div class="ai-empty-ico">✦</div>
           <div class="ai-empty-text">Hi! I'm Vexis AI.<br>Ask me anything — I'm here to help.</div>
         </div>
       </div>
-
-      <div class="ai-input-row">
+      <div class="ai-input-row" id="aiChatInputRow">
         <textarea class="ai-textarea" id="aiInput" rows="1" placeholder="Message Vexis AI…"
           onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAI();}"
           oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,110)+'px'"></textarea>
         <button class="ai-send" id="aiSendBtn" onclick="sendAI()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+
+      <!-- ── IMAGE MODE ── -->
+      <div class="ai-img-body" id="aiImgBody" style="display:none">
+        <div class="ai-img-result" id="aiImgResult">
+          <div class="ai-img-placeholder" id="aiImgPlaceholder">
+            <div class="ai-img-placeholder-ico">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            </div>
+            <div class="ai-img-placeholder-text">Describe what you want to see<br>and press Generate — powered by DALL-E 3</div>
+          </div>
+          <a class="ai-img-download" id="aiImgDownload" download="vexis-image.png">Download</a>
+        </div>
+      </div>
+      <div class="ai-img-prompt-row" id="aiImgInputRow" style="display:none">
+        <textarea class="ai-textarea" id="aiImgInput" rows="1" placeholder="Describe an image… (DALL-E 3)"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();generateImage();}"
+          oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,110)+'px'"></textarea>
+        <button class="ai-send" id="aiImgBtn" onclick="generateImage()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        </button>
+      </div>
+
+      <!-- ── LOCAL AI MODE ── -->
+      <div class="ai-local-body" id="aiLocalBody" style="display:none">
+        <div class="ai-local-note">
+          <strong style="color:var(--text)">Run AI right in your browser — no server needed.</strong><br>
+          Models are downloaded once and cached. Requires a modern browser with WebGPU support (Chrome 113+).
+        </div>
+        <div>
+          <div class="ai-local-label">Select a model</div>
+          <select class="ai-model-select" id="aiModelSelect">
+            <option value="Llama-3.2-1B-Instruct-q4f16_1-MLC">Llama 3.2 1B — ~800 MB (fast)</option>
+            <option value="Qwen2.5-1.5B-Instruct-q4f16_1-MLC">Qwen 2.5 1.5B — ~1 GB</option>
+            <option value="Phi-3.5-mini-instruct-q4f16_1-MLC">Phi-3.5 Mini — ~2.1 GB (best quality)</option>
+          </select>
+          <div class="ai-progress-wrap" id="aiProgressWrap">
+            <div class="ai-progress-bar" id="aiProgressBar"></div>
+          </div>
+          <div class="ai-local-status" id="aiLocalStatus" style="margin-top:8px">Model not loaded.</div>
+        </div>
+        <button class="mbtn mbtn-add" id="aiLoadModelBtn" onclick="loadLocalModel()" style="max-width:160px">Load Model</button>
+      </div>
+      <div class="ai-local-messages" id="aiLocalMessages" style="display:none"></div>
+      <div class="ai-local-input-row" id="aiLocalInputRow" style="display:none">
+        <textarea class="ai-textarea" id="aiLocalInput" rows="1" placeholder="Chat with local model…"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendLocalAI();}"
+          oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,110)+'px'"></textarea>
+        <button class="ai-send" id="aiLocalSendBtn" onclick="sendLocalAI()">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
         </button>
       </div>
@@ -2619,7 +2764,13 @@ function closeTab(e, id) {
   const el = document.querySelector(`.tab[data-id="${id}"]`);
   if (!el) return;
   const wasActive = el.classList.contains('active');
+  const tabState = _tabState[id];
   delete _tabState[id];
+  // Fully kill the iframe so audio/video stops immediately
+  if (tabState && tabState.page === 'iframe') {
+    const iframe = document.getElementById('mainIframe');
+    iframe.src = 'about:blank';
+  }
   el.style.transition='all .15s ease'; el.style.opacity='0'; el.style.transform='scale(.88)';
   setTimeout(() => {
     el.remove();
@@ -2935,6 +3086,206 @@ async function sendAI() {
     _aiTyping = false;
     document.getElementById('aiSendBtn').disabled = false;
     document.getElementById('aiInput').focus();
+  }
+}
+
+/* ── AI mode switcher ── */
+let _aiMode = 'chat';
+
+function switchAIMode(mode) {
+  _aiMode = mode;
+  ['chat','image','local'].forEach(m => {
+    document.getElementById('aiMode' + m.charAt(0).toUpperCase() + m.slice(1))
+      .classList.toggle('active', m === mode);
+  });
+  const chatVisible  = mode === 'chat';
+  const imgVisible   = mode === 'image';
+  const localVisible = mode === 'local';
+
+  document.getElementById('aiMessages').style.display      = chatVisible  ? '' : 'none';
+  document.getElementById('aiChatInputRow').style.display  = chatVisible  ? '' : 'none';
+  document.getElementById('aiImgBody').style.display       = imgVisible   ? '' : 'none';
+  document.getElementById('aiImgInputRow').style.display   = imgVisible   ? '' : 'none';
+  document.getElementById('aiLocalBody').style.display     = localVisible ? '' : 'none';
+
+  const localLoaded = !!window._localEngine;
+  document.getElementById('aiLocalMessages').style.display = (localVisible && localLoaded) ? '' : 'none';
+  document.getElementById('aiLocalInputRow').style.display = (localVisible && localLoaded) ? '' : 'none';
+
+  const subs = {chat:'Powered by GPT-4o · Connected to server', image:'DALL-E 3 · Image generation', local:'WebLLM · Runs 100% in your browser'};
+  document.getElementById('aiHeaderSub').textContent = subs[mode];
+
+  if (imgVisible) setTimeout(() => document.getElementById('aiImgInput').focus(), 150);
+  if (localVisible && localLoaded) setTimeout(() => document.getElementById('aiLocalInput').focus(), 150);
+}
+
+/* ── Image generation (DALL-E 3) ── */
+let _imgGenerating = false;
+
+async function generateImage() {
+  if (_imgGenerating) return;
+  const input = document.getElementById('aiImgInput');
+  const prompt = input.value.trim();
+  if (!prompt) return;
+
+  _imgGenerating = true;
+  const btn = document.getElementById('aiImgBtn');
+  btn.disabled = true;
+  input.disabled = true;
+
+  const result  = document.getElementById('aiImgResult');
+  const ph      = document.getElementById('aiImgPlaceholder');
+  const dlBtn   = document.getElementById('aiImgDownload');
+
+  ph.innerHTML = `<div class="ai-img-spin"><div class="spin-large"></div></div>`;
+  dlBtn.style.display = 'none';
+
+  const existingImg = result.querySelector('img');
+  if (existingImg) existingImg.remove();
+
+  try {
+    const res = await fetch(`${AI_SERVER}/api/imagine`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || `Server error ${res.status}`);
+    }
+    const data = await res.json();
+    ph.innerHTML = '';
+    const img = document.createElement('img');
+    img.src = data.url;
+    img.alt = prompt;
+    result.insertBefore(img, dlBtn);
+    dlBtn.href = data.url;
+    dlBtn.style.display = '';
+    input.value = '';
+    input.style.height = 'auto';
+  } catch (err) {
+    ph.innerHTML = `<div class="ai-img-placeholder"><div class="ai-img-placeholder-ico" style="font-size:1.4rem">⚠</div><div class="ai-img-placeholder-text">${err.message}</div></div>`;
+  } finally {
+    _imgGenerating = false;
+    btn.disabled = false;
+    input.disabled = false;
+    input.focus();
+  }
+}
+
+/* ── Local AI (WebLLM) ── */
+window._localEngine  = null;
+window._localHistory = [];
+let _localLoading    = false;
+
+async function loadLocalModel() {
+  if (_localLoading || window._localEngine) return;
+  _localLoading = true;
+
+  const modelId  = document.getElementById('aiModelSelect').value;
+  const btn      = document.getElementById('aiLoadModelBtn');
+  const status   = document.getElementById('aiLocalStatus');
+  const progWrap = document.getElementById('aiProgressWrap');
+  const progBar  = document.getElementById('aiProgressBar');
+
+  btn.disabled = true;
+  btn.textContent = 'Loading…';
+  progWrap.style.display = '';
+  status.textContent = 'Importing WebLLM…';
+
+  try {
+    const webllm = await import('https://esm.run/@mlc-ai/web-llm');
+
+    status.textContent = 'Downloading model (first time only, cached after)…';
+
+    const engine = await webllm.CreateMLCEngine(modelId, {
+      initProgressCallback: (p) => {
+        const pct = Math.round((p.progress || 0) * 100);
+        progBar.style.width = pct + '%';
+        status.textContent = p.text || `Loading… ${pct}%`;
+      }
+    });
+
+    window._localEngine = engine;
+    window._localHistory = [];
+    progWrap.style.display = 'none';
+    status.textContent = `${modelId.split('-').slice(0,3).join(' ')} ready.`;
+    btn.textContent = 'Loaded';
+
+    document.getElementById('aiLocalBody').style.display = 'none';
+    document.getElementById('aiLocalMessages').style.display = '';
+    document.getElementById('aiLocalInputRow').style.display = '';
+    setTimeout(() => document.getElementById('aiLocalInput').focus(), 100);
+
+    const msgs = document.getElementById('aiLocalMessages');
+    const empty = document.createElement('div');
+    empty.className = 'ai-empty';
+    empty.innerHTML = `<div class="ai-empty-ico">✦</div><div class="ai-empty-text">Local model ready!<br>Everything runs in your browser — no data leaves your device.</div>`;
+    msgs.appendChild(empty);
+
+  } catch (err) {
+    status.textContent = `Error: ${err.message}`;
+    progWrap.style.display = 'none';
+    btn.disabled = false;
+    btn.textContent = 'Retry';
+    _localLoading = false;
+  }
+}
+
+async function sendLocalAI() {
+  if (!window._localEngine) return;
+  const input = document.getElementById('aiLocalInput');
+  const text  = input.value.trim();
+  if (!text) return;
+
+  input.value = '';
+  input.style.height = 'auto';
+
+  const msgs = document.getElementById('aiLocalMessages');
+  msgs.querySelectorAll('.ai-empty').forEach(e => e.remove());
+
+  const addMsg = (role, content) => {
+    const wrap = document.createElement('div');
+    wrap.className = `ai-msg ${role === 'user' ? 'user' : 'ai'}`;
+    const safe = content.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+    wrap.innerHTML = role === 'user'
+      ? `<div class="ai-bubble">${safe}</div>`
+      : `<div class="ai-avatar"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a9 9 0 0 1 9 9c0 3.18-1.65 5.97-4.13 7.56L16 21H8l-.87-2.44A9 9 0 0 1 12 2z"/></svg></div><div class="ai-bubble">${safe}</div>`;
+    msgs.appendChild(wrap);
+    msgs.scrollTop = msgs.scrollHeight;
+    return wrap;
+  };
+
+  addMsg('user', text);
+  window._localHistory.push({ role: 'user', content: text });
+
+  const sendBtn = document.getElementById('aiLocalSendBtn');
+  sendBtn.disabled = true;
+  input.disabled = true;
+
+  const replyWrap = addMsg('ai', '…');
+  const bubble = replyWrap.querySelector('.ai-bubble');
+  let replyText = '';
+
+  try {
+    const chunks = await window._localEngine.chat.completions.create({
+      messages: window._localHistory,
+      stream: true,
+      temperature: 0.7,
+    });
+    for await (const chunk of chunks) {
+      const delta = chunk.choices[0]?.delta?.content || '';
+      replyText += delta;
+      bubble.innerHTML = replyText.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+      msgs.scrollTop = msgs.scrollHeight;
+    }
+    window._localHistory.push({ role: 'assistant', content: replyText });
+  } catch (err) {
+    bubble.textContent = `Error: ${err.message}`;
+  } finally {
+    sendBtn.disabled = false;
+    input.disabled = false;
+    input.focus();
   }
 }
 
