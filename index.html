@@ -1929,8 +1929,7 @@ const BASE_ITEMS = {
     
   ],
   apps:   [
-    {icon:'bolt',   name:'Vexis AI',    desc:'Chat, image generation & local AI', url:'ai.html', fixed:true},
-    
+
   ],
   tools:  [
     {icon:'code',   name:'Calculator',  desc:'calc for short🤓',    url:'tools/calculator.html'},
@@ -2253,12 +2252,17 @@ async function doSignOut() {
    BUILD HOME
 ══════════════════════════════════════════════ */
 function buildHome() {
+  const aiBtn = `
+    <div class="nav-circle-wrap" onclick="openIframe('Vexis AI', 'ai.html', 'home')">
+      <div class="nav-circle">${ico('bolt', 22)}</div>
+      <span class="nav-circle-label">AI</span>
+    </div>`;
   document.getElementById('navCircles').innerHTML = NAV_SECTIONS.map(s => `
     <div class="nav-circle-wrap" onclick="navigateTo('${s.key}')">
       <div class="nav-circle">${ico(s.icon, 22)}</div>
       <span class="nav-circle-label">${s.label}</span>
     </div>
-  `).join('');
+  `).join('') + aiBtn;
 }
 
 /* ══════════════════════════════════════════════
