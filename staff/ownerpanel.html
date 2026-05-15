@@ -96,6 +96,7 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',-apple-system,BlinkM
 .user-name{font-size:.76rem;font-weight:600;color:var(--white);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .user-email{font-size:.62rem;color:var(--dim);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .user-role{padding:2px 8px;border-radius:5px;font-size:.58rem;font-weight:700;text-transform:uppercase;flex-shrink:0}
+.user-role.main_owner{background:rgba(255,80,220,.12);border:1px solid rgba(255,80,220,.35);color:#ff50dc}
 .user-role.owner{background:rgba(255,184,74,.1);border:1px solid rgba(255,184,74,.3);color:#ffb84a}
 .user-role.moderator{background:rgba(122,160,255,.1);border:1px solid rgba(122,160,255,.3);color:#7aa0ff}
 .user-role.banned{background:rgba(248,81,73,.1);border:1px solid rgba(248,81,73,.25);color:var(--danger)}
@@ -155,7 +156,31 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',-apple-system,BlinkM
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--raise2);border:1px solid var(--bdrhi);border-radius:8px;padding:9px 18px;font-size:.76rem;color:var(--white);opacity:0;transition:all .2s;pointer-events:none;z-index:9999;white-space:nowrap}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-@media(max-width:600px){.sidebar{width:52px}.nav-item span{display:none}.nav-count{display:none}}
+@media(max-width:900px){
+  .sidebar{width:52px}
+  .nav-item span{display:none}
+  .nav-count{display:none}
+  .content{padding:12px}
+  .stat-grid{grid-template-columns:repeat(2,1fr)}
+  .stat-val{font-size:1.2rem}
+  .drawer{width:min(300px,92vw)}
+  .add-grid{grid-template-columns:1fr}
+  .add-grid .btn-accent{grid-column:1}
+}
+@media(max-width:600px){
+  .header{padding:10px 12px}
+  .header-title{font-size:.82rem}
+  .content{padding:10px}
+  .sec-title{font-size:.84rem}
+  .stat-grid{grid-template-columns:repeat(2,1fr);gap:6px}
+  .stat-card{padding:10px 12px}
+  .stat-val{font-size:1rem}
+  .card{padding:11px 12px}
+  .user-row{padding:8px 10px}
+  .btn{font-size:.65rem;padding:0 10px}
+  .btn-full{height:32px;font-size:.68rem}
+  .inp,.ta{font-size:.72rem}
+}
 
 /* ── USER PROFILE DRAWER ── */
 .drawer-overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .2s}
@@ -192,7 +217,7 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',-apple-system,BlinkM
       <div class="header-title">Owner Panel</div>
       <div class="header-sub">Full platform control</div>
     </div>
-    <span class="badge">Owner</span>
+    <span class="badge" id="roleBadge">Owner</span>
   </div>
 
   <div class="main">
@@ -389,11 +414,17 @@ const bust  = k => { delete _cache[k]; };
 auth.onAuthStateChanged(async user => {
   if (!user) { document.body.innerHTML = '<div style="text-align:center;padding:60px;color:#555;font-family:sans-serif">Not signed in.</div>'; return; }
   const snap = await db.collection('users').doc(user.uid).get();
-  if (snap.data()?.role !== 'owner') {
+  const myRole = snap.data()?.role;
+  if (myRole !== 'owner' && myRole !== 'main_owner') {
     document.body.innerHTML = '<div style="text-align:center;padding:60px;color:#555;font-family:sans-serif">Owner access required.</div>';
     return;
   }
+  window._myRole = myRole;
   me = user;
+  if (myRole === 'main_owner') {
+    const b = document.getElementById('roleBadge');
+    if (b) { b.textContent = 'Main Owner'; b.style.background='rgba(255,80,220,.12)'; b.style.borderColor='rgba(255,80,220,.35)'; b.style.color='#ff50dc'; }
+  }
   go('dashboard');
 });
 
@@ -574,23 +605,29 @@ function renderUsers(users) {
   const el = document.getElementById('usersList');
   if (!users.length) { el.innerHTML='<div class="empty"><div class="empty-text">No users found.</div></div>'; return; }
   el.innerHTML = '';
+  const iAmMainOwner = window._myRole === 'main_owner';
   users.forEach(u => {
-    const role = u.role||'user'; const isMe = u.id===me?.uid; const isOwn = role==='owner';
+    const role = u.role||'user';
+    const isMe = u.id===me?.uid;
+    const isOwner = role==='owner' || role==='main_owner';
+    // Regular owners can't act on other owners; main_owner can act on everyone except themselves
+    const canAct = !isMe && (!isOwner || iAmMainOwner);
     const row = document.createElement('div'); row.className='user-row'; row.style.cursor='pointer';
     row.title = 'Click to view profile';
     const avStyle = u.photoURL ? `background-image:url('${u.photoURL}');color:transparent` : `background:hsl(${Math.abs([...(u.id||'')].reduce((h,c)=>((h<<5)-h)+c.charCodeAt(0),0))%360},42%,32%)`;
     const init = u.photoURL ? '' : (u.displayName||'?')[0].toUpperCase();
-    const actionsHtml = isMe||isOwn ? '' : `
+    const actionsHtml = !canAct ? '' : `
       <div class="user-actions" onclick="event.stopPropagation()">
         ${role==='moderator'
           ? `<button class="btn btn-sm" onclick="setRole('${u.id}','user',this)">Remove Mod</button>`
           : role==='banned'
             ? `<button class="btn btn-sm" onclick="setRole('${u.id}','user',this)">Unban</button>`
-            : `<button class="btn btn-sm" onclick="setRole('${u.id}','moderator',this)">Make Mod</button>`
+            : role==='owner' && iAmMainOwner
+              ? `<button class="btn btn-sm" onclick="setRole('${u.id}','user',this)">Remove Owner</button>`
+              : `<button class="btn btn-sm" onclick="setRole('${u.id}','moderator',this)">Make Mod</button>`
         }
+        ${iAmMainOwner && role!=='owner' && role!=='main_owner' && role!=='banned' ? `<button class="btn btn-sm" onclick="setRole('${u.id}','owner',this)">Make Owner</button>` : ''}
         ${role!=='banned'?`<button class="btn btn-danger" onclick="setRole('${u.id}','banned',this)">Ban</button>`:''}
-        <button class="btn btn-sm" onclick="adjustCoins('${u.id}',this)">Coins</button>
-        <button class="btn btn-sm" onclick="renameUser('${u.id}','${esc(u.displayName||'').replace(/'/g,"\\'")}',this)">Rename</button>
       </div>`;
     row.innerHTML = `<div class="user-av" style="${avStyle}">${init}</div>
       <div class="user-info"><div class="user-name">${esc(u.displayName||'Unknown')}${isMe?' <span style="color:var(--dim);font-weight:400">(you)</span>':''}</div><div class="user-email">${esc(u.email||u.id)}</div></div>
@@ -605,13 +642,16 @@ function renderUsers(users) {
 function openUserDrawer(u) {
   const role    = u.role || 'user';
   const isMe    = u.id === me?.uid;
-  const isOwner = role === 'owner';
+  const isOwner = role === 'owner' || role === 'main_owner';
+  const iAmMainOwner = window._myRole === 'main_owner';
+  const canAct  = !isMe && (!isOwner || iAmMainOwner);
   const avStyle = u.photoURL
     ? `background-image:url('${u.photoURL}');color:transparent`
     : `background:hsl(${Math.abs([...(u.id||'')].reduce((h,c)=>((h<<5)-h)+c.charCodeAt(0),0))%360},42%,32%)`;
   const init = u.photoURL ? '' : (u.displayName||'?')[0].toUpperCase();
 
-  const roleBadge = {
+  const roleBadgeStyle = {
+    main_owner:'background:rgba(255,80,220,.12);border:1px solid rgba(255,80,220,.35);color:#ff50dc',
     owner:     'background:rgba(255,184,74,.12);border:1px solid rgba(255,184,74,.3);color:#ffb84a',
     moderator: 'background:rgba(122,160,255,.12);border:1px solid rgba(122,160,255,.3);color:#7aa0ff',
     banned:    'background:rgba(248,81,73,.1);border:1px solid rgba(248,81,73,.25);color:#f85149',
@@ -626,9 +666,8 @@ function openUserDrawer(u) {
     ['UID',          `<span class="mono">${esc(u.id)}</span>`],
     ['Display Name', esc(u.displayName || '—')],
     ['Email',        esc(u.email || '—')],
-    ['Role',         `<span style="padding:2px 7px;border-radius:4px;font-size:.65rem;font-weight:700;${roleBadge}">${role}</span>`],
+    ['Role',         `<span style="padding:2px 7px;border-radius:4px;font-size:.65rem;font-weight:700;${roleBadgeStyle}">${role}</span>`],
     ['Joined',       joinDate],
-    ['Coins',        u.coins !== undefined ? u.coins : '—'],
     ['Messages',     u._msgCount !== undefined ? u._msgCount : '<span style="color:var(--muted);font-size:.68rem">loading…</span>'],
   ];
 
@@ -637,42 +676,44 @@ function openUserDrawer(u) {
     <div class="drawer-name">${esc(u.displayName||'Unknown')}</div>
     <div class="drawer-email">${esc(u.email||u.id)}</div>
     <div class="drawer-badges">
-      <span style="padding:3px 10px;border-radius:20px;font-size:.6rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;${roleBadge}">${role}</span>
+      <span style="padding:3px 10px;border-radius:20px;font-size:.6rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;${roleBadgeStyle}">${role}</span>
       ${isMe ? '<span style="padding:3px 10px;border-radius:20px;font-size:.6rem;font-weight:700;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:#7a7a7a">YOU</span>' : ''}
     </div>
     <div>
       ${infoRows.map(([l,v]) => `<div class="info-row"><span class="info-label">${l}</span><span class="info-val">${v}</span></div>`).join('')}
     </div>`;
 
-  // Action buttons (not for self or owner)
   const actions = document.getElementById('drawerActions');
-  if (!isMe && !isOwner) {
+  if (canAct) {
     actions.style.display = '';
     const isBanned = role === 'banned';
     const isMod    = role === 'moderator';
+    const isOwnerRole = role === 'owner';
     actions.innerHTML = `
       ${isMod
         ? `<button class="btn btn-sm btn-full" onclick="drawerSetRole('${u.id}','user',this)">Remove Moderator</button>`
         : isBanned
           ? `<button class="btn btn-sm btn-full" onclick="drawerSetRole('${u.id}','user',this)">Unban User</button>`
-          : `<button class="btn btn-sm btn-full" onclick="drawerSetRole('${u.id}','moderator',this)">Promote to Moderator</button>`
+          : isOwnerRole && iAmMainOwner
+            ? `<button class="btn btn-sm btn-full" onclick="drawerSetRole('${u.id}','user',this)">Remove Owner</button>`
+            : `<button class="btn btn-sm btn-full" onclick="drawerSetRole('${u.id}','moderator',this)">Promote to Moderator</button>`
       }
+      ${iAmMainOwner && !isOwnerRole && !isBanned ? `<button class="btn btn-sm btn-full" onclick="drawerSetRole('${u.id}','owner',this)">Promote to Owner</button>` : ''}
       ${!isBanned ? `<button class="btn btn-danger btn-full" onclick="drawerSetRole('${u.id}','banned',this)">Ban User</button>` : ''}
-      <button class="btn btn-sm btn-full" onclick="drawerAdjustCoins('${u.id}',this)">Adjust Coins</button>
-      <button class="btn btn-sm btn-full" onclick="drawerRename('${u.id}','${esc(u.displayName||'').replace(/'/g,"\\'")}',this)">Rename</button>`;
+      <button class="btn btn-sm btn-full" onclick="drawerRename('${u.id}','${esc(u.displayName||'').replace(/'/g,"\\'")}',this)">Rename</button>
+      <button class="btn btn-sm btn-full" onclick="drawerWipeMessages('${u.id}',this)">Wipe Messages</button>
+      ${u.email ? `<button class="btn btn-sm btn-full" onclick="drawerSendPasswordReset('${esc(u.email)}',this)">Send Password Reset</button>` : ''}`;
   } else {
     actions.style.display = 'none';
   }
 
   document.getElementById('drawerOverlay').classList.add('open');
 
-  // Load message count async
   if (u._msgCount === undefined) {
     db.collection('socialMessages').where('userId','==',u.id).get().then(snap => {
       u._msgCount = snap.size;
       const rows = document.querySelectorAll('#drawerBody .info-val');
-      // find the messages row (index 6)
-      if (rows[6]) rows[6].textContent = snap.size;
+      if (rows[5]) rows[5].textContent = snap.size;
     }).catch(()=>{});
   }
 }
@@ -687,49 +728,53 @@ async function drawerSetRole(uid, role, btn) {
     await db.collection('users').doc(uid).update({ role });
     const u = _allUsers.find(x => x.id === uid); if (u) u.role = role;
     bust('users'); renderUsers(_allUsers); closeDrawer();
-    toast(role === 'banned' ? 'User banned' : role === 'moderator' ? 'Promoted to mod' : 'Role updated');
+    const msg = {banned:'User banned',moderator:'Promoted to moderator',owner:'Promoted to owner',user:'Role removed'}[role] || 'Role updated';
+    toast(msg);
   } catch(e) { toast('Error: ' + e.message); btn.disabled = false; btn.textContent = 'Retry'; }
-}
-
-async function drawerAdjustCoins(uid, btn) {
-  const amt = prompt('Coin amount to add (negative to subtract):'); if (amt === null) return;
-  const n = parseInt(amt); if (isNaN(n)) { toast('Invalid number'); return; }
-  btn.disabled = true;
-  try {
-    await db.collection('users').doc(uid).update({ coins: FS.FieldValue.increment(n) });
-    const u = _allUsers.find(x => x.id === uid); if (u) { u.coins = (u.coins || 0) + n; u._msgCount = u._msgCount; }
-    toast(`${n >= 0 ? '+' : ''}${n} coins applied`);
-  } catch(e) { toast('Error: ' + e.message); }
-  finally { btn.disabled = false; }
 }
 
 async function drawerRename(uid, cur, btn) {
   const name = prompt('New display name:', cur); if (!name || name.trim() === cur) return;
-  btn.disabled = true;
+  btn.disabled = true; btn.textContent = 'Saving…';
   try {
     await db.collection('users').doc(uid).update({ displayName: name.trim() });
     const u = _allUsers.find(x => x.id === uid); if (u) u.displayName = name.trim();
     renderUsers(_allUsers); closeDrawer(); toast('Name updated');
-  } catch(e) { toast('Error: ' + e.message); btn.disabled = false; }
+  } catch(e) { toast('Error: ' + e.message); btn.disabled = false; btn.textContent = 'Rename'; }
+}
+
+async function drawerWipeMessages(uid, btn) {
+  if (!confirm('Delete ALL messages from this user? This cannot be undone.')) return;
+  btn.disabled = true; btn.textContent = 'Wiping…';
+  try {
+    const snap = await db.collection('socialMessages').where('userId','==',uid).get();
+    const batch = db.batch();
+    snap.docs.forEach(d => batch.delete(d.ref));
+    await batch.commit();
+    const u = _allUsers.find(x => x.id === uid); if (u) u._msgCount = 0;
+    closeDrawer(); toast(`Deleted ${snap.size} message${snap.size===1?'':'s'}`);
+  } catch(e) { toast('Error: ' + e.message); btn.disabled = false; btn.textContent = 'Wipe Messages'; }
+}
+
+async function drawerSendPasswordReset(email, btn) {
+  if (!confirm(`Send password reset email to ${email}?`)) return;
+  btn.disabled = true; btn.textContent = 'Sending…';
+  try {
+    await firebase.auth().sendPasswordResetEmail(email);
+    toast('Password reset email sent');
+  } catch(e) { toast('Error: ' + e.message); }
+  finally { btn.disabled = false; btn.textContent = 'Send Password Reset'; }
 }
 
 async function setRole(uid, role, btn) {
-  btn.disabled=true;btn.textContent='Updating…';
+  btn.disabled=true; btn.textContent='…';
   try {
     await db.collection('users').doc(uid).update({role});
     const u=_allUsers.find(x=>x.id===uid); if(u) u.role=role;
     bust('users'); renderUsers(_allUsers);
-    toast(role==='banned'?'User banned':role==='moderator'?'Promoted to mod':'Role updated');
+    const msg = {banned:'User banned',moderator:'Promoted to mod',owner:'Promoted to owner',user:'Role removed'}[role] || 'Role updated';
+    toast(msg);
   } catch(e){toast('Error: '+e.message);btn.disabled=false;btn.textContent='Retry';}
-}
-
-async function adjustCoins(uid, btn) {
-  const amt = prompt('Coin amount to add (negative to subtract):'); if(amt===null)return;
-  const n=parseInt(amt); if(isNaN(n)){toast('Invalid number');return;}
-  btn.disabled=true;
-  try { await db.collection('users').doc(uid).update({coins:FS.FieldValue.increment(n)}); toast(`${n>=0?'+':''}${n} coins applied`); }
-  catch(e){toast('Error: '+e.message);}
-  finally{btn.disabled=false;}
 }
 
 async function renameUser(uid, cur, btn) {
