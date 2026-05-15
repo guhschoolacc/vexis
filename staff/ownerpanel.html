@@ -37,10 +37,12 @@
             --radius: 12px;
             --radius-lg: 16px;
             --transition: 160ms cubic-bezier(0.4, 0, 0.2, 1);
+            --font-base: 0.8rem;
+            --line-height: 1.5;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        html, body { height: 100%; overflow: hidden; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; }
+        html, body { height: 100%; overflow: hidden; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; font-size: var(--font-base); line-height: var(--line-height); }
 
         ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-thumb { background: var(--border-hi); border-radius: 10px; }
@@ -49,51 +51,54 @@
 
         .header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 14px 22px; display: flex; align-items: center; gap: 14px; flex-shrink: 0; backdrop-filter: blur(12px); }
         .header-icon { width: 38px; height: 38px; border-radius: var(--radius); background: var(--accent-soft); border: 1px solid var(--accent-border); display: flex; align-items: center; justify-content: center; color: var(--accent); }
-        .header-title { font-size: 0.9rem; font-weight: 700; color: var(--text-white); }
-        .header-sub { font-size: 0.65rem; color: var(--text-dim); }
-        .badge { padding: 5px 13px; border-radius: 20px; font-size: 0.6rem; font-weight: 700; text-transform: uppercase; background: var(--accent-soft); border: 1px solid var(--accent-border); color: var(--accent); margin-left: auto; }
+        .header-title { font-size: 0.95rem; font-weight: 700; color: var(--text-white); }
+        .header-sub { font-size: 0.68rem; color: var(--text-dim); }
+        .badge { padding: 5px 13px; border-radius: 20px; font-size: 0.62rem; font-weight: 700; text-transform: uppercase; background: var(--accent-soft); border: 1px solid var(--accent-border); color: var(--accent); margin-left: auto; }
 
         .main { display: flex; flex: 1; overflow: hidden; }
         .sidebar { width: 200px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 10px 8px; gap: 1px; overflow-y: auto; }
-        .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: var(--radius-sm); cursor: pointer; font-size: 0.78rem; font-weight: 500; color: var(--text-dim); transition: all var(--transition); }
+        .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: var(--radius-sm); cursor: pointer; font-size: 0.8rem; font-weight: 500; color: var(--text-dim); transition: all var(--transition); }
         .nav-item:hover { color: var(--text-bright); background: var(--surface-raised); }
         .nav-item.active { color: var(--text-white); background: var(--surface-overlay); position: relative; }
         .nav-item.active::before { content: ''; position: absolute; left: 0; top: 6px; bottom: 6px; width: 3px; border-radius: 0 3px 3px 0; background: var(--accent); }
         .nav-item svg { opacity: 0.55; }
         .nav-item.active svg { opacity: 1; color: var(--accent); }
         .nav-sep { height: 1px; background: var(--border); margin: 8px 6px; }
-        .nav-count { margin-left: auto; background: var(--danger-soft); color: var(--danger); border-radius: 10px; font-size: 0.58rem; padding: 2px 7px; }
+        .nav-count { margin-left: auto; background: var(--danger-soft); color: var(--danger); border-radius: 10px; font-size: 0.6rem; font-weight: 700; padding: 2px 7px; }
 
         .content { flex: 1; overflow-y: auto; padding: 24px 28px; background: var(--bg-alt); }
         .section { display: none; animation: fadeSlide 0.28s ease-out; }
         .section.active { display: block; }
         @keyframes fadeSlide { from { opacity: 0; transform: translateY(8px); } }
 
-        .sec-title { font-size: 1.05rem; font-weight: 700; color: var(--text-white); margin-bottom: 2px; }
-        .sec-sub { font-size: 0.68rem; color: var(--text-dim); margin-bottom: 20px; }
-        .sec-label { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin: 22px 0 10px; }
+        .sec-title { font-size: 1.1rem; font-weight: 700; color: var(--text-white); margin-bottom: 4px; }
+        .sec-sub { font-size: 0.72rem; color: var(--text-dim); margin-bottom: 22px; }
+        .sec-label { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin: 24px 0 10px; }
         .sec-label:first-of-type { margin-top: 0; }
 
-        .stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px,1fr)); gap: 10px; margin-bottom: 24px; }
-        .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; }
-        .stat-val { font-size: 1.65rem; font-weight: 800; color: var(--text-white); font-family: 'JetBrains Mono', monospace; }
-        .stat-lbl { font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; margin-top: 6px; }
+        .stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px,1fr)); gap: 10px; margin-bottom: 26px; }
+        .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; }
+        .stat-val { font-size: 1.7rem; font-weight: 800; color: var(--text-white); font-family: 'JetBrains Mono', monospace; }
+        .stat-lbl { font-size: 0.62rem; color: var(--text-muted); text-transform: uppercase; margin-top: 6px; }
 
-        .top-user { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
-        .top-rank { width: 24px; font-size: 0.62rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
-        .top-name { flex: 1; font-size: 0.76rem; color: var(--text); }
-        .top-count { font-size: 0.68rem; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; background: var(--surface-raised); padding: 3px 8px; border-radius: 6px; }
+        .top-user { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 0.8rem; }
+        .top-rank { width: 24px; font-size: 0.65rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
+        .top-name { flex: 1; color: var(--text); font-weight: 500; }
+        .top-count { font-size: 0.7rem; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; background: var(--surface-raised); padding: 3px 8px; border-radius: 6px; }
 
-        .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 15px 18px; margin-bottom: 8px; }
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; margin-bottom: 10px; font-size: 0.82rem; }
         .card.resolved, .card.done { opacity: 0.4; pointer-events: none; }
-        .card-top { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 10px; }
-        .tag { padding: 3px 10px; border-radius: 6px; font-size: 0.58rem; font-weight: 700; text-transform: uppercase; }
+        .card-top { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 12px; }
+        .tag { padding: 3px 10px; border-radius: 6px; font-size: 0.6rem; font-weight: 700; text-transform: uppercase; }
         .tag.pending { background: rgba(240,160,64,0.1); color: #f0a040; }
         .tag.open { background: var(--danger-soft); color: var(--danger); }
         .tag.resolved, .tag.done { background: var(--success-soft); color: var(--success); }
-        .card-who { flex: 1; font-size: 0.74rem; }
-        .card-body { background: var(--bg-alt); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 10px; font-size: 0.77rem; }
-        .btn { padding: 0 16px; height: 32px; border-radius: var(--radius-sm); font-size: 0.7rem; font-weight: 600; border: none; cursor: pointer; transition: all var(--transition); }
+        .card-who { flex: 1; font-size: 0.78rem; }
+        .card-body { background: var(--bg-alt); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 12px; font-size: 0.82rem; line-height: 1.5; }
+        .card-title { font-size: 0.85rem; font-weight: 600; color: var(--text-white); margin-bottom: 4px; }
+        .card-desc { font-size: 0.8rem; color: var(--text); line-height: 1.5; }
+
+        .btn { padding: 0 16px; height: 34px; border-radius: var(--radius-sm); font-size: 0.72rem; font-weight: 600; border: none; cursor: pointer; transition: all var(--transition); display: inline-flex; align-items: center; justify-content: center; gap: 5px; }
         .btn:disabled { opacity: 0.4; cursor: not-allowed; }
         .btn-sm { background: var(--surface-overlay); color: var(--text); border: 1px solid var(--border); }
         .btn-sm:hover:not(:disabled) { border-color: var(--border-hi); color: var(--text-white); }
@@ -101,53 +106,91 @@
         .btn-danger:hover:not(:disabled) { background: rgba(248,81,73,0.2); }
         .btn-accent { background: var(--accent); color: #0a0a0f; font-weight: 700; }
         .btn-accent:hover:not(:disabled) { filter: brightness(1.08); }
+        .btn-full { width: 100%; height: 38px; font-size: 0.78rem; margin-top: 6px; }
 
-        .inp, .ta { background: var(--bg-alt); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 9px 13px; font-size: 0.76rem; color: var(--text-white); outline: none; width: 100%; font-family: inherit; }
+        .inp, .ta { background: var(--bg-alt); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 14px; font-size: 0.82rem; color: var(--text-white); outline: none; width: 100%; font-family: inherit; line-height: 1.5; }
         .inp:focus, .ta:focus { border-color: var(--accent-border); box-shadow: 0 0 0 3px var(--accent-soft); }
+        .ta { min-height: 80px; resize: vertical; }
 
-        .user-row { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 11px 15px; margin-bottom: 6px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all var(--transition); }
+        .user-row { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 16px; margin-bottom: 7px; display: flex; align-items: center; gap: 14px; cursor: pointer; transition: all var(--transition); }
         .user-row:hover { border-color: var(--border-hi); transform: translateX(2px); }
-        .user-av { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #fff; background-size: cover; }
-        .user-info { flex: 1; }
-        .user-name { font-size: 0.78rem; font-weight: 600; color: var(--text-white); }
-        .user-email { font-size: 0.63rem; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; }
-        .user-role { padding: 3px 10px; border-radius: 6px; font-size: 0.58rem; font-weight: 700; text-transform: uppercase; }
+        .user-av { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #fff; background-size: cover; font-size: 0.9rem; }
+        .user-info { flex: 1; min-width: 0; }
+        .user-name { font-size: 0.82rem; font-weight: 600; color: var(--text-white); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .user-email { font-size: 0.65rem; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; margin-top: 2px; }
+        .user-role { padding: 3px 10px; border-radius: 6px; font-size: 0.6rem; font-weight: 700; text-transform: uppercase; flex-shrink: 0; }
         .user-role.main_owner { background: var(--purple-soft); color: #d070ff; }
         .user-role.owner { background: var(--accent-soft); color: #f0a040; }
         .user-role.moderator { background: var(--info-soft); color: #7aa0ff; }
         .user-role.banned { background: var(--danger-soft); color: var(--danger); }
+        .user-role.user { background: var(--surface-overlay); color: var(--text-dim); }
+        .user-actions { display: flex; gap: 5px; flex-wrap: wrap; }
 
-        .flag-row { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 13px 16px; display: flex; justify-content: space-between; margin-bottom: 7px; }
-        .toggle { width: 40px; height: 22px; border-radius: 11px; background: var(--surface-overlay); border: 1px solid var(--border-hi); cursor: pointer; position: relative; }
+        .msg-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; display: flex; align-items: flex-start; gap: 14px; margin-bottom: 8px; font-size: 0.82rem; }
+        .msg-name { font-weight: 600; color: var(--text-white); margin-bottom: 3px; }
+        .msg-text { color: var(--text); line-height: 1.5; word-break: break-word; }
+        .msg-time { font-size: 0.62rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; white-space: nowrap; }
+        .msg-del { background: none; border: none; cursor: pointer; color: var(--text-dim); font-size: 1.1rem; padding: 4px 8px; border-radius: 6px; }
+        .msg-del:hover { background: var(--danger-soft); color: var(--danger); }
+
+        .ann-item { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; display: flex; gap: 14px; align-items: flex-start; margin-bottom: 8px; }
+        .ann-badge { padding: 3px 10px; border-radius: 6px; font-size: 0.6rem; font-weight: 700; background: var(--accent-soft); border: 1px solid var(--accent-border); color: var(--accent); flex-shrink: 0; margin-top: 2px; }
+        .ann-text { font-size: 0.82rem; color: var(--text); flex: 1; line-height: 1.5; }
+        .ann-time { font-size: 0.62rem; color: var(--text-muted); margin-top: 4px; font-family: 'JetBrains Mono', monospace; }
+
+        .flag-row { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+        .flag-label { font-size: 0.82rem; color: var(--text); font-weight: 500; }
+        .flag-sub { font-size: 0.65rem; color: var(--text-dim); margin-top: 2px; }
+        .toggle { width: 42px; height: 24px; border-radius: 12px; background: var(--surface-overlay); border: 1px solid var(--border-hi); cursor: pointer; position: relative; flex-shrink: 0; }
         .toggle.on { background: rgba(63,185,80,0.2); border-color: rgba(63,185,80,0.45); }
-        .toggle::after { content: ''; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: var(--text-dim); transition: 0.2s; }
+        .toggle::after { content: ''; position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%; background: var(--text-dim); transition: 0.2s; }
         .toggle.on::after { transform: translateX(18px); background: var(--success); }
 
-        .msg-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 16px; display: flex; gap: 14px; margin-bottom: 6px; }
-        .msg-name { font-weight: 600; color: var(--text-white); }
+        .automod-box { background: var(--bg-alt); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 20px; }
+        .tag-list { display: flex; flex-wrap: wrap; gap: 6px; min-height: 32px; margin-bottom: 12px; }
+        .word-tag { display: flex; align-items: center; gap: 5px; background: var(--danger-soft); border: 1px solid var(--danger-border); border-radius: 6px; padding: 4px 10px; font-size: 0.72rem; color: var(--danger); }
+        .word-tag-x { background: none; border: none; cursor: pointer; color: inherit; font-size: 1rem; padding: 0 3px; }
+        .word-tag-x:hover { opacity: 0.5; }
 
-        .toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(14px); background: var(--surface-overlay); border: 1px solid var(--border-hi); border-radius: var(--radius); padding: 10px 22px; color: var(--text-white); opacity: 0; transition: 0.2s; z-index: 9999; }
+        .add-grid { display: grid; gap: 8px; margin-top: 8px; }
+        .add-grid .html-ta { min-height: 80px; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; }
+        .item-row { display: flex; align-items: center; gap: 10px; background: var(--bg-alt); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 6px; }
+        .item-name { flex: 1; font-size: 0.78rem; color: var(--text); font-weight: 500; }
+        .item-html { font-size: 0.62rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
+        .item-del { background: none; border: none; cursor: pointer; color: var(--text-dim); font-size: 1rem; padding: 2px 6px; border-radius: 4px; }
+        .item-del:hover { background: var(--danger-soft); color: var(--danger); }
+
+        .toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(14px); background: var(--surface-overlay); border: 1px solid var(--border-hi); border-radius: var(--radius); padding: 10px 24px; color: var(--text-white); opacity: 0; transition: 0.2s; z-index: 9999; font-size: 0.8rem; font-weight: 500; }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
         /* Modal */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(8px); z-index: 600; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
         .modal-overlay.open { opacity: 1; pointer-events: all; }
-        .modal { background: var(--surface); border: 1px solid var(--border-hi); border-radius: var(--radius-lg); width: 90%; max-width: 500px; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.6); padding: 24px; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .modal-title { font-size: 1rem; font-weight: 700; color: var(--text-white); }
-        .modal-close { background: none; border: none; color: var(--text-dim); font-size: 1.2rem; cursor: pointer; }
-        .modal-body { display: flex; flex-direction: column; align-items: center; }
-        .modal-av { width: 72px; height: 72px; border-radius: 50%; background-size: cover; margin-bottom: 16px; }
-        .modal-name { font-size: 1rem; font-weight: 700; color: var(--text-white); }
-        .modal-email { font-size: 0.7rem; color: var(--text-dim); margin-bottom: 16px; }
-        .modal-badges { display: flex; gap: 8px; margin-bottom: 20px; }
+        .modal { background: var(--surface); border: 1px solid var(--border-hi); border-radius: var(--radius-lg); width: 90%; max-width: 520px; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.6); padding: 28px; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; }
+        .modal-title { font-size: 1.1rem; font-weight: 700; color: var(--text-white); }
+        .modal-close { background: none; border: none; color: var(--text-dim); font-size: 1.3rem; cursor: pointer; }
+        .modal-body { display: flex; flex-direction: column; align-items: center; margin-bottom: 18px; }
+        .modal-av { width: 76px; height: 76px; border-radius: 50%; background-size: cover; margin-bottom: 16px; font-size: 1.8rem; display: flex; align-items: center; justify-content: center; color: #fff; }
+        .modal-name { font-size: 1.1rem; font-weight: 700; color: var(--text-white); }
+        .modal-email { font-size: 0.72rem; color: var(--text-dim); margin-bottom: 16px; font-family: 'JetBrains Mono', monospace; }
+        .modal-badges { display: flex; gap: 8px; margin-bottom: 22px; }
         .info-row { display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid var(--border); width: 100%; }
-        .info-label { font-size: 0.65rem; text-transform: uppercase; color: var(--text-muted); }
-        .info-val { font-size: 0.78rem; color: var(--text); }
-        .modal-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 20px; width: 100%; }
+        .info-label { font-size: 0.68rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; }
+        .info-val { font-size: 0.82rem; color: var(--text); font-weight: 500; }
+        .modal-actions { display: flex; flex-direction: column; gap: 8px; width: 100%; margin-top: 10px; }
 
-        @media (max-width: 900px) { .sidebar { width: 56px; } .nav-item span { display: none; } .content { padding: 14px; } }
-        @media (max-width: 600px) { .header { padding: 10px 14px; } .content { padding: 10px; } }
+        .empty { text-align: center; padding: 40px 20px; color: var(--text-dim); font-size: 0.8rem; }
+
+        @media (max-width: 900px) {
+            .sidebar { width: 56px; }
+            .nav-item span { display: none; }
+            .content { padding: 16px; }
+        }
+        @media (max-width: 600px) {
+            .header { padding: 10px 14px; }
+            .content { padding: 12px; }
+        }
     </style>
 </head>
 <body>
@@ -183,14 +226,14 @@
                 <div id="topUsers"><div style="text-align:center;padding:28px"><div class="spin"></div></div></div>
             </div>
             <div class="section" id="sec-reports">
-                <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:4px">
+                <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:4px;flex-wrap:wrap;gap:10px">
                     <div><div class="sec-title">Reports</div><div class="sec-sub" style="margin-bottom:0">User-submitted message reports</div></div>
                     <button class="btn btn-sm" onclick="clearResolvedReports()">Clear Resolved</button>
                 </div>
                 <div id="reportsList"><div style="text-align:center;padding:36px"><div class="spin"></div></div></div>
             </div>
             <div class="section" id="sec-bugs">
-                <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:4px">
+                <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:4px;flex-wrap:wrap;gap:10px">
                     <div><div class="sec-title">Bug Reports</div><div class="sec-sub" style="margin-bottom:0">Submitted by users via the bug report button</div></div>
                     <button class="btn btn-sm" onclick="clearResolvedBugs()">Clear Resolved</button>
                 </div>
@@ -203,14 +246,14 @@
             </div>
             <div class="section" id="sec-chat">
                 <div class="sec-title">Chat Mod</div><div class="sec-sub">Search and delete messages from global chat</div>
-                <div style="display:flex;gap:8px;margin-bottom:16px"><input class="inp" id="chatSearch" placeholder="Keyword or @username…" onkeydown="if(event.key==='Enter')searchChat()"><button class="btn btn-accent" onclick="searchChat()">Search</button></div>
+                <div style="display:flex;gap:8px;margin-bottom:16px"><input class="inp" id="chatSearch" placeholder="Keyword or @username…" onkeydown="if(event.key==='Enter')searchChat()" style="flex:1"><button class="btn btn-accent" onclick="searchChat()">Search</button></div>
                 <div id="chatResults"><div class="empty"><div class="empty-text">Enter a keyword or username to search.</div></div></div>
             </div>
             <div class="section" id="sec-announce">
                 <div class="sec-title">Announcements</div><div class="sec-sub">Broadcast an official message to global chat</div>
-                <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:20px">
+                <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:20px">
                     <div class="field"><label class="field-label">Message</label><textarea class="ta" id="annText" placeholder="Write your announcement…"></textarea></div>
-                    <div style="display:flex;align-items:center;gap:10px"><label style="font-size:.68rem;color:var(--text-dim);display:flex;align-items:center;gap:7px"><input type="checkbox" id="annPinned"> Pin to top of chat</label><button class="btn btn-accent" style="margin-left:auto" onclick="sendAnn()">Send Announcement</button></div>
+                    <div style="display:flex;align-items:center;gap:10px"><label style="font-size:.7rem;color:var(--text-dim);display:flex;align-items:center;gap:7px"><input type="checkbox" id="annPinned"> Pin to top of chat</label><button class="btn btn-accent" style="margin-left:auto" onclick="sendAnn()">Send Announcement</button></div>
                 </div>
                 <div class="sec-label">Recent Announcements</div>
                 <div id="annHistory"><div class="empty"><div class="empty-text">No announcements yet.</div></div></div>
@@ -218,12 +261,15 @@
             <div class="section" id="sec-platform">
                 <div class="sec-title">Platform</div><div class="sec-sub">MOTD, banner, feature flags, auto-mod, and items</div>
                 <div class="sec-label">Message of the Day</div>
-                <div style="display:flex;gap:8px;margin-bottom:20px"><input class="inp" id="motdVal" placeholder="Shown on the home screen…"><button class="btn btn-accent" onclick="saveMOTD()">Save</button><button class="btn btn-sm" onclick="clearMOTD()">Clear</button></div>
+                <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap"><input class="inp" id="motdVal" placeholder="Shown on the home screen…" style="flex:1"><button class="btn btn-accent" onclick="saveMOTD()">Save</button><button class="btn btn-sm" onclick="clearMOTD()">Clear</button></div>
                 <div class="sec-label">Maintenance Banner</div>
-                <div style="display:flex;gap:8px;margin-bottom:20px"><input class="inp" id="bannerVal" placeholder="Banner message…"><button class="btn btn-accent" onclick="saveBanner(true)">Show</button><button class="btn btn-sm" onclick="saveBanner(false)">Hide</button></div>
+                <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap"><input class="inp" id="bannerVal" placeholder="Banner message…" style="flex:1"><button class="btn btn-accent" onclick="saveBanner(true)">Show</button><button class="btn btn-sm" onclick="saveBanner(false)">Hide</button></div>
                 <div class="sec-label">Feature Flags</div><div id="flagsList" style="margin-bottom:20px"></div>
                 <div class="sec-label">Auto-Mod Keywords</div>
-                <div class="automod-box" style="margin-bottom:20px"><div class="tag-list" id="automodTags"></div><div style="display:flex;gap:7px"><input class="inp" id="automodInp" placeholder="Add a blocked word…" onkeydown="if(event.key==='Enter')addWord()"><button class="btn btn-accent" onclick="addWord()">Add</button></div></div>
+                <div class="automod-box">
+                    <div class="tag-list" id="automodTags"></div>
+                    <div style="display:flex;gap:7px"><input class="inp" id="automodInp" placeholder="Add a blocked word…" onkeydown="if(event.key==='Enter')addWord()"><button class="btn btn-accent" onclick="addWord()">Add</button></div>
+                </div>
                 <div class="sec-label">Platform Items</div><div id="itemSections"></div>
             </div>
         </div>
@@ -232,9 +278,8 @@
 
 <div class="toast" id="toast"></div>
 
-<!-- USER MODAL -->
 <div class="modal-overlay" id="userModalOverlay" onclick="if(event.target===this)closeUserModal()">
-    <div class="modal" id="userModal">
+    <div class="modal">
         <div class="modal-header">
             <span class="modal-title">User Profile</span>
             <button class="modal-close" onclick="closeUserModal()">✕</button>
@@ -295,7 +340,15 @@
         document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
         document.getElementById('nav-' + sec)?.classList.add('active');
         document.getElementById('sec-' + sec)?.classList.add('active');
-        const loaders = { dashboard: loadDashboard, reports: loadReports, bugs: loadBugs, users: loadUsers, chat: ()=>{}, announce: loadAnnouncements, platform: loadPlatform };
+        const loaders = {
+            dashboard: loadDashboard,
+            reports: loadReports,
+            bugs: loadBugs,
+            users: loadUsers,
+            chat: () => {},
+            announce: loadAnnouncements,
+            platform: loadPlatform
+        };
         loaders[sec]?.();
     }
 
@@ -315,12 +368,26 @@
             if (rSnap.size) { const nc = document.getElementById('nc-reports'); nc.textContent = rSnap.size; nc.style.display = ''; }
             if (bSnap.size) { const nc = document.getElementById('nc-bugs'); nc.textContent = bSnap.size; nc.style.display = ''; }
             const counts = {};
-            mSnap.docs.forEach(d => { const dat = d.data(); if(dat.userId) { counts[dat.userId] = counts[dat.userId] || {name: dat.displayName||'?', n:0}; counts[dat.userId].n++; } });
-            const top = Object.values(counts).sort((a,b)=>b.n-a.n).slice(0,8);
+            mSnap.docs.forEach(d => {
+                const dat = d.data();
+                if (dat.userId) {
+                    counts[dat.userId] = counts[dat.userId] || { name: dat.displayName || '?', n: 0 };
+                    counts[dat.userId].n++;
+                }
+            });
+            const top = Object.values(counts).sort((a,b) => b.n - a.n).slice(0,8);
             const el = document.getElementById('topUsers');
-            el.innerHTML = top.length ? '<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px">'+top.map((u,i)=>`<div class="top-user"><span class="top-rank">${i+1}</span><span class="top-name">${esc(u.name)}</span><span class="top-count">${u.n} msg${u.n===1?'':'s'}</span></div>`).join('')+'</div>' : '<div class="empty"><div class="empty-text">No messages yet.</div></div>';
+            if (top.length) {
+                el.innerHTML = '<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px">' +
+                    top.map((u,i) => `<div class="top-user"><span class="top-rank">${i+1}</span><span class="top-name">${esc(u.name)}</span><span class="top-count">${u.n} msg${u.n===1?'':'s'}</span></div>`).join('') +
+                    '</div>';
+            } else {
+                el.innerHTML = '<div class="empty"><div class="empty-text">No messages yet.</div></div>';
+            }
             fresh('dashboard');
-        } catch(e) { document.getElementById('topUsers').innerHTML = `<div class="empty"><div class="empty-text">Error: ${esc(e.message)}</div></div>`; }
+        } catch(e) {
+            document.getElementById('topUsers').innerHTML = `<div class="empty"><div class="empty-text">Error: ${esc(e.message)}</div></div>`;
+        }
     }
 
     async function loadReports() {
@@ -329,49 +396,95 @@
         el.innerHTML = '<div style="text-align:center;padding:36px"><div class="spin"></div></div>';
         try {
             const snap = await db.collection('reports').orderBy('timestamp','desc').limit(80).get();
-            const docs = snap.docs.map(d=>({id:d.id,...d.data()}));
-            if (!docs.length) { el.innerHTML = '<div class="empty"><div class="empty-ico">✓</div><div class="empty-text">No reports yet.</div></div>'; fresh('reports'); return; }
+            const docs = snap.docs.map(d => ({id: d.id, ...d.data()}));
+            if (!docs.length) {
+                el.innerHTML = '<div class="empty"><div class="empty-ico">✓</div><div class="empty-text">No reports yet.</div></div>';
+                fresh('reports');
+                return;
+            }
             el.innerHTML = '';
             docs.forEach(r => {
-                const ts = r.timestamp?.toDate ? r.timestamp.toDate() : new Date(r.timestamp||0);
-                const time = ts.toLocaleString([],{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+                const ts = r.timestamp?.toDate ? r.timestamp.toDate() : new Date(r.timestamp || 0);
+                const time = ts.toLocaleString([], { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
                 const res = r.status === 'resolved';
-                const card = document.createElement('div'); card.className = 'card'+(res?' resolved':''); card.id='rc-'+r.id;
-                card.innerHTML = `<div class="card-top"><span class="tag ${r.status||'pending'}">${r.status||'pending'}</span><div class="card-who">By <strong>${esc(r.reportedByName||'?')}</strong> — targeting <strong>${esc(r.reportedDisplayName||'?')}</strong></div><span class="card-time">${time}</span></div><div class="card-body">${esc(r.messageText||'[no content]')}</div><div class="card-actions"><button class="btn btn-sm" ${res?'disabled':''} onclick="resolveReport('${r.id}',this)">${res?'Resolved':'Dismiss'}</button><button class="btn btn-danger" ${res?'disabled':''} onclick="deleteMsg('${r.id}','${r.messageId||''}',this)">Delete Message</button></div>`;
+                const card = document.createElement('div');
+                card.className = 'card' + (res ? ' resolved' : '');
+                card.id = 'rc-' + r.id;
+                card.innerHTML = `
+                    <div class="card-top">
+                        <span class="tag ${r.status||'pending'}">${r.status||'pending'}</span>
+                        <div class="card-who">By <strong>${esc(r.reportedByName||'?')}</strong> — targeting <strong>${esc(r.reportedDisplayName||'?')}</strong></div>
+                        <span class="card-time">${time}</span>
+                    </div>
+                    <div class="card-body">${esc(r.messageText||'[no content]')}</div>
+                    <div class="card-actions">
+                        <button class="btn btn-sm" ${res?'disabled':''} onclick="resolveReport('${r.id}',this)">${res?'Resolved':'Dismiss'}</button>
+                        <button class="btn btn-danger" ${res?'disabled':''} onclick="deleteMsg('${r.id}','${r.messageId||''}',this)">Delete Message</button>
+                    </div>`;
                 el.appendChild(card);
             });
             fresh('reports');
-        } catch(e) { el.innerHTML = `<div class="empty"><div class="empty-text">Error: ${esc(e.message)}</div></div>`; }
+        } catch(e) {
+            el.innerHTML = `<div class="empty"><div class="empty-text">Error: ${esc(e.message)}</div></div>`;
+        }
     }
 
     async function clearResolvedReports() {
         if (!confirm('Permanently delete all resolved reports?')) return;
         try {
             const snap = await db.collection('reports').where('status','==','resolved').get();
-            const batch = db.batch(); snap.docs.forEach(d => batch.delete(d.ref)); await batch.commit();
-            bust('reports'); toast(`Cleared ${snap.size} resolved report${snap.size===1?'':'s'}`); loadReports();
-        } catch(e) { toast('Error: '+e.message); }
+            const batch = db.batch();
+            snap.docs.forEach(d => batch.delete(d.ref));
+            await batch.commit();
+            bust('reports');
+            toast(`Cleared ${snap.size} resolved report${snap.size===1?'':'s'}`);
+            loadReports();
+        } catch(e) { toast('Error: ' + e.message); }
     }
 
     async function resolveReport(id, btn) {
-        btn.disabled = true; btn.textContent = 'Resolving…';
+        btn.disabled = true;
+        btn.textContent = 'Resolving…';
         try {
-            await db.collection('reports').doc(id).update({status:'resolved', resolvedBy:me.uid});
-            const c = document.getElementById('rc-'+id); if(c){c.classList.add('resolved'); c.querySelectorAll('.btn').forEach(b=>b.disabled=true); c.querySelector('.tag').className='tag resolved'; c.querySelector('.tag').textContent='resolved';}
-            bust('reports'); toast('Dismissed');
-        } catch(e) { toast('Error: '+e.message); btn.disabled = false; btn.textContent = 'Dismiss'; }
+            await db.collection('reports').doc(id).update({ status:'resolved', resolvedBy: me.uid });
+            const c = document.getElementById('rc-' + id);
+            if (c) {
+                c.classList.add('resolved');
+                c.querySelectorAll('.btn').forEach(b => b.disabled = true);
+                const tag = c.querySelector('.tag');
+                if (tag) { tag.className = 'tag resolved'; tag.textContent = 'resolved'; }
+            }
+            bust('reports');
+            toast('Dismissed');
+        } catch(e) {
+            toast('Error: ' + e.message);
+            btn.disabled = false;
+            btn.textContent = 'Dismiss';
+        }
     }
 
     async function deleteMsg(rId, mId, btn) {
-        if(!mId) return toast('No message ID');
-        if(!confirm('Delete this message?')) return;
-        btn.disabled = true; btn.textContent = 'Deleting…';
+        if (!mId) return toast('No message ID');
+        if (!confirm('Delete this message?')) return;
+        btn.disabled = true;
+        btn.textContent = 'Deleting…';
         try {
-            try{await db.collection('socialMessages').doc(mId).delete();}catch(e){}
-            await db.collection('reports').doc(rId).update({status:'resolved', resolvedBy:me.uid});
-            const c = document.getElementById('rc-'+rId); if(c){c.classList.add('resolved'); c.querySelectorAll('.btn').forEach(b=>b.disabled=true); c.querySelector('.tag').className='tag resolved'; c.querySelector('.tag').textContent='resolved';}
-            bust('reports'); toast('Message deleted');
-        } catch(e) { toast('Error: '+e.message); btn.disabled = false; btn.textContent = 'Delete Message'; }
+            try { await db.collection('socialMessages').doc(mId).delete(); } catch(e) {}
+            await db.collection('reports').doc(rId).update({ status:'resolved', resolvedBy: me.uid });
+            const c = document.getElementById('rc-' + rId);
+            if (c) {
+                c.classList.add('resolved');
+                c.querySelectorAll('.btn').forEach(b => b.disabled = true);
+                const tag = c.querySelector('.tag');
+                if (tag) { tag.className = 'tag resolved'; tag.textContent = 'resolved'; }
+            }
+            bust('reports');
+            toast('Message deleted');
+        } catch(e) {
+            toast('Error: ' + e.message);
+            btn.disabled = false;
+            btn.textContent = 'Delete Message';
+        }
     }
 
     async function loadBugs() {
@@ -380,47 +493,85 @@
         el.innerHTML = '<div style="text-align:center;padding:36px"><div class="spin"></div></div>';
         try {
             const snap = await db.collection('bugReports').orderBy('timestamp','desc').limit(80).get();
-            const docs = snap.docs.map(d=>({id:d.id,...d.data()}));
-            if (!docs.length) { el.innerHTML = '<div class="empty"><div class="empty-ico">✓</div><div class="empty-text">No bug reports yet.</div></div>'; fresh('bugs'); return; }
+            const docs = snap.docs.map(d => ({id: d.id, ...d.data()}));
+            if (!docs.length) {
+                el.innerHTML = '<div class="empty"><div class="empty-ico">✓</div><div class="empty-text">No bug reports yet.</div></div>';
+                fresh('bugs');
+                return;
+            }
             el.innerHTML = '';
             docs.forEach(b => {
-                const ts = b.timestamp?.toDate ? b.timestamp.toDate() : new Date(b.timestamp||0);
-                const time = ts.toLocaleString([],{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+                const ts = b.timestamp?.toDate ? b.timestamp.toDate() : new Date(b.timestamp || 0);
+                const time = ts.toLocaleString([], { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
                 const done = b.status === 'resolved';
-                const card = document.createElement('div'); card.className = 'card'+(done?' done':''); card.id='bc-'+b.id;
-                card.innerHTML = `<div class="card-top"><span class="tag ${b.status||'open'}">${b.status||'open'}</span><div class="card-who">By <strong>${esc(b.userName||'?')}</strong></div><span class="card-time">${time}</span></div><div class="card-title">${esc(b.title||'Untitled')}</div><div class="card-desc">${esc(b.desc||'')}</div><div class="card-actions"><button class="btn btn-sm" ${done?'disabled':''} onclick="resolveBug('${b.id}',this)">${done?'Resolved':'Mark Resolved'}</button></div>`;
+                const card = document.createElement('div');
+                card.className = 'card' + (done ? ' done' : '');
+                card.id = 'bc-' + b.id;
+                card.innerHTML = `
+                    <div class="card-top">
+                        <span class="tag ${b.status||'open'}">${b.status||'open'}</span>
+                        <div class="card-who">By <strong>${esc(b.userName||'?')}</strong></div>
+                        <span class="card-time">${time}</span>
+                    </div>
+                    <div class="card-title">${esc(b.title||'Untitled')}</div>
+                    <div class="card-desc">${esc(b.desc||'')}</div>
+                    <div class="card-actions" style="margin-top:10px">
+                        <button class="btn btn-sm" ${done?'disabled':''} onclick="resolveBug('${b.id}',this)">${done?'Resolved':'Mark Resolved'}</button>
+                    </div>`;
                 el.appendChild(card);
             });
             fresh('bugs');
-        } catch(e) { el.innerHTML = `<div class="empty"><div class="empty-text">Error: ${esc(e.message)}</div></div>`; }
+        } catch(e) {
+            el.innerHTML = `<div class="empty"><div class="empty-text">Error: ${esc(e.message)}</div></div>`;
+        }
     }
 
     async function clearResolvedBugs() {
         if (!confirm('Permanently delete all resolved bug reports?')) return;
         try {
             const snap = await db.collection('bugReports').where('status','==','resolved').get();
-            const batch = db.batch(); snap.docs.forEach(d => batch.delete(d.ref)); await batch.commit();
-            bust('bugs'); toast(`Cleared ${snap.size} resolved bug${snap.size===1?'':'s'}`); loadBugs();
-        } catch(e) { toast('Error: '+e.message); }
+            const batch = db.batch();
+            snap.docs.forEach(d => batch.delete(d.ref));
+            await batch.commit();
+            bust('bugs');
+            toast(`Cleared ${snap.size} resolved bug${snap.size===1?'':'s'}`);
+            loadBugs();
+        } catch(e) { toast('Error: ' + e.message); }
     }
 
     async function resolveBug(id, btn) {
-        btn.disabled = true; btn.textContent = 'Resolving…';
+        btn.disabled = true;
+        btn.textContent = 'Resolving…';
         try {
-            await db.collection('bugReports').doc(id).update({status:'resolved', resolvedBy:me.uid});
-            const c = document.getElementById('bc-'+id); if(c){c.classList.add('done'); c.querySelectorAll('.btn').forEach(b=>b.disabled=true); c.querySelector('.tag').className='tag done'; c.querySelector('.tag').textContent='resolved';}
-            bust('bugs'); toast('Marked resolved');
-        } catch(e) { toast('Error: '+e.message); btn.disabled = false; btn.textContent = 'Mark Resolved'; }
+            await db.collection('bugReports').doc(id).update({ status:'resolved', resolvedBy: me.uid });
+            const c = document.getElementById('bc-' + id);
+            if (c) {
+                c.classList.add('done');
+                c.querySelectorAll('.btn').forEach(b => b.disabled = true);
+                const tag = c.querySelector('.tag');
+                if (tag) { tag.className = 'tag done'; tag.textContent = 'resolved'; }
+            }
+            bust('bugs');
+            toast('Marked resolved');
+        } catch(e) {
+            toast('Error: ' + e.message);
+            btn.disabled = false;
+            btn.textContent = 'Mark Resolved';
+        }
     }
 
     async function loadUsers() {
         if (!stale('users') && _allUsers.length) { renderUsers(_allUsers); return; }
-        document.getElementById('usersList').innerHTML = '<div style="text-align:center;padding:36px"><div class="spin"></div></div>';
+        const el = document.getElementById('usersList');
+        el.innerHTML = '<div style="text-align:center;padding:36px"><div class="spin"></div></div>';
         try {
             const snap = await db.collection('users').get();
-            _allUsers = snap.docs.map(d=>({id:d.id,...d.data()}));
-            fresh('users'); renderUsers(_allUsers);
-        } catch(e) { document.getElementById('usersList').innerHTML = `<div class="empty"><div class="empty-text">Error: ${esc(e.message)}</div></div>`; }
+            _allUsers = snap.docs.map(d => ({id: d.id, ...d.data()}));
+            fresh('users');
+            renderUsers(_allUsers);
+        } catch(e) {
+            el.innerHTML = `<div class="empty"><div class="empty-text">Error: ${esc(e.message)}</div></div>`;
+        }
     }
 
     function filterUsers(q) {
@@ -438,12 +589,29 @@
             const isMe = u.id === me?.uid;
             const isOwner = role === 'owner' || role === 'main_owner';
             const canAct = !isMe && (!isOwner || iAmMainOwner);
-            const row = document.createElement('div'); row.className = 'user-row'; row.style.cursor = 'pointer';
-            const hash = Math.abs([...(u.id||'')].reduce((h,c)=>((h<<5)-h)+c.charCodeAt(0),0))%360;
+            const row = document.createElement('div');
+            row.className = 'user-row';
+            row.style.cursor = 'pointer';
+            const hash = Math.abs([...(u.id||'')].reduce((h,c) => ((h<<5)-h)+c.charCodeAt(0), 0)) % 360;
             const avStyle = u.photoURL ? `background-image:url('${u.photoURL}')` : `background:hsl(${hash},42%,32%)`;
             const init = u.photoURL ? '' : (u.displayName||'?')[0].toUpperCase();
-            const actionsHtml = canAct ? `<div class="user-actions" onclick="event.stopPropagation()">${role==='moderator'?`<button class="btn btn-sm" onclick="setRole('${u.id}','user',this)">Remove Mod</button>`:role==='banned'?`<button class="btn btn-sm" onclick="setRole('${u.id}','user',this)">Unban</button>`:role==='owner'&&iAmMainOwner?`<button class="btn btn-sm" onclick="setRole('${u.id}','user',this)">Remove Owner</button>`:`<button class="btn btn-sm" onclick="setRole('${u.id}','moderator',this)">Make Mod</button>`}${iAmMainOwner&&role!=='owner'&&role!=='main_owner'&&role!=='banned'?`<button class="btn btn-sm" onclick="setRole('${u.id}','owner',this)">Make Owner</button>`:''}${role!=='banned'?`<button class="btn btn-danger" onclick="setRole('${u.id}','banned',this)">Ban</button>`:''}</div>` : '';
-            row.innerHTML = `<div class="user-av" style="${avStyle}">${init}</div><div class="user-info"><div class="user-name">${esc(u.displayName||'Unknown')}${isMe?' <span style="color:var(--text-dim)">(you)</span>':''}</div><div class="user-email">${esc(u.email||u.id)}</div></div><span class="user-role ${role}">${role}</span>${actionsHtml}`;
+            const actionsHtml = canAct ? `
+                <div class="user-actions" onclick="event.stopPropagation()">
+                    ${role==='moderator' ? `<button class="btn btn-sm" onclick="setRole('${u.id}','user',this)">Remove Mod</button>`
+                    : role==='banned' ? `<button class="btn btn-sm" onclick="setRole('${u.id}','user',this)">Unban</button>`
+                    : role==='owner' && iAmMainOwner ? `<button class="btn btn-sm" onclick="setRole('${u.id}','user',this)">Remove Owner</button>`
+                    : `<button class="btn btn-sm" onclick="setRole('${u.id}','moderator',this)">Make Mod</button>`}
+                    ${iAmMainOwner && role!=='owner' && role!=='main_owner' && role!=='banned' ? `<button class="btn btn-sm" onclick="setRole('${u.id}','owner',this)">Make Owner</button>` : ''}
+                    ${role!=='banned' ? `<button class="btn btn-danger" onclick="setRole('${u.id}','banned',this)">Ban</button>` : ''}
+                </div>` : '';
+            row.innerHTML = `
+                <div class="user-av" style="${avStyle}">${init}</div>
+                <div class="user-info">
+                    <div class="user-name">${esc(u.displayName||'Unknown')}${isMe ? ' <span style="color:var(--text-dim);font-weight:400">(you)</span>' : ''}</div>
+                    <div class="user-email">${esc(u.email||u.id)}</div>
+                </div>
+                <span class="user-role ${role}">${role}</span>
+                ${actionsHtml}`;
             row.addEventListener('click', () => openUserModal(u));
             el.appendChild(row);
         });
@@ -455,181 +623,267 @@
         const isOwner = role === 'owner' || role === 'main_owner';
         const iAmMainOwner = window._myRole === 'main_owner';
         const canAct = !isMe && (!isOwner || iAmMainOwner);
-        const hash = Math.abs([...(u.id||'')].reduce((h,c)=>((h<<5)-h)+c.charCodeAt(0),0))%360;
+        const hash = Math.abs([...(u.id||'')].reduce((h,c) => ((h<<5)-h)+c.charCodeAt(0), 0)) % 360;
         const avStyle = u.photoURL ? `background-image:url('${u.photoURL}')` : `background:hsl(${hash},42%,32%)`;
         const init = u.photoURL ? '' : (u.displayName||'?')[0].toUpperCase();
         const joinDate = u.createdAt?.toDate ? u.createdAt.toDate().toLocaleDateString() : '—';
-        const roleStyle = {main_owner:'background:rgba(208,112,255,.12);color:#d070ff',owner:'background:rgba(240,160,64,.12);color:#f0a040',moderator:'background:rgba(122,160,255,.12);color:#7aa0ff',banned:'background:rgba(248,81,73,.12);color:#f85149',user:'background:rgba(255,255,255,.05);color:#7a7a7a'}[role]||'';
+        const roleStyle = {
+            main_owner: 'background:rgba(208,112,255,.12);color:#d070ff',
+            owner: 'background:rgba(240,160,64,.12);color:#f0a040',
+            moderator: 'background:rgba(122,160,255,.12);color:#7aa0ff',
+            banned: 'background:rgba(248,81,73,.12);color:#f85149',
+            user: 'background:rgba(255,255,255,.05);color:#7a7a7a'
+        }[role] || '';
 
         document.getElementById('modalBody').innerHTML = `
             <div class="modal-av" style="${avStyle}">${init}</div>
             <div class="modal-name">${esc(u.displayName||'Unknown')}</div>
             <div class="modal-email">${esc(u.email||u.id)}</div>
-            <div class="modal-badges"><span style="padding:4px 12px;border-radius:20px;font-size:.6rem;font-weight:700;${roleStyle}">${role}</span>${isMe?'<span style="padding:4px 12px;border-radius:20px;font-size:.6rem;background:rgba(255,255,255,.06);color:#7a7a7a">YOU</span>':''}</div>
+            <div class="modal-badges">
+                <span style="padding:4px 12px;border-radius:20px;font-size:0.62rem;font-weight:700;${roleStyle}">${role}</span>
+                ${isMe ? '<span style="padding:4px 12px;border-radius:20px;font-size:0.62rem;background:rgba(255,255,255,.06);color:#7a7a7a">YOU</span>' : ''}
+            </div>
             <div class="info-row"><span class="info-label">UID</span><span class="info-val" style="font-family:monospace">${esc(u.id)}</span></div>
             <div class="info-row"><span class="info-label">Display Name</span><span class="info-val">${esc(u.displayName||'—')}</span></div>
             <div class="info-row"><span class="info-label">Email</span><span class="info-val">${esc(u.email||'—')}</span></div>
             <div class="info-row"><span class="info-label">Joined</span><span class="info-val">${joinDate}</span></div>
             <div class="info-row"><span class="info-label">Messages</span><span class="info-val" id="modalMsgCount">loading…</span></div>
         `;
+
         const actionsDiv = document.getElementById('modalActions');
         if (canAct) {
             const isBanned = role === 'banned';
             const isMod = role === 'moderator';
             const isOwnerRole = role === 'owner';
             actionsDiv.innerHTML = `
-                ${isMod?`<button class="btn btn-sm btn-full" onclick="modalSetRole('${u.id}','user',this)">Remove Moderator</button>`
-                :isBanned?`<button class="btn btn-sm btn-full" onclick="modalSetRole('${u.id}','user',this)">Unban User</button>`
-                :isOwnerRole&&iAmMainOwner?`<button class="btn btn-sm btn-full" onclick="modalSetRole('${u.id}','user',this)">Remove Owner</button>`
-                :`<button class="btn btn-sm btn-full" onclick="modalSetRole('${u.id}','moderator',this)">Promote to Moderator</button>`}
-                ${iAmMainOwner&&!isOwnerRole&&!isBanned?`<button class="btn btn-sm btn-full" onclick="modalSetRole('${u.id}','owner',this)">Promote to Owner</button>`:''}
-                ${!isBanned?`<button class="btn btn-danger btn-full" onclick="modalSetRole('${u.id}','banned',this)">Ban User</button>`:''}
+                ${isMod ? `<button class="btn btn-sm btn-full" onclick="modalSetRole('${u.id}','user',this)">Remove Moderator</button>`
+                : isBanned ? `<button class="btn btn-sm btn-full" onclick="modalSetRole('${u.id}','user',this)">Unban User</button>`
+                : isOwnerRole && iAmMainOwner ? `<button class="btn btn-sm btn-full" onclick="modalSetRole('${u.id}','user',this)">Remove Owner</button>`
+                : `<button class="btn btn-sm btn-full" onclick="modalSetRole('${u.id}','moderator',this)">Promote to Moderator</button>`}
+                ${iAmMainOwner && !isOwnerRole && !isBanned ? `<button class="btn btn-sm btn-full" onclick="modalSetRole('${u.id}','owner',this)">Promote to Owner</button>` : ''}
+                ${!isBanned ? `<button class="btn btn-danger btn-full" onclick="modalSetRole('${u.id}','banned',this)">Ban User</button>` : ''}
                 <button class="btn btn-sm btn-full" onclick="modalRename('${u.id}','${esc(u.displayName||'').replace(/'/g,"\\'")}',this)">Rename</button>
                 <button class="btn btn-sm btn-full" onclick="modalWipeMessages('${u.id}',this)">Wipe Messages</button>
-                ${u.email?`<button class="btn btn-sm btn-full" onclick="modalSendPasswordReset('${esc(u.email)}',this)">Send Password Reset</button>`:''}
+                ${u.email ? `<button class="btn btn-sm btn-full" onclick="modalSendPasswordReset('${esc(u.email)}',this)">Send Password Reset</button>` : ''}
             `;
         } else {
             actionsDiv.innerHTML = '';
         }
         document.getElementById('userModalOverlay').classList.add('open');
+
         db.collection('socialMessages').where('userId','==',u.id).get().then(snap => {
             document.getElementById('modalMsgCount').textContent = snap.size;
-        }).catch(() => { document.getElementById('modalMsgCount').textContent = 'error'; });
+        }).catch(() => {
+            document.getElementById('modalMsgCount').textContent = 'error';
+        });
     }
 
     function closeUserModal() { document.getElementById('userModalOverlay').classList.remove('open'); }
 
     async function modalSetRole(uid, role, btn) {
-        btn.disabled = true; btn.textContent = 'Updating…';
+        btn.disabled = true;
+        btn.textContent = 'Updating…';
         try {
-            await db.collection('users').doc(uid).update({role});
-            const u = _allUsers.find(x=>x.id===uid); if(u) u.role = role;
-            bust('users'); renderUsers(_allUsers); closeUserModal();
-            toast({banned:'User banned',moderator:'Promoted to moderator',owner:'Promoted to owner',user:'Role removed'}[role]||'Role updated');
-        } catch(e) { toast('Error: '+e.message); btn.disabled = false; btn.textContent = 'Retry'; }
+            await db.collection('users').doc(uid).update({ role });
+            const u = _allUsers.find(x => x.id === uid);
+            if (u) u.role = role;
+            bust('users');
+            renderUsers(_allUsers);
+            closeUserModal();
+            toast({ banned:'User banned', moderator:'Promoted to moderator', owner:'Promoted to owner', user:'Role removed' }[role] || 'Role updated');
+        } catch(e) {
+            toast('Error: ' + e.message);
+            btn.disabled = false;
+            btn.textContent = 'Retry';
+        }
     }
 
     async function modalRename(uid, cur, btn) {
-        const name = prompt('New display name:', cur); if(!name || name.trim()===cur) return;
-        btn.disabled = true; btn.textContent = 'Saving…';
+        const name = prompt('New display name:', cur);
+        if (!name || name.trim() === cur) return;
+        btn.disabled = true;
+        btn.textContent = 'Saving…';
         try {
-            await db.collection('users').doc(uid).update({displayName: name.trim()});
-            const u = _allUsers.find(x=>x.id===uid); if(u) u.displayName = name.trim();
-            renderUsers(_allUsers); closeUserModal(); toast('Name updated');
-        } catch(e) { toast('Error: '+e.message); btn.disabled = false; btn.textContent = 'Rename'; }
+            await db.collection('users').doc(uid).update({ displayName: name.trim() });
+            const u = _allUsers.find(x => x.id === uid);
+            if (u) u.displayName = name.trim();
+            renderUsers(_allUsers);
+            closeUserModal();
+            toast('Name updated');
+        } catch(e) {
+            toast('Error: ' + e.message);
+            btn.disabled = false;
+            btn.textContent = 'Rename';
+        }
     }
 
     async function modalWipeMessages(uid, btn) {
-        if(!confirm('Delete ALL messages from this user?')) return;
-        btn.disabled = true; btn.textContent = 'Wiping…';
+        if (!confirm('Delete ALL messages from this user?')) return;
+        btn.disabled = true;
+        btn.textContent = 'Wiping…';
         try {
             const snap = await db.collection('socialMessages').where('userId','==',uid).get();
-            const batch = db.batch(); snap.docs.forEach(d=>batch.delete(d.ref)); await batch.commit();
-            closeUserModal(); toast(`Deleted ${snap.size} message${snap.size===1?'':'s'}`);
-        } catch(e) { toast('Error: '+e.message); btn.disabled = false; btn.textContent = 'Wipe Messages'; }
+            const batch = db.batch();
+            snap.docs.forEach(d => batch.delete(d.ref));
+            await batch.commit();
+            closeUserModal();
+            toast(`Deleted ${snap.size} message${snap.size===1?'':'s'}`);
+        } catch(e) {
+            toast('Error: ' + e.message);
+            btn.disabled = false;
+            btn.textContent = 'Wipe Messages';
+        }
     }
 
     async function modalSendPasswordReset(email, btn) {
-        if(!confirm(`Send password reset email to ${email}?`)) return;
-        btn.disabled = true; btn.textContent = 'Sending…';
+        if (!confirm(`Send password reset email to ${email}?`)) return;
+        btn.disabled = true;
+        btn.textContent = 'Sending…';
         try {
             await firebase.auth().sendPasswordResetEmail(email);
             toast('Password reset email sent');
-        } catch(e) { toast('Error: '+e.message); }
-        finally { btn.disabled = false; btn.textContent = 'Send Password Reset'; }
+        } catch(e) {
+            toast('Error: ' + e.message);
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Send Password Reset';
+        }
     }
 
     async function setRole(uid, role, btn) {
-        btn.disabled = true; btn.textContent = '…';
-        try {
-            await db.collection('users').doc(uid).update({role});
-            const u = _allUsers.find(x=>x.id===uid); if(u) u.role = role;
-            bust('users'); renderUsers(_allUsers);
-            toast({banned:'User banned',moderator:'Promoted to mod',owner:'Promoted to owner',user:'Role removed'}[role]||'Role updated');
-        } catch(e) { toast('Error: '+e.message); btn.disabled = false; btn.textContent = 'Retry'; }
-    }
-
-    async function renameUser(uid, cur, btn) {
-        const name = prompt('New display name:', cur); if(!name||name.trim()===cur) return;
         btn.disabled = true;
+        btn.textContent = '…';
         try {
-            await db.collection('users').doc(uid).update({displayName:name.trim()});
-            const u = _allUsers.find(x=>x.id===uid); if(u) u.displayName = name.trim();
-            renderUsers(_allUsers); toast('Name updated');
-        } catch(e) { toast('Error: '+e.message); } finally { btn.disabled = false; }
+            await db.collection('users').doc(uid).update({ role });
+            const u = _allUsers.find(x => x.id === uid);
+            if (u) u.role = role;
+            bust('users');
+            renderUsers(_allUsers);
+            toast({ banned:'User banned', moderator:'Promoted to mod', owner:'Promoted to owner', user:'Role removed' }[role] || 'Role updated');
+        } catch(e) {
+            toast('Error: ' + e.message);
+            btn.disabled = false;
+            btn.textContent = 'Retry';
+        }
     }
 
     async function searchChat() {
         const q = document.getElementById('chatSearch').value.trim();
         const el = document.getElementById('chatResults');
-        if(!q) return;
+        if (!q) return;
         el.innerHTML = '<div style="text-align:center;padding:28px"><div class="spin"></div></div>';
         try {
             const snap = await db.collection('socialMessages').orderBy('timestamp','desc').limit(300).get();
-            const lq = q.toLowerCase().replace(/^@/,'');
-            const res = snap.docs.map(d=>({id:d.id,...d.data()})).filter(d=>(d.text||'').toLowerCase().includes(lq)||(d.displayName||'').toLowerCase().includes(lq)).slice(0,50);
-            if(!res.length){el.innerHTML='<div class="empty"><div class="empty-text">No messages matched.</div></div>';return;}
+            const lq = q.toLowerCase().replace(/^@/, '');
+            const res = snap.docs.map(d => ({id: d.id, ...d.data()}))
+                .filter(d => (d.text||'').toLowerCase().includes(lq) || (d.displayName||'').toLowerCase().includes(lq))
+                .slice(0,50);
+            if (!res.length) {
+                el.innerHTML = '<div class="empty"><div class="empty-text">No messages matched.</div></div>';
+                return;
+            }
             el.innerHTML = '';
-            res.forEach(m=>{
-                const ts = m.timestamp?.toDate?m.timestamp.toDate():new Date(m.timestamp||0);
-                const time = ts.toLocaleString([],{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
-                const card = document.createElement('div'); card.className='msg-card'; card.id='mc-'+m.id;
-                card.innerHTML = `<div style="flex:1"><div class="msg-name">${esc(m.displayName||'?')}</div><div class="msg-text">${esc(m.text||'')}</div></div><span class="msg-time">${time}</span><button class="msg-del" onclick="delChatMsg('${m.id}',this)">🗑</button>`;
+            res.forEach(m => {
+                const ts = m.timestamp?.toDate ? m.timestamp.toDate() : new Date(m.timestamp||0);
+                const time = ts.toLocaleString([], { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+                const card = document.createElement('div');
+                card.className = 'msg-card';
+                card.id = 'mc-' + m.id;
+                card.innerHTML = `
+                    <div style="flex:1;min-width:0">
+                        <div class="msg-name">${esc(m.displayName||'?')}</div>
+                        <div class="msg-text">${esc(m.text||'')}</div>
+                    </div>
+                    <span class="msg-time">${time}</span>
+                    <button class="msg-del" onclick="delChatMsg('${m.id}',this)">🗑</button>`;
                 el.appendChild(card);
             });
-        } catch(e){el.innerHTML=`<div class="empty"><div class="empty-text">Error: ${esc(e.message)}</div></div>`;}
+        } catch(e) {
+            el.innerHTML = `<div class="empty"><div class="empty-text">Error: ${esc(e.message)}</div></div>`;
+        }
     }
 
-    async function delChatMsg(id,btn){
-        if(!confirm('Delete this message?'))return; btn.disabled=true;
-        try{await db.collection('socialMessages').doc(id).delete();document.getElementById('mc-'+id)?.remove();toast('Deleted');}
-        catch(e){toast('Error: '+e.message);btn.disabled=false;}
+    async function delChatMsg(id, btn) {
+        if (!confirm('Delete this message?')) return;
+        btn.disabled = true;
+        try {
+            await db.collection('socialMessages').doc(id).delete();
+            document.getElementById('mc-' + id)?.remove();
+            toast('Deleted');
+        } catch(e) {
+            toast('Error: ' + e.message);
+            btn.disabled = false;
+        }
     }
 
     async function loadAnnouncements() {
-        if(!stale('announce')) return;
+        if (!stale('announce')) return;
         const el = document.getElementById('annHistory');
         try {
             const snap = await db.collection('announcements').orderBy('timestamp','desc').limit(20).get();
             fresh('announce');
-            if(!snap.empty) {
-                el.innerHTML='';
-                snap.docs.forEach(d=>{
-                    const a=d.data(); const ts=a.timestamp?.toDate?a.timestamp.toDate():new Date(a.timestamp||0);
-                    const time=ts.toLocaleString([],{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
-                    const item=document.createElement('div');item.className='ann-item';
-                    item.innerHTML=`<span class="ann-badge">OFFICIAL</span><div><div class="ann-text">${esc(a.text||'')}</div><div class="ann-time">${time}${a.pinned?' · 📌':''}</div></div>`;
+            if (!snap.empty) {
+                el.innerHTML = '';
+                snap.docs.forEach(d => {
+                    const a = d.data();
+                    const ts = a.timestamp?.toDate ? a.timestamp.toDate() : new Date(a.timestamp||0);
+                    const time = ts.toLocaleString([], { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+                    const item = document.createElement('div');
+                    item.className = 'ann-item';
+                    item.innerHTML = `
+                        <span class="ann-badge">OFFICIAL</span>
+                        <div>
+                            <div class="ann-text">${esc(a.text||'')}</div>
+                            <div class="ann-time">${time}${a.pinned ? ' · 📌' : ''}</div>
+                        </div>`;
                     el.appendChild(item);
                 });
             }
-        } catch(e){}
+        } catch(e) {}
     }
 
     async function sendAnn() {
-        const text=document.getElementById('annText').value.trim();
-        const pinned=document.getElementById('annPinned').checked;
-        if(!text){toast('Write a message first');return;}
-        const btn=document.querySelector('#sec-announce .btn-accent');
-        btn.disabled=true;btn.textContent='Sending…';
+        const text = document.getElementById('annText').value.trim();
+        const pinned = document.getElementById('annPinned').checked;
+        if (!text) { toast('Write a message first'); return; }
+        const btn = document.querySelector('#sec-announce .btn-accent');
+        btn.disabled = true;
+        btn.textContent = 'Sending…';
         try {
             await Promise.all([
-                db.collection('announcements').add({text,pinned,sentBy:me.uid,sentByName:me.displayName||'Owner',timestamp:FS.FieldValue.serverTimestamp()}),
-                db.collection('socialMessages').add({text,userId:me.uid,displayName:me.displayName||'Vexis',photoURL:null,timestamp:FS.FieldValue.serverTimestamp(),reactions:{},replyTo:null,gifUrl:null,imageBase64:null,isOfficial:true,pinned})
+                db.collection('announcements').add({
+                    text, pinned, sentBy: me.uid, sentByName: me.displayName || 'Owner',
+                    timestamp: FS.FieldValue.serverTimestamp()
+                }),
+                db.collection('socialMessages').add({
+                    text, userId: me.uid, displayName: me.displayName || 'Vexis',
+                    photoURL: null, timestamp: FS.FieldValue.serverTimestamp(),
+                    reactions: {}, replyTo: null, gifUrl: null, imageBase64: null,
+                    isOfficial: true, pinned
+                })
             ]);
-            document.getElementById('annText').value=''; document.getElementById('annPinned').checked=false;
-            bust('announce'); loadAnnouncements(); toast('Announcement sent!');
-        } catch(e){toast('Error: '+e.message);}
-        finally{btn.disabled=false;btn.textContent='Send Announcement';}
+            document.getElementById('annText').value = '';
+            document.getElementById('annPinned').checked = false;
+            bust('announce');
+            loadAnnouncements();
+            toast('Announcement sent!');
+        } catch(e) {
+            toast('Error: ' + e.message);
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Send Announcement';
+        }
     }
 
     async function loadPlatform() {
-        if(!stale('platform') && Object.keys(_siteConfig).length) { renderPlatform(); return; }
+        if (!stale('platform') && Object.keys(_siteConfig).length) { renderPlatform(); return; }
         try {
             const snap = await db.collection('siteSettings').doc('main').get();
             _siteConfig = snap.exists ? snap.data() : {};
             _autoWords = _siteConfig.automodWords || [];
-            fresh('platform'); renderPlatform();
-        } catch(e) { toast('Error loading config: '+e.message); }
+            fresh('platform');
+            renderPlatform();
+        } catch(e) { toast('Error loading config: ' + e.message); }
     }
 
     function renderPlatform() {
@@ -637,75 +891,154 @@
         document.getElementById('bannerVal').value = _siteConfig.bannerText || '';
         renderFlags(_siteConfig.flags || {});
         renderAutomod();
-        renderItems(_siteConfig.items || {games:[],apps:[],tools:[]});
+        renderItems(_siteConfig.items || { games:[], apps:[], tools:[] });
     }
 
-    async function savePlatform(patch) { Object.assign(_siteConfig, patch); await db.collection('siteSettings').doc('main').set(_siteConfig,{merge:true}); bust('platform'); }
-    async function saveMOTD() { const v = document.getElementById('motdVal').value.trim(); await savePlatform({motd:v}); toast(v?'MOTD saved':'MOTD cleared'); }
-    async function clearMOTD() { document.getElementById('motdVal').value=''; await saveMOTD(); }
-    async function saveBanner(show) { const t = document.getElementById('bannerVal').value.trim(); await savePlatform({bannerText:t,bannerOn:show}); toast(show?'Banner shown':'Banner hidden'); }
+    async function savePlatform(patch) {
+        Object.assign(_siteConfig, patch);
+        await db.collection('siteSettings').doc('main').set(_siteConfig, { merge: true });
+        bust('platform');
+    }
+
+    async function saveMOTD() {
+        const v = document.getElementById('motdVal').value.trim();
+        await savePlatform({ motd: v });
+        toast(v ? 'MOTD saved' : 'MOTD cleared');
+    }
+    async function clearMOTD() {
+        document.getElementById('motdVal').value = '';
+        await saveMOTD();
+    }
+    async function saveBanner(show) {
+        const t = document.getElementById('bannerVal').value.trim();
+        await savePlatform({ bannerText: t, bannerOn: show });
+        toast(show ? 'Banner shown' : 'Banner hidden');
+    }
 
     const FLAG_DEFS = [
-        {key:'globalChat',label:'Global Chat',sub:'Allow users to send messages in global chat'},
-        {key:'guestLogin',label:'Guest Login',sub:'Allow guest access without an account'},
-        {key:'imageGen',label:'Image Generation',sub:'AI image generation in Vexis AI'},
-        {key:'localAI',label:'Local AI',sub:'Download and run AI models in-browser'}
+        { key:'globalChat', label:'Global Chat', sub:'Allow users to send messages in global chat' },
+        { key:'guestLogin', label:'Guest Login', sub:'Allow guest access without an account' },
+        { key:'imageGen',   label:'Image Generation', sub:'AI image generation in Vexis AI' },
+        { key:'localAI',    label:'Local AI', sub:'Download and run AI models in-browser' }
     ];
+
     function renderFlags(flags) {
-        const el = document.getElementById('flagsList'); el.innerHTML='';
-        FLAG_DEFS.forEach(def=>{
-            const on = flags[def.key]!==false;
-            const row = document.createElement('div'); row.className='flag-row';
-            row.innerHTML = `<div><div class="flag-label">${def.label}</div><div class="flag-sub">${def.sub}</div></div><button class="toggle ${on?'on':''}" id="fl-${def.key}" onclick="toggleFlag('${def.key}',this)"></button>`;
+        const el = document.getElementById('flagsList');
+        el.innerHTML = '';
+        FLAG_DEFS.forEach(def => {
+            const on = flags[def.key] !== false;
+            const row = document.createElement('div');
+            row.className = 'flag-row';
+            row.innerHTML = `
+                <div>
+                    <div class="flag-label">${def.label}</div>
+                    <div class="flag-sub">${def.sub}</div>
+                </div>
+                <button class="toggle ${on ? 'on' : ''}" id="fl-${def.key}" onclick="toggleFlag('${def.key}',this)"></button>`;
             el.appendChild(row);
         });
     }
-    async function toggleFlag(key,btn) {
+
+    async function toggleFlag(key, btn) {
         const on = btn.classList.toggle('on');
-        const flags = _siteConfig.flags||{}; flags[key]=on; _siteConfig.flags=flags;
-        await savePlatform({flags}); toast(`${key}: ${on?'on':'off'}`);
+        const flags = _siteConfig.flags || {};
+        flags[key] = on;
+        _siteConfig.flags = flags;
+        await savePlatform({ flags });
+        toast(`${key}: ${on ? 'on' : 'off'}`);
     }
 
     function renderAutomod() {
-        const el = document.getElementById('automodTags'); el.innerHTML='';
-        if(!_autoWords.length){el.innerHTML='<span style="font-size:.68rem;color:var(--text-muted)">No blocked words.</span>';return;}
-        _autoWords.forEach(w=>{
-            const t=document.createElement('span');t.className='word-tag';
-            t.innerHTML=`${esc(w)}<button class="word-tag-x" onclick="removeWord('${esc(w).replace(/'/g,"\\'")}')">×</button>`;
+        const el = document.getElementById('automodTags');
+        el.innerHTML = '';
+        if (!_autoWords.length) {
+            el.innerHTML = '<span style="font-size:0.7rem;color:var(--text-muted)">No blocked words.</span>';
+            return;
+        }
+        _autoWords.forEach(w => {
+            const t = document.createElement('span');
+            t.className = 'word-tag';
+            t.innerHTML = `${esc(w)}<button class="word-tag-x" onclick="removeWord('${esc(w).replace(/'/g,"\\'")}')">×</button>`;
             el.appendChild(t);
         });
     }
+
     async function addWord() {
-        const inp=document.getElementById('automodInp'); const w=inp.value.trim().toLowerCase(); if(!w||_autoWords.includes(w)){inp.value='';return;}
-        _autoWords.push(w); inp.value=''; await savePlatform({automodWords:_autoWords}); renderAutomod();
+        const inp = document.getElementById('automodInp');
+        const w = inp.value.trim().toLowerCase();
+        if (!w || _autoWords.includes(w)) { inp.value = ''; return; }
+        _autoWords.push(w);
+        inp.value = '';
+        await savePlatform({ automodWords: _autoWords });
+        renderAutomod();
     }
-    async function removeWord(w) { _autoWords=_autoWords.filter(x=>x!==w); await savePlatform({automodWords:_autoWords}); renderAutomod(); }
+
+    async function removeWord(w) {
+        _autoWords = _autoWords.filter(x => x !== w);
+        await savePlatform({ automodWords: _autoWords });
+        renderAutomod();
+    }
 
     function renderItems(items) {
-        const el=document.getElementById('itemSections'); el.innerHTML='';
-        ['games','apps','tools'].forEach(cat=>{
-            const list=items[cat]||[]; const singular=cat.slice(0,-1);
-            const sec=document.createElement('div'); sec.style.marginBottom='22px';
-            sec.innerHTML = `<div class="sec-label">${cat.charAt(0).toUpperCase()+cat.slice(1)}</div><div id="pi-${cat}">${list.map((item,i)=>`<div class="item-row"><span class="item-name">${esc(item.name)}</span><span class="item-html">${esc((item.html||'').substring(0,52))}…</span><button class="item-del" onclick="removeItem('${cat}',${i})">✕</button></div>`).join('')||'<div style="color:var(--text-muted)">No items yet.</div>'}</div>
-            <div class="add-grid"><input class="inp" id="pn-${cat}" placeholder="${singular} name"><textarea class="html-ta" id="ph-${cat}" placeholder="Paste HTML code…"></textarea><button class="btn btn-accent" onclick="addItem('${cat}')">Add ${singular}</button></div>`;
+        const el = document.getElementById('itemSections');
+        el.innerHTML = '';
+        ['games','apps','tools'].forEach(cat => {
+            const list = items[cat] || [];
+            const singular = cat.slice(0, -1);
+            const sec = document.createElement('div');
+            sec.style.marginBottom = '24px';
+            sec.innerHTML = `
+                <div class="sec-label">${cat.charAt(0).toUpperCase()+cat.slice(1)}</div>
+                <div id="pi-${cat}">
+                    ${list.map((item,i) => `
+                        <div class="item-row">
+                            <span class="item-name">${esc(item.name)}</span>
+                            <span class="item-html" title="${esc(item.html||'')}">${esc((item.html||'').substring(0,40))}…</span>
+                            <button class="item-del" onclick="removeItem('${cat}',${i})">✕</button>
+                        </div>`).join('') || '<div style="color:var(--text-muted);font-size:0.7rem;padding:4px 0">No items yet.</div>'}
+                </div>
+                <div class="add-grid">
+                    <input class="inp" id="pn-${cat}" placeholder="${singular.charAt(0).toUpperCase()+singular.slice(1)} name">
+                    <textarea class="html-ta" id="ph-${cat}" placeholder="Paste HTML code for this ${singular}…"></textarea>
+                    <button class="btn btn-accent" onclick="addItem('${cat}')">Add ${singular}</button>
+                </div>`;
             el.appendChild(sec);
         });
     }
+
     async function addItem(cat) {
-        const name=document.getElementById('pn-'+cat).value.trim(); const html=document.getElementById('ph-'+cat).value.trim();
-        if(!name) return toast('Name required'); if(!html) return toast('HTML code required');
-        const items=_siteConfig.items||{games:[],apps:[],tools:[]}; items[cat]=[...items[cat],{name,html}];
-        _siteConfig.items=items; document.getElementById('pn-'+cat).value=''; document.getElementById('ph-'+cat).value='';
-        await savePlatform({items}); toast('Added'); renderItems(items);
-    }
-    async function removeItem(cat,idx) {
-        const items=_siteConfig.items||{games:[],apps:[],tools:[]}; items[cat]=items[cat].filter((_,i)=>i!==idx);
-        _siteConfig.items=items; await savePlatform({items}); renderItems(items);
+        const name = document.getElementById('pn-' + cat).value.trim();
+        const html = document.getElementById('ph-' + cat).value.trim();
+        if (!name) return toast('Name required');
+        if (!html) return toast('HTML code required');
+        const items = _siteConfig.items || { games:[], apps:[], tools:[] };
+        items[cat] = [...items[cat], { name, html }];
+        _siteConfig.items = items;
+        document.getElementById('pn-' + cat).value = '';
+        document.getElementById('ph-' + cat).value = '';
+        await savePlatform({ items });
+        toast('Added');
+        renderItems(items);
     }
 
-    function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+    async function removeItem(cat, idx) {
+        const items = _siteConfig.items || { games:[], apps:[], tools:[] };
+        items[cat] = items[cat].filter((_, i) => i !== idx);
+        _siteConfig.items = items;
+        await savePlatform({ items });
+        renderItems(items);
+    }
+
+    function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
     let _tt;
-    function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(_tt);_tt=setTimeout(()=>el.classList.remove('show'),2400);}
+    function toast(msg) {
+        const el = document.getElementById('toast');
+        el.textContent = msg;
+        el.classList.add('show');
+        clearTimeout(_tt);
+        _tt = setTimeout(() => el.classList.remove('show'), 2400);
+    }
 </script>
 </body>
 </html>
