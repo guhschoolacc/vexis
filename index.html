@@ -4671,6 +4671,15 @@ async function loadSiteConfig() {
     // Automod words
     _automodWords = cfg.automodWords || [];
     window._automodWords = _automodWords;
+    // Platform items from Firestore → push into CUSTOM so grids update
+    if (cfg.items) {
+      ['games','apps','tools'].forEach(cat => {
+        if (Array.isArray(cfg.items[cat])) {
+          CUSTOM[cat] = cfg.items[cat].map(it => ({icon:'custom', name:it.name, desc:it.url, url:it.url}));
+        }
+      });
+      ['games','apps','tools'].forEach(buildGrid);
+    }
   } catch(e) {}
 }
 
