@@ -545,12 +545,15 @@ async function generateImageDalle(prompt) {
   const res = await fetch(AI_SERVER + '/api/imagine', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ prompt, model: 'dall-e-3', size: '1024x1024' })
+    body: JSON.stringify({ prompt })
   });
-  if (!res.ok) throw new Error('Server error ' + res.status);
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || 'Server error ' + res.status);
+  }
   const data = await res.json();
-  const imgUrl = data.url || (data.data && data.data[0] && data.data[0].url);
-  if (!imgUrl) throw new Error('No image URL in response.');
+  const imgUrl = data.url || (data.b64 ? 'data:image/png;base64,' + data.b64 : null);
+  if (!imgUrl) throw new Error('No image in response.');
   setImgResultState('image', imgUrl);
   document.getElementById('aiImgDownload').href = imgUrl;
 }
