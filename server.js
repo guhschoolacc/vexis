@@ -13,6 +13,7 @@ const OpenAI  = require('openai').default;
 const PORT    = process.env.PORT || 3000;
 const API_KEY = process.env.OPENAI_API_KEY;
 const MODEL   = 'gpt-4o';
+const IMG_MODEL = 'gpt-image-1';
 
 if (!API_KEY) {
   console.error('\n[Vexis AI] ERROR: OPENAI_API_KEY is missing from your .env file.');
@@ -74,7 +75,7 @@ app.post('/api/imagine', async (req, res) => {
 
   try {
     const response = await openai.images.generate({
-      model: 'dall-e-3',
+      model: IMG_MODEL,
       prompt: prompt.trim(),
       n: 1,
       size: '1024x1024',
