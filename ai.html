@@ -6,709 +6,450 @@
 <title>Vexis AI</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#111;--surf:#191919;--raise:#212121;--raise2:#2a2a2a;--bdr:#2c2c2c;--bdrhi:#383838;--dim:#7a7a7a;--muted:#4a4a4a;--text:#c8c8c8;--bright:#ececec;--white:#f5f5f5;--accent:#ffb84a}
-html,body{height:100%;overflow:hidden;font-family:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
-
-/* HEADER */
-.ai-header{display:flex;flex-direction:row;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--bdr);flex-shrink:0}
-.ai-header-icon{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--raise2),var(--muted));border:1px solid var(--bdrhi);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--dim)}
-.ai-header-info{display:flex;flex-direction:column;gap:0px}
-.ai-header-name{font-size:.84rem;font-weight:700;color:var(--white)}
-.ai-header-sub{font-size:.62rem;color:var(--dim);margin-top:1px}
-.ai-badge{margin-left:auto;padding:3px 10px;border-radius:20px;font-size:.6rem;font-weight:700;font-family:'DM Mono',monospace;background:var(--raise2);border:1px solid var(--bdrhi);color:var(--dim);white-space:nowrap}
-
-/* MODE TABS */
-.ai-mode-tabs{display:flex;flex-direction:row;gap:3px;padding:10px 18px;border-bottom:1px solid var(--bdr);flex-shrink:0}
-.ai-mode-tab{padding:4px 13px;border-radius:7px;font-size:.67rem;font-weight:600;color:var(--dim);cursor:pointer;background:transparent;border:1px solid transparent;transition:all .14s;font-family:'DM Sans',sans-serif}
-.ai-mode-tab:hover{color:var(--text);background:var(--raise)}
-.ai-mode-tab.active{color:var(--white);background:var(--raise2);border-color:var(--bdrhi)}
-
-/* MESSAGES */
-.ai-messages{flex:1;overflow-y:auto;padding:16px 18px;display:flex;flex-direction:column;gap:12px}
-.ai-messages::-webkit-scrollbar{width:4px}
-.ai-messages::-webkit-scrollbar-track{background:transparent}
-.ai-messages::-webkit-scrollbar-thumb{background:var(--muted);border-radius:4px}
-.ai-msg{display:flex;gap:10px;max-width:88%;animation:up .2s ease both}
-.ai-msg.user{align-self:flex-end;flex-direction:row-reverse}
-.ai-msg.ai{align-self:flex-start}
-.ai-bubble{padding:9px 13px;border-radius:12px;font-size:.76rem;line-height:1.6;color:var(--text);word-break:break-word}
-.ai-msg.user .ai-bubble{background:var(--raise2);border:1px solid var(--bdrhi);border-radius:12px 12px 3px 12px;color:var(--bright)}
-.ai-msg.ai .ai-bubble{background:var(--bg);border:1px solid var(--bdr);border-radius:12px 12px 12px 3px}
-.ai-avatar{width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,var(--raise2),var(--muted));border:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;color:var(--dim)}
-.ai-typing{display:flex;gap:4px;align-items:center;padding:4px 0}
-.ai-typing span{width:5px;height:5px;border-radius:50%;background:var(--muted);animation:aiPulse 1.2s ease infinite}
-.ai-typing span:nth-child(2){animation-delay:.2s}
-.ai-typing span:nth-child(3){animation-delay:.4s}
-
-/* INPUT ROW */
-.ai-input-row{display:flex;align-items:flex-end;gap:8px;padding:12px 18px 16px;border-top:1px solid var(--bdr);flex-shrink:0}
-.ai-textarea{flex:1;background:var(--bg);border:1px solid var(--bdr);border-radius:10px;padding:9px 13px;font-family:'DM Sans',sans-serif;font-size:.78rem;color:var(--white);outline:none;resize:none;line-height:1.5;max-height:110px;overflow-y:auto;transition:border-color .14s}
-.ai-textarea::placeholder{color:var(--muted)}
-.ai-textarea:focus{border-color:var(--bdrhi)}
-.ai-textarea::-webkit-scrollbar{width:3px}
-.ai-textarea::-webkit-scrollbar-thumb{background:var(--muted);border-radius:3px}
-.ai-send{width:36px;height:36px;border-radius:9px;background:var(--raise2);border:1px solid var(--bdrhi);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all .15s;color:var(--dim)}
-.ai-send:hover{background:var(--raise);border-color:var(--dim);color:var(--text)}
-.ai-send:active{transform:scale(.95)}
-
-/* EMPTY STATE */
-.ai-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--muted);padding:20px}
-.ai-empty-ico{font-size:1.8rem;opacity:.4}
-.ai-empty-text{font-size:.72rem;text-align:center;line-height:1.6;color:var(--dim)}
-
-/* IMAGE MODE */
-.ai-img-body{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.ai-img-settings{display:flex;flex-direction:row;flex-wrap:wrap;gap:10px;padding:14px 18px;border-bottom:1px solid var(--bdr);flex-shrink:0}
-.ai-img-setting-group{display:flex;flex-direction:column;gap:4px}
-.ai-img-setting-label{font-size:.6rem;font-weight:600;color:var(--dim);text-transform:uppercase;letter-spacing:.04em}
-.ai-img-select{background:var(--raise);border:1px solid var(--bdr);border-radius:7px;padding:5px 10px;font-family:'DM Sans',sans-serif;font-size:.72rem;color:var(--text);outline:none;cursor:pointer;transition:border-color .14s}
-.ai-img-select:hover{border-color:var(--bdrhi)}
-.ai-img-select:focus{border-color:var(--bdrhi)}
-.ai-img-select option{background:var(--raise)}
-.ai-img-result{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;padding:16px 18px}
-.ai-img-placeholder{display:flex;flex-direction:column;align-items:center;gap:10px;color:var(--muted)}
-.ai-img-placeholder-ico{opacity:.35}
-.ai-img-placeholder-text{font-size:.72rem;text-align:center;line-height:1.7;color:var(--dim)}
-.ai-img-generated{max-width:100%;max-height:100%;border-radius:10px;border:1px solid var(--bdr);object-fit:contain}
-.ai-img-download{display:none;position:absolute;bottom:24px;right:26px;padding:5px 14px;border-radius:8px;background:var(--raise2);border:1px solid var(--bdrhi);color:var(--text);font-size:.66rem;font-weight:600;font-family:'DM Sans',sans-serif;text-decoration:none;cursor:pointer;transition:all .14s}
-.ai-img-download:hover{background:var(--raise);color:var(--white)}
-.ai-img-download.visible{display:block}
-.ai-img-prompt-row{display:flex;align-items:flex-end;gap:8px;padding:12px 18px 16px;border-top:1px solid var(--bdr);flex-shrink:0}
-.ai-img-generating{display:flex;flex-direction:column;align-items:center;gap:12px;color:var(--dim)}
-.ai-img-generating-text{font-size:.72rem}
-
-/* LOCAL AI MODE */
-.ai-local-body{flex:1;display:flex;flex-direction:column;overflow-y:auto;padding:18px}
-.ai-local-body::-webkit-scrollbar{width:4px}
-.ai-local-body::-webkit-scrollbar-thumb{background:var(--muted);border-radius:4px}
-.ai-local-warning{background:var(--raise);border:1px solid var(--bdrhi);border-radius:10px;padding:12px 14px;font-size:.72rem;color:var(--dim);line-height:1.6;margin-bottom:14px}
-.ai-local-warning strong{color:var(--text);font-weight:600}
-.ai-local-section{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
-.ai-local-label{font-size:.6rem;font-weight:600;color:var(--dim);text-transform:uppercase;letter-spacing:.04em}
-.ai-local-select{background:var(--raise);border:1px solid var(--bdr);border-radius:7px;padding:6px 10px;font-family:'DM Sans',sans-serif;font-size:.73rem;color:var(--text);outline:none;cursor:pointer;transition:border-color .14s;width:100%}
-.ai-local-select:hover{border-color:var(--bdrhi)}
-.ai-local-select:focus{border-color:var(--bdrhi)}
-.ai-local-select option{background:var(--raise)}
-.ai-local-load-btn{padding:7px 16px;border-radius:8px;background:var(--raise2);border:1px solid var(--bdrhi);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.72rem;font-weight:600;cursor:pointer;transition:all .15s;align-self:flex-start}
-.ai-local-load-btn:hover{background:var(--raise);color:var(--white)}
-.ai-local-load-btn:disabled{opacity:.4;cursor:not-allowed}
-.ai-local-status{font-size:.68rem;color:var(--dim);line-height:1.5;margin-top:4px}
-.ai-local-messages{flex:1;overflow-y:auto;padding:16px 18px;display:flex;flex-direction:column;gap:12px}
-.ai-local-messages::-webkit-scrollbar{width:4px}
-.ai-local-messages::-webkit-scrollbar-thumb{background:var(--muted);border-radius:4px}
-.ai-local-input-row{display:flex;align-items:flex-end;gap:8px;padding:12px 18px 16px;border-top:1px solid var(--bdr);flex-shrink:0}
-
-/* SPINNER */
-.spin-large{width:32px;height:32px;border-radius:50%;border:3px solid var(--bdr);border-top-color:var(--dim);animation:spin .7s linear infinite}
-
-/* MARKDOWN-LITE */
-.ai-bubble code{font-family:'DM Mono',monospace;font-size:.72rem;background:var(--raise2);border:1px solid var(--bdr);padding:1px 5px;border-radius:4px;color:var(--accent)}
-.ai-bubble pre{background:var(--raise);border:1px solid var(--bdr);border-radius:8px;padding:10px 12px;overflow-x:auto;margin:6px 0}
-.ai-bubble pre code{background:none;border:none;padding:0;font-size:.71rem;color:var(--text)}
-.ai-bubble strong{color:var(--bright);font-weight:600}
-.ai-bubble em{color:var(--text);font-style:italic}
-.ai-bubble a{color:var(--accent);text-decoration:none}
-.ai-bubble a:hover{text-decoration:underline}
-
-/* ANIMATIONS */
+:root {
+  --bg: #08080e;
+  --bg2: #0c0c14;
+  --surf: #101018;
+  --raise: #161622;
+  --raise2: #1c1c2e;
+  --raise3: #242438;
+  --bdr: rgba(255,255,255,.055);
+  --bdrhi: rgba(255,255,255,.1);
+  --bdr-accent: rgba(160,120,255,.22);
+  --dim: #68688a;
+  --muted: #3a3a54;
+  --text: #b0b0cc;
+  --bright: #ddddf0;
+  --white: #eeeefc;
+  --accent: #a07cff;
+  --accent2: #7a55e0;
+  --accent-glow: rgba(160,120,255,.12);
+  --gold: #ffb84a;
+  --teal: #3edbb8;
+  --rose: #ff5e80;
+  --font: 'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --mono: 'DM Mono','Fira Code',monospace;
+}
+html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+/* ── AMBIENT BG ───────────────────────────────────────────── */
+.vx-ambient{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.vx-orb{position:absolute;border-radius:50%;filter:blur(110px);will-change:transform}
+.vx-orb-1{width:420px;height:420px;background:radial-gradient(circle,rgba(160,120,255,.3),transparent 70%);top:-8%;left:-6%;animation:orbDrift 26s ease-in-out infinite}
+.vx-orb-2{width:340px;height:340px;background:radial-gradient(circle,rgba(62,219,184,.22),transparent 70%);bottom:-8%;right:-6%;animation:orbDrift 32s ease-in-out infinite reverse}
+.vx-orb-3{width:260px;height:260px;background:radial-gradient(circle,rgba(255,94,128,.15),transparent 70%);top:45%;left:45%;animation:orbDrift 24s ease-in-out infinite -8s}
+@keyframes orbDrift{
+  0%,100%{transform:translate(0,0) scale(1)}
+  25%{transform:translate(35px,-25px) scale(1.06)}
+  50%{transform:translate(-25px,35px) scale(.94)}
+  75%{transform:translate(25px,20px) scale(1.03)}
+}
+/* subtle grain */
+.vx-noise{position:fixed;inset:0;z-index:1;opacity:.022;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-repeat:repeat}
+/* ── MAIN SHELL ───────────────────────────────────────────── */
+#vx{position:relative;z-index:2;display:flex;flex-direction:column;height:100%;max-width:740px;margin:0 auto}
+@media(min-width:800px){
+  #vx{margin:14px auto;height:calc(100% - 28px);border-radius:22px;border:1px solid var(--bdr);background:rgba(8,8,14,.72);backdrop-filter:blur(44px) saturate(1.15);-webkit-backdrop-filter:blur(44px) saturate(1.15);box-shadow:0 8px 60px rgba(0,0,0,.55),0 0 40px rgba(160,120,255,.06);overflow:hidden}
+}
+/* ── HEADER ───────────────────────────────────────────────── */
+.vx-hdr{display:flex;align-items:center;gap:12px;padding:15px 20px;border-bottom:1px solid var(--bdr);flex-shrink:0;background:rgba(12,12,20,.45);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.vx-hdr-icon{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--accent2),var(--accent));display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;box-shadow:0 2px 14px rgba(160,120,255,.28);position:relative;overflow:hidden}
+.vx-hdr-icon::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent 40%,rgba(255,255,255,.18));border-radius:inherit}
+.vx-hdr-icon svg{position:relative;z-index:1}
+.vx-hdr-info{display:flex;flex-direction:column;gap:1px}
+.vx-hdr-name{font-size:.9rem;font-weight:700;color:var(--white);letter-spacing:-.02em}
+.vx-hdr-sub{font-size:.64rem;color:var(--dim);display:flex;align-items:center;gap:5px}
+.vx-dot{width:6px;height:6px;border-radius:50%;background:var(--teal);box-shadow:0 0 8px rgba(62,219,184,.5);animation:dotPulse 2.4s ease-in-out infinite}
+@keyframes dotPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.55;transform:scale(.85)}}
+.vx-badge{margin-left:auto;padding:4px 12px;border-radius:20px;font-size:.58rem;font-weight:700;font-family:var(--mono);background:var(--accent-glow);border:1px solid var(--bdr-accent);color:var(--accent);white-space:nowrap;letter-spacing:.04em;text-transform:uppercase;transition:all .3s cubic-bezier(.34,1.56,.64,1);cursor:default}
+.vx-badge:hover{background:rgba(160,120,255,.18);transform:scale(1.06)}
+/* ── TABS ─────────────────────────────────────────────────── */
+.vx-tabs{display:flex;gap:4px;padding:10px 20px;border-bottom:1px solid var(--bdr);flex-shrink:0;background:rgba(10,10,16,.25)}
+.vx-tab{position:relative;padding:6px 15px;border-radius:10px;font-size:.71rem;font-weight:600;color:var(--dim);cursor:pointer;background:transparent;border:1px solid transparent;transition:all .22s cubic-bezier(.34,1.56,.64,1);font-family:var(--font);overflow:hidden}
+.vx-tab::before{content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(135deg,var(--accent-glow),transparent);opacity:0;transition:opacity .22s}
+.vx-tab:hover{color:var(--text);background:var(--raise);transform:translateY(-1px)}
+.vx-tab.on{color:var(--white);background:var(--raise2);border-color:var(--bdr-accent);box-shadow:0 2px 14px rgba(160,120,255,.1)}
+.vx-tab.on::before{opacity:1}
+/* ── MESSAGES ─────────────────────────────────────────────── */
+.vx-msgs{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px;scroll-behavior:smooth}
+.vx-msgs::-webkit-scrollbar{width:5px}
+.vx-msgs::-webkit-scrollbar-track{background:transparent}
+.vx-msgs::-webkit-scrollbar-thumb{background:var(--muted);border-radius:5px}
+.vx-msgs::-webkit-scrollbar-thumb:hover{background:var(--dim)}
+.vx-m{display:flex;gap:10px;max-width:85%;animation:mIn .45s cubic-bezier(.16,1,.3,1) both}
+.vx-m.u{align-self:flex-end;flex-direction:row-reverse;animation-name:mInR}
+.vx-m.a{align-self:flex-start}
+@keyframes mIn{from{opacity:0;transform:translateY(18px) scale(.95);filter:blur(5px)}to{opacity:1;transform:none;filter:none}}
+@keyframes mInR{from{opacity:0;transform:translateX(18px) scale(.95);filter:blur(5px)}to{opacity:1;transform:none;filter:none}}
+.vx-b{padding:11px 15px;border-radius:14px;font-size:.79rem;line-height:1.72;color:var(--text);word-break:break-word;position:relative}
+.vx-m.u .vx-b{background:linear-gradient(135deg,var(--raise2),var(--raise3));border:1px solid var(--bdrhi);border-radius:14px 14px 4px 14px;color:var(--bright)}
+.vx-m.a .vx-b{background:rgba(16,16,24,.55);border:1px solid var(--bdr);border-radius:14px 14px 14px 4px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.vx-av{width:30px;height:30px;border-radius:10px;background:linear-gradient(135deg,var(--accent2),var(--accent));display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;color:#fff;box-shadow:0 2px 10px rgba(160,120,255,.2);position:relative;overflow:hidden}
+.vx-av::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent 40%,rgba(255,255,255,.14));border-radius:inherit}
+/* typing */
+.vx-typing{display:flex;gap:5px;align-items:center;padding:5px 2px}
+.vx-typing span{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:tBounce 1.4s ease-in-out infinite}
+.vx-typing span:nth-child(2){animation-delay:.15s}
+.vx-typing span:nth-child(3){animation-delay:.3s}
+@keyframes tBounce{0%,60%,100%{transform:translateY(0) scale(1);opacity:.25}30%{transform:translateY(-9px) scale(1.15);opacity:1}}
+/* ── INPUT ────────────────────────────────────────────────── */
+.vx-inp{display:flex;align-items:flex-end;gap:10px;padding:14px 20px 18px;border-top:1px solid var(--bdr);flex-shrink:0;background:rgba(10,10,16,.35);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.vx-tw{flex:1;position:relative;border-radius:12px}
+.vx-tw::before{content:'';position:absolute;inset:-1.5px;border-radius:13.5px;background:var(--bdr);z-index:0;transition:all .35s}
+.vx-tw:focus-within::before{background:linear-gradient(135deg,var(--accent2),var(--accent),var(--teal));opacity:.55}
+.vx-ta{position:relative;z-index:1;width:100%;background:var(--surf);border:none;border-radius:12px;padding:10px 14px;font-family:var(--font);font-size:.81rem;color:var(--white);outline:none;resize:none;line-height:1.55;max-height:120px;overflow-y:auto;transition:background .2s}
+.vx-ta::placeholder{color:var(--muted)}
+.vx-ta:focus{background:var(--raise)}
+.vx-ta::-webkit-scrollbar{width:3px}
+.vx-ta::-webkit-scrollbar-thumb{background:var(--muted);border-radius:3px}
+.vx-send{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--accent2),var(--accent));border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all .25s cubic-bezier(.34,1.56,.64,1);color:#fff;box-shadow:0 2px 14px rgba(160,120,255,.28);position:relative;overflow:hidden}
+.vx-send::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent,rgba(255,255,255,.14));border-radius:inherit}
+.vx-send:hover{transform:translateY(-2px) scale(1.06);box-shadow:0 4px 22px rgba(160,120,255,.42)}
+.vx-send:active{transform:scale(.9);box-shadow:0 1px 8px rgba(160,120,255,.2)}
+.vx-send:disabled{opacity:.35;cursor:not-allowed;transform:none!important;box-shadow:none!important}
+/* particles */
+.vx-particle{position:fixed;border-radius:50%;pointer-events:none;z-index:999;animation:pBurst .65s ease-out forwards}
+@keyframes pBurst{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--tx),var(--ty)) scale(0)}}
+/* ── EMPTY STATE ──────────────────────────────────────────── */
+.vx-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:40px 20px;animation:eFade .9s ease both}
+@keyframes eFade{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+.vx-e-wrap{position:relative;width:68px;height:68px}
+.vx-e-ico{width:68px;height:68px;border-radius:20px;background:linear-gradient(135deg,var(--accent2),var(--accent));display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.7rem;box-shadow:0 4px 28px rgba(160,120,255,.32);position:relative;overflow:hidden;animation:iFloat 5s ease-in-out infinite}
+.vx-e-ico::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent,rgba(255,255,255,.18));border-radius:inherit}
+@keyframes iFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.vx-ring{position:absolute;inset:-10px;border-radius:26px;border:2px solid var(--accent);opacity:0;animation:ringOut 3.5s ease-in-out infinite}
+.vx-ring:nth-child(2){animation-delay:1.2s}
+.vx-ring:nth-child(3){animation-delay:2.4s}
+@keyframes ringOut{0%{opacity:.35;transform:scale(1)}100%{opacity:0;transform:scale(1.6)}}
+.vx-e-title{font-size:1.15rem;font-weight:700;color:var(--white);letter-spacing:-.02em}
+.vx-e-text{font-size:.78rem;text-align:center;line-height:1.72;color:var(--dim);max-width:300px}
+.vx-suggests{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:6px}
+.vx-sug{padding:7px 15px;border-radius:22px;font-size:.69rem;font-weight:500;color:var(--dim);background:var(--raise);border:1px solid var(--bdr);cursor:pointer;transition:all .25s cubic-bezier(.34,1.56,.64,1);font-family:var(--font)}
+.vx-sug:hover{color:var(--accent);background:var(--accent-glow);border-color:var(--bdr-accent);transform:translateY(-3px);box-shadow:0 6px 20px rgba(160,120,255,.14)}
+/* ── IMAGE MODE ───────────────────────────────────────────── */
+.vx-img-body{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.vx-img-settings{display:flex;flex-wrap:wrap;gap:12px;padding:14px 20px;border-bottom:1px solid var(--bdr);flex-shrink:0;background:rgba(10,10,16,.25)}
+.vx-img-sg{display:flex;flex-direction:column;gap:5px}
+.vx-img-sl{font-size:.57rem;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.08em}
+.vx-sel{background:var(--raise);border:1px solid var(--bdr);border-radius:8px;padding:6px 12px;font-family:var(--font);font-size:.73rem;color:var(--text);outline:none;cursor:pointer;transition:all .2s;-webkit-appearance:none}
+.vx-sel:hover{border-color:var(--bdrhi)}
+.vx-sel:focus{border-color:var(--bdr-accent);box-shadow:0 0 0 3px var(--accent-glow)}
+.vx-sel option{background:var(--raise)}
+.vx-img-result{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;padding:20px}
+.vx-img-ph{display:flex;flex-direction:column;align-items:center;gap:14px;color:var(--muted)}
+.vx-img-ph-ico{width:56px;height:56px;border-radius:16px;background:var(--raise);border:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;color:var(--dim);animation:iFloat 5s ease-in-out infinite}
+.vx-img-ph-txt{font-size:.75rem;text-align:center;line-height:1.72;color:var(--dim)}
+.vx-img-gen{max-width:100%;max-height:100%;border-radius:14px;border:1px solid var(--bdr);object-fit:contain;animation:imgIn .55s cubic-bezier(.16,1,.3,1) both;box-shadow:0 4px 24px rgba(0,0,0,.4)}
+@keyframes imgIn{from{opacity:0;transform:scale(.88);filter:blur(12px)}to{opacity:1;transform:none;filter:none}}
+.vx-img-dl{display:none;position:absolute;bottom:28px;right:28px;padding:6px 16px;border-radius:10px;background:rgba(16,16,24,.8);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--bdrhi);color:var(--text);font-size:.7rem;font-weight:600;font-family:var(--font);text-decoration:none;cursor:pointer;transition:all .25s}
+.vx-img-dl:hover{background:var(--accent-glow);border-color:var(--bdr-accent);color:var(--white);transform:translateY(-2px)}
+.vx-img-dl.vis{display:block;animation:mIn .3s ease both}
+.vx-img-loading{display:flex;flex-direction:column;align-items:center;gap:16px;color:var(--dim)}
+.vx-img-loading-txt{font-size:.75rem}
+/* ── LOCAL AI ─────────────────────────────────────────────── */
+.vx-local-body{flex:1;display:flex;flex-direction:column;overflow-y:auto;padding:20px}
+.vx-local-body::-webkit-scrollbar{width:4px}
+.vx-local-body::-webkit-scrollbar-thumb{background:var(--muted);border-radius:4px}
+.vx-local-warn{background:linear-gradient(135deg,rgba(160,120,255,.06),rgba(62,219,184,.04));border:1px solid var(--bdr-accent);border-radius:14px;padding:14px 16px;font-size:.76rem;color:var(--dim);line-height:1.72;margin-bottom:16px;animation:mIn .5s ease both}
+.vx-local-warn strong{color:var(--accent);font-weight:700}
+.vx-local-sec{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.vx-local-lbl{font-size:.58rem;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.08em}
+.vx-local-sel{background:var(--raise);border:1px solid var(--bdr);border-radius:10px;padding:8px 12px;font-family:var(--font);font-size:.76rem;color:var(--text);outline:none;cursor:pointer;transition:all .2s;width:100%;-webkit-appearance:none}
+.vx-local-sel:hover{border-color:var(--bdrhi)}
+.vx-local-sel:focus{border-color:var(--bdr-accent);box-shadow:0 0 0 3px var(--accent-glow)}
+.vx-local-sel option{background:var(--raise)}
+.vx-local-btn{padding:9px 22px;border-radius:10px;background:linear-gradient(135deg,var(--accent2),var(--accent));border:none;color:#fff;font-family:var(--font);font-size:.76rem;font-weight:600;cursor:pointer;transition:all .25s cubic-bezier(.34,1.56,.64,1);align-self:flex-start;box-shadow:0 2px 14px rgba(160,120,255,.28)}
+.vx-local-btn:hover{transform:translateY(-2px) scale(1.03);box-shadow:0 4px 22px rgba(160,120,255,.42)}
+.vx-local-btn:active{transform:scale(.94)}
+.vx-local-btn:disabled{opacity:.35;cursor:not-allowed;transform:none!important;box-shadow:none!important}
+.vx-local-status{font-size:.72rem;color:var(--dim);line-height:1.6;margin-top:4px}
+.vx-local-msgs{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px}
+.vx-local-msgs::-webkit-scrollbar{width:4px}
+.vx-local-msgs::-webkit-scrollbar-thumb{background:var(--muted);border-radius:4px}
+/* ── SPINNER ──────────────────────────────────────────────── */
+.spin-lg{width:36px;height:36px;border-radius:50%;border:3px solid var(--raise3);border-top-color:var(--accent);animation:spin .8s linear infinite;box-shadow:0 0 18px rgba(160,120,255,.12)}
 @keyframes spin{to{transform:rotate(360deg)}}
-@keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-@keyframes aiPulse{0%,80%,100%{transform:scale(1);opacity:.4}40%{transform:scale(1.3);opacity:1}}
+/* ── MARKDOWN ─────────────────────────────────────────────── */
+.vx-b code{font-family:var(--mono);font-size:.73rem;background:var(--raise2);border:1px solid var(--bdr);padding:2px 6px;border-radius:5px;color:var(--gold)}
+.vx-b pre{background:var(--raise);border:1px solid var(--bdr);border-radius:10px;padding:12px 14px;overflow-x:auto;margin:8px 0}
+.vx-b pre code{background:none;border:none;padding:0;font-size:.72rem;color:var(--text)}
+.vx-b strong{color:var(--bright);font-weight:600}
+.vx-b em{font-style:italic}
+.vx-b a{color:var(--accent);text-decoration:none;transition:color .2s}
+.vx-b a:hover{color:var(--white);text-decoration:underline}
+/* ── HIDDEN ───────────────────────────────────────────────── */
+.hide{display:none!important}
+@media(max-width:500px){
+  .vx-m{max-width:92%}
+  .vx-suggests{flex-direction:column;align-items:center}
+}
 </style>
 </head>
 <body>
-<div id="app" style="display:flex;flex-direction:column;height:100%">
-
-  <!-- HEADER -->
-  <div class="ai-header">
-    <div class="ai-header-icon">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a9 9 0 0 1 9 9c0 3.18-1.65 5.97-4.13 7.56L16 21H8l-.87-2.44A9 9 0 0 1 12 2z"/><path d="M9 12h6M9 8h6"/></svg>
-    </div>
-    <div class="ai-header-info">
-      <div class="ai-header-name">Vexis AI</div>
-      <div class="ai-header-sub" id="aiHeaderSub">Powered by GPT-4o</div>
-    </div>
-    <span class="ai-badge" id="aiBadge">GPT-4o</span>
-  </div>
-
-  <!-- MODE TABS -->
-  <div class="ai-mode-tabs">
-    <button class="ai-mode-tab active" id="aiModeChat" onclick="switchAIMode('chat')">Chat</button>
-    <button class="ai-mode-tab" id="aiModeImage" onclick="switchAIMode('image')">Image</button>
-    <button class="ai-mode-tab" id="aiModeLocal" onclick="switchAIMode('local')">Local AI</button>
-  </div>
-
-  <!-- CHAT MESSAGES -->
-  <div class="ai-messages" id="aiMessages">
-    <div class="ai-empty" id="aiEmptyState">
-      <div class="ai-empty-ico">✦</div>
-      <div class="ai-empty-text">Hi! I'm Vexis AI.<br>Ask me anything — I'm here to help.</div>
-    </div>
-  </div>
-
-  <!-- CHAT INPUT -->
-  <div class="ai-input-row" id="aiChatInputRow">
-    <textarea class="ai-textarea" id="aiInput" rows="1" placeholder="Message Vexis AI…"
-      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAI();}"
-      oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,110)+'px'"></textarea>
-    <button class="ai-send" id="aiSendBtn" onclick="sendAI()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-    </button>
-  </div>
-
-  <!-- IMAGE MODE BODY -->
-  <div class="ai-img-body" id="aiImgBody" style="display:none">
-    <div class="ai-img-settings">
-      <div class="ai-img-setting-group">
-        <label class="ai-img-setting-label">Provider</label>
-        <select class="ai-img-select" id="aiImgProvider" onchange="onImgProviderChange()">
-          <option value="pollinations">Pollinations (free)</option>
-          <option value="dalle3">DALL-E / gpt-image-1 (API key)</option>
-        </select>
-      </div>
-      <div class="ai-img-setting-group" id="aiPollinationsModelGroup">
-        <label class="ai-img-setting-label">Model</label>
-        <select class="ai-img-select" id="aiPollinationsModel">
-          <option value="flux">Flux — fast</option>
-          <option value="">Auto</option>
-          <option value="turbo">Turbo — speed</option>
-          <option value="sd">Stable Diffusion</option>
-        </select>
-      </div>
-      <div class="ai-img-setting-group" id="aiPollinationsSizeGroup">
-        <label class="ai-img-setting-label">Size</label>
-        <select class="ai-img-select" id="aiPollinationsSize">
-          <option value="1024x1024">1024×1024</option>
-          <option value="1024x768">1024×768</option>
-          <option value="768x1024">768×1024</option>
-          <option value="512x512">512×512</option>
-        </select>
-      </div>
-    </div>
-    <div class="ai-img-result" id="aiImgResult">
-      <div class="ai-img-placeholder" id="aiImgPlaceholder">
-        <div class="ai-img-placeholder-ico">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-        </div>
-        <div class="ai-img-placeholder-text">Describe what you want to see and press Generate<br><span id="aiImgProviderNote" style="color:var(--muted)">Pollinations · free · no API key needed</span></div>
-      </div>
-      <a class="ai-img-download" id="aiImgDownload" download="vexis-image.png">Download</a>
-    </div>
-  </div>
-
-  <!-- IMAGE INPUT -->
-  <div class="ai-img-prompt-row" id="aiImgInputRow" style="display:none">
-    <textarea class="ai-textarea" id="aiImgInput" rows="1" placeholder="Describe an image…"
-      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();generateImage();}"
-      oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,110)+'px'"></textarea>
-    <button class="ai-send" id="aiImgBtn" onclick="generateImage()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-    </button>
-  </div>
-
-  <!-- LOCAL AI BODY -->
-  <div class="ai-local-body" id="aiLocalBody" style="display:none">
-    <div class="ai-local-warning">
-      <strong>About Local AI</strong><br>
-      Runs a language model entirely in your browser using WebLLM. No data leaves your device.
-      The first time you load a model it will be downloaded and cached — this may take several minutes depending on your connection and the model size.
-    </div>
-    <div class="ai-local-section">
-      <label class="ai-local-label">Model</label>
-      <select class="ai-local-select" id="aiLocalModel">
-        <option value="Llama-3.2-1B-Instruct-q4f32_1-MLC">Llama 3.2 1B — Instruct (fast, ~0.7 GB)</option>
-        <option value="Llama-3.2-3B-Instruct-q4f16_1-MLC">Llama 3.2 3B — Instruct (~1.8 GB)</option>
-        <option value="Phi-3.5-mini-instruct-q4f16_1-MLC">Phi-3.5 Mini — Instruct (~2.1 GB)</option>
-        <option value="gemma-2-2b-it-q4f16_1-MLC">Gemma 2 2B — IT (~1.4 GB)</option>
-        <option value="Mistral-7B-Instruct-v0.3-q4f16_1-MLC">Mistral 7B — Instruct v0.3 (~4.1 GB)</option>
-      </select>
-    </div>
-    <div class="ai-local-section">
-      <button class="ai-local-load-btn" id="aiLocalLoadBtn" onclick="loadLocalModel()">Load Model</button>
-      <div class="ai-local-status" id="aiLocalStatus">Select a model and click Load to begin.</div>
-    </div>
-  </div>
-
-  <!-- LOCAL AI MESSAGES -->
-  <div class="ai-local-messages" id="aiLocalMessages" style="display:none"></div>
-
-  <!-- LOCAL AI INPUT -->
-  <div class="ai-local-input-row" id="aiLocalInputRow" style="display:none">
-    <textarea class="ai-textarea" id="aiLocalInput" rows="1" placeholder="Chat with local model…"
-      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendLocalAI();}"
-      oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,110)+'px'"></textarea>
-    <button class="ai-send" id="aiLocalSendBtn" onclick="sendLocalAI()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-    </button>
-  </div>
-
+<!-- ambient -->
+<div class="vx-ambient">
+  <div class="vx-orb vx-orb-1"></div>
+  <div class="vx-orb vx-orb-2"></div>
+  <div class="vx-orb vx-orb-3"></div>
 </div>
-
+<div class="vx-noise"></div>
+<div id="vx">
+  <!-- HEADER -->
+  <div class="vx-hdr">
+    <div class="vx-hdr-icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a9 9 0 0 1 9 9c0 3.18-1.65 5.97-4.13 7.56L16 21H8l-.87-2.44A9 9 0 0 1 12 2z"/><path d="M9 12h6M9 8h6"/></svg>
+    </div>
+    <div class="vx-hdr-info">
+      <div class="vx-hdr-name">Vexis AI</div>
+      <div class="vx-hdr-sub" id="hdrSub"><span class="vx-dot"></span>Powered by GPT-4o</div>
+    </div>
+    <span class="vx-badge" id="badge">GPT-4o</span>
+  </div>
+  <!-- TABS -->
+  <div class="vx-tabs">
+    <button class="vx-tab on" id="tabChat" onclick="go('chat')">✦ Chat</button>
+    <button class="vx-tab" id="tabImg" onclick="go('image')">◐ Image</button>
+    <button class="vx-tab" id="tabLocal" onclick="go('local')">⊡ Local AI</button>
+  </div>
+  <!-- ═══ CHAT ═══ -->
+  <div class="vx-msgs" id="chatMsgs">
+    <div class="vx-empty" id="emptyState">
+      <div class="vx-e-wrap">
+        <div class="vx-ring"></div><div class="vx-ring"></div><div class="vx-ring"></div>
+        <div class="vx-e-ico">✦</div>
+      </div>
+      <div class="vx-e-title">Hey, I'm Vexis</div>
+      <div class="vx-e-text">Your AI assistant — ask me anything, from code to creative ideas.</div>
+      <div class="vx-suggests">
+        <button class="vx-sug" onclick="fill('Explain quantum computing simply')">Explain quantum computing</button>
+        <button class="vx-sug" onclick="fill('Write a Python sort function')">Write Python code</button>
+        <button class="vx-sug" onclick="fill('Give me 5 creative startup ideas')">Startup ideas</button>
+      </div>
+    </div>
+  </div>
+  <div class="vx-inp" id="chatInp">
+    <div class="vx-tw"><textarea class="vx-ta" id="chatTA" rows="1" placeholder="Message Vexis AI…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}" oninput="ar(this)"></textarea></div>
+    <button class="vx-send" id="chatSend" onclick="sendChat()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+  </div>
+  <!-- ═══ IMAGE ═══ -->
+  <div class="vx-img-body hide" id="imgBody">
+    <div class="vx-img-settings">
+      <div class="vx-img-sg"><label class="vx-img-sl">Provider</label><select class="vx-sel" id="imgProv" onchange="imgProvChange()"><option value="pollinations">Pollinations (free)</option><option value="dalle3">DALL-E / gpt-image-1 (API key)</option></select></div>
+      <div class="vx-img-sg" id="imgModelG"><label class="vx-img-sl">Model</label><select class="vx-sel" id="imgModel"><option value="flux">Flux — fast</option><option value="">Auto</option><option value="turbo">Turbo — speed</option></select></div>
+      <div class="vx-img-sg" id="imgSizeG"><label class="vx-img-sl">Size</label><select class="vx-sel" id="imgSize"><option value="1024x1024">1024×1024</option><option value="1024x768">1024×768</option><option value="768x1024">768×1024</option><option value="512x512">512×512</option></select></div>
+    </div>
+    <div class="vx-img-result" id="imgResult">
+      <div class="vx-img-ph" id="imgPH">
+        <div class="vx-img-ph-ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+        <div class="vx-img-ph-txt">Describe what you want to see and press Generate<br><span id="imgNote" style="color:var(--muted)">Pollinations · free · no API key needed</span></div>
+      </div>
+      <a class="vx-img-dl" id="imgDL" download="vexis-image.png">⬇ Download</a>
+    </div>
+  </div>
+  <div class="vx-inp hide" id="imgInp">
+    <div class="vx-tw"><textarea class="vx-ta" id="imgTA" rows="1" placeholder="Describe an image…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();genImg()}" oninput="ar(this)"></textarea></div>
+    <button class="vx-send" id="imgSend" onclick="genImg()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></button>
+  </div>
+  <!-- ═══ LOCAL AI ═══ -->
+  <div class="vx-local-body hide" id="localBody">
+    <div class="vx-local-warn"><strong>⊡ Local AI</strong><br>Runs a language model entirely in your browser using WebLLM. No data leaves your device. The first load downloads and caches the model — this may take a few minutes.</div>
+    <div class="vx-local-sec"><label class="vx-local-lbl">Model</label><select class="vx-local-sel" id="localModel"><option value="Llama-3.2-1B-Instruct-q4f32_1-MLC">Llama 3.2 1B — Instruct (fast, ~0.7 GB)</option><option value="Llama-3.2-3B-Instruct-q4f16_1-MLC">Llama 3.2 3B — Instruct (~1.8 GB)</option><option value="Phi-3.5-mini-instruct-q4f16_1-MLC">Phi-3.5 Mini — Instruct (~2.1 GB)</option><option value="gemma-2-2b-it-q4f16_1-MLC">Gemma 2 2B — IT (~1.4 GB)</option><option value="Mistral-7B-Instruct-v0.3-q4f16_1-MLC">Mistral 7B — Instruct v0.3 (~4.1 GB)</option></select></div>
+    <div class="vx-local-sec"><button class="vx-local-btn" id="localBtn" onclick="loadLocal()">Load Model</button><div class="vx-local-status" id="localSt">Select a model and click Load to begin.</div></div>
+  </div>
+  <div class="vx-local-msgs hide" id="localMsgs"></div>
+  <div class="vx-inp hide" id="localInp">
+    <div class="vx-tw"><textarea class="vx-ta" id="localTA" rows="1" placeholder="Chat with local model…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendLocal()}" oninput="ar(this)"></textarea></div>
+    <button class="vx-send" id="localSend" onclick="sendLocal()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+  </div>
+</div>
 <script>
-const AI_SERVER = window.location.origin;
-let _aiHistory = [];
-let _aiTyping = false;
-let _aiMode = 'chat';
-let _imgGenerating = false;
-let _imgBlobUrl = null;
-window._localEngine = null;
-window._localHistory = [];
-let _localLoading = false;
-
-// ── Utility ────────────────────────────────────────────────────────────────
-
-function escHtml(s) {
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const SRV=location.origin;
+let hist=[],typing=false,mode='chat',imgBusy=false,imgBlob=null;
+window._le=null;window._lh=[];let localBusy=false;
+/* util */
+function ar(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,120)+'px'}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function md(t){
+  t=t.replace(/```(\w*)\n?([\s\S]*?)```/g,(_,l,c)=>'<pre><code>'+esc(c.trim())+'</code></pre>');
+  t=t.replace(/`([^`]+)`/g,(_,c)=>'<code>'+esc(c)+'</code>');
+  t=t.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
+  t=t.replace(/\*([^*]+)\*/g,'<em>$1</em>');
+  t=t.replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>');
+  t=t.replace(/\n/g,'<br>');return t;
 }
-
-function markdownLite(text) {
-  // Code blocks
-  text = text.replace(/```(\w*)\n?([\s\S]*?)```/g, (_, lang, code) =>
-    `<pre><code>${escHtml(code.trim())}</code></pre>`);
-  // Inline code
-  text = text.replace(/`([^`]+)`/g, (_, c) => `<code>${escHtml(c)}</code>`);
-  // Bold
-  text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-  // Italic
-  text = text.replace(/\*([^*]+)\*/g, '<em>$1</em>');
-  // Links
-  text = text.replace(/\[([^\]]+)\]\((https?:\/\/[^\)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
-  // Line breaks
-  text = text.replace(/\n/g, '<br>');
-  return text;
-}
-
-function scrollAI(container) {
-  setTimeout(() => { container.scrollTop = container.scrollHeight; }, 30);
-}
-
-// ── Mode switching ─────────────────────────────────────────────────────────
-
-function switchAIMode(mode) {
-  _aiMode = mode;
-
-  // Tab states
-  document.getElementById('aiModeChat').classList.toggle('active', mode === 'chat');
-  document.getElementById('aiModeImage').classList.toggle('active', mode === 'image');
-  document.getElementById('aiModeLocal').classList.toggle('active', mode === 'local');
-
-  // Chat
-  document.getElementById('aiMessages').style.display        = mode === 'chat'  ? 'flex'  : 'none';
-  document.getElementById('aiChatInputRow').style.display    = mode === 'chat'  ? 'flex'  : 'none';
-
-  // Image
-  document.getElementById('aiImgBody').style.display         = mode === 'image' ? 'flex'  : 'none';
-  document.getElementById('aiImgInputRow').style.display     = mode === 'image' ? 'flex'  : 'none';
-
-  // Local
-  document.getElementById('aiLocalBody').style.display       = mode === 'local' ? 'flex'  : 'none';
-  document.getElementById('aiLocalMessages').style.display   = mode === 'local' ? 'flex'  : 'none';
-  document.getElementById('aiLocalInputRow').style.display   = mode === 'local' ? 'flex'  : 'none';
-
-  // Header badge + subtitle
-  const sub  = document.getElementById('aiHeaderSub');
-  const badge = document.getElementById('aiBadge');
-  if (mode === 'chat') {
-    sub.textContent   = 'Powered by GPT-4o';
-    badge.textContent = 'GPT-4o';
-  } else if (mode === 'image') {
-    sub.textContent   = 'AI Image Generation';
-    badge.textContent = 'Image';
-  } else {
-    sub.textContent   = 'Runs in your browser';
-    badge.textContent = 'Local';
-  }
-
-  // Focus appropriate input
-  setTimeout(() => {
-    if (mode === 'chat')  document.getElementById('aiInput').focus();
-    if (mode === 'image') document.getElementById('aiImgInput').focus();
-    if (mode === 'local' && window._localEngine) document.getElementById('aiLocalInput').focus();
-  }, 60);
-}
-
-// ── Chat ───────────────────────────────────────────────────────────────────
-
-function aiAddMsg(role, content) {
-  const empty = document.getElementById('aiEmptyState');
-  if (empty) empty.remove();
-
-  const msgs = document.getElementById('aiMessages');
-  const wrap = document.createElement('div');
-  wrap.className = 'ai-msg ' + (role === 'user' ? 'user' : 'ai');
-
-  if (role !== 'user') {
-    const av = document.createElement('div');
-    av.className = 'ai-avatar';
-    av.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a9 9 0 0 1 9 9c0 3.18-1.65 5.97-4.13 7.56L16 21H8l-.87-2.44A9 9 0 0 1 12 2z"/><path d="M9 12h6M9 8h6"/></svg>`;
-    wrap.appendChild(av);
-  }
-
-  const bubble = document.createElement('div');
-  bubble.className = 'ai-bubble';
-  bubble.innerHTML = role === 'user' ? escHtml(content) : markdownLite(content);
-  wrap.appendChild(bubble);
-
-  msgs.appendChild(wrap);
-  scrollAI(msgs);
-  return wrap;
-}
-
-function aiShowTyping() {
-  const msgs = document.getElementById('aiMessages');
-  const wrap = document.createElement('div');
-  wrap.className = 'ai-msg ai';
-  wrap.id = '_aiTypingBubble';
-
-  const av = document.createElement('div');
-  av.className = 'ai-avatar';
-  av.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a9 9 0 0 1 9 9c0 3.18-1.65 5.97-4.13 7.56L16 21H8l-.87-2.44A9 9 0 0 1 12 2z"/><path d="M9 12h6M9 8h6"/></svg>`;
-  wrap.appendChild(av);
-
-  const bubble = document.createElement('div');
-  bubble.className = 'ai-bubble';
-  bubble.innerHTML = `<div class="ai-typing"><span></span><span></span><span></span></div>`;
-  wrap.appendChild(bubble);
-
-  msgs.appendChild(wrap);
-  scrollAI(msgs);
-  _aiTyping = true;
-}
-
-function aiHideTyping() {
-  const t = document.getElementById('_aiTypingBubble');
-  if (t) t.remove();
-  _aiTyping = false;
-}
-
-async function sendAI() {
-  const inp = document.getElementById('aiInput');
-  const text = inp.value.trim();
-  if (!text || _aiTyping) return;
-
-  inp.value = '';
-  inp.style.height = 'auto';
-  document.getElementById('aiSendBtn').disabled = true;
-
-  aiAddMsg('user', text);
-  _aiHistory.push({ role: 'user', content: text });
-  aiShowTyping();
-
-  try {
-    // Try the parent Vexis OS server first, then fall back to a direct OpenAI call
-    const res = await fetch(AI_SERVER + '/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages: _aiHistory })
-    });
-
-    aiHideTyping();
-
-    if (res.ok) {
-      const data = await res.json();
-      const reply = data.reply || data.message || (data.choices && data.choices[0].message.content) || 'No response.';
-      _aiHistory.push({ role: 'assistant', content: reply });
-      aiAddMsg('ai', reply);
-    } else {
-      throw new Error('Server responded with ' + res.status);
-    }
-  } catch (err) {
-    aiHideTyping();
-    // Friendly offline / no-server message
-    const errMsg = 'I couldn\'t reach the AI server. Make sure Vexis OS is running and your API key is configured, then try again.';
-    aiAddMsg('ai', errMsg);
-    // Remove the failed user message from history to keep it clean
-    _aiHistory.pop();
-  }
-
-  document.getElementById('aiSendBtn').disabled = false;
-  setTimeout(() => document.getElementById('aiInput').focus(), 50);
-}
-
-// ── Image Generation ───────────────────────────────────────────────────────
-
-function onImgProviderChange() {
-  const provider = document.getElementById('aiImgProvider').value;
-  const isPollinations = provider === 'pollinations';
-  document.getElementById('aiPollinationsModelGroup').style.display = isPollinations ? 'flex' : 'none';
-  document.getElementById('aiPollinationsSizeGroup').style.display  = isPollinations ? 'flex' : 'none';
-  const note = document.getElementById('aiImgProviderNote');
-  if (isPollinations) {
-    note.textContent = 'Pollinations · free · no API key needed';
-  } else {
-    note.textContent = 'DALL-E / gpt-image-1 · requires OpenAI API key on server';
+function scr(c){setTimeout(()=>{c.scrollTop=c.scrollHeight},40)}
+/* particles */
+function particles(btn){
+  const r=btn.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
+  const cols=['#a07cff','#7a55e0','#3edbb8','#ffb84a','#ff5e80'];
+  for(let i=0;i<10;i++){
+    const p=document.createElement('div');p.className='vx-particle';
+    const a=(Math.PI*2/10)*i+(Math.random()*.5-.25),d=28+Math.random()*50;
+    const tx=Math.cos(a)*d,ty=Math.sin(a)*d,sz=3+Math.random()*4;
+    p.style.cssText=`left:${cx}px;top:${cy}px;width:${sz}px;height:${sz}px;background:${cols[i%5]};--tx:${tx}px;--ty:${ty}px`;
+    document.body.appendChild(p);setTimeout(()=>p.remove(),660);
   }
 }
-
-function setImgResultState(state, src) {
-  const result    = document.getElementById('aiImgResult');
-  const placeholder = document.getElementById('aiImgPlaceholder');
-  const download  = document.getElementById('aiImgDownload');
-
-  // Clear previous image if any
-  const prev = result.querySelector('img.ai-img-generated');
-  if (prev) prev.remove();
-  const prevSpin = result.querySelector('.ai-img-generating');
-  if (prevSpin) prevSpin.remove();
-
-  if (state === 'placeholder') {
-    placeholder.style.display = 'flex';
-    download.classList.remove('visible');
-  } else if (state === 'loading') {
-    placeholder.style.display = 'none';
-    download.classList.remove('visible');
-    const loading = document.createElement('div');
-    loading.className = 'ai-img-generating';
-    loading.innerHTML = `<div class="spin-large"></div><div class="ai-img-generating-text">Generating image…</div>`;
-    result.appendChild(loading);
-  } else if (state === 'image') {
-    placeholder.style.display = 'none';
-    const img = document.createElement('img');
-    img.className = 'ai-img-generated';
-    img.src = src;
-    img.alt = 'Generated image';
-    result.appendChild(img);
-    download.href = src;
-    download.classList.add('visible');
-  }
+/* fill suggestion */
+function fill(t){const i=document.getElementById('chatTA');i.value=t;i.focus();ar(i)}
+/* svg helper */
+const avSvg='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a9 9 0 0 1 9 9c0 3.18-1.65 5.97-4.13 7.56L16 21H8l-.87-2.44A9 9 0 0 1 12 2z"/><path d="M9 12h6M9 8h6"/></svg>';
+/* ── MODE SWITCH ──────────────────────────────────────────── */
+function go(m){
+  mode=m;
+  document.getElementById('tabChat').classList.toggle('on',m==='chat');
+  document.getElementById('tabImg').classList.toggle('on',m==='image');
+  document.getElementById('tabLocal').classList.toggle('on',m==='local');
+  ['chatMsgs','chatInp'].forEach(id=>document.getElementById(id).classList.toggle('hide',m!=='chat'));
+  ['imgBody','imgInp'].forEach(id=>document.getElementById(id).classList.toggle('hide',m!=='image'));
+  document.getElementById('localBody').classList.toggle('hide',m!=='local');
+  document.getElementById('localMsgs').classList.toggle('hide',m!=='local'||!window._le);
+  document.getElementById('localInp').classList.toggle('hide',m!=='local'||!window._le);
+  const sub=document.getElementById('hdrSub'),badge=document.getElementById('badge');
+  if(m==='chat'){sub.innerHTML='<span class="vx-dot"></span>Powered by GPT-4o';badge.textContent='GPT-4o'}
+  else if(m==='image'){sub.innerHTML='<span class="vx-dot"></span>AI Image Generation';badge.textContent='IMAGE'}
+  else{sub.innerHTML='<span class="vx-dot"></span>Runs in your browser';badge.textContent='LOCAL'}
+  setTimeout(()=>{
+    if(m==='chat')document.getElementById('chatTA').focus();
+    if(m==='image')document.getElementById('imgTA').focus();
+    if(m==='local'&&window._le)document.getElementById('localTA').focus();
+  },80);
 }
-
-async function generateImage() {
-  if (_imgGenerating) return;
-  const inp = document.getElementById('aiImgInput');
-  const prompt = inp.value.trim();
-  if (!prompt) return;
-
-  _imgGenerating = true;
-  document.getElementById('aiImgBtn').disabled = true;
-  setImgResultState('loading');
-
-  const provider = document.getElementById('aiImgProvider').value;
-
-  try {
-    if (provider === 'pollinations') {
-      await generateImagePollinations(prompt);
-    } else {
-      await generateImageDalle(prompt);
-    }
-  } catch (err) {
-    setImgResultState('placeholder');
-    const note = document.getElementById('aiImgProviderNote');
-    note.textContent = 'Error: ' + (err.message || 'Failed to generate image.');
-  }
-
-  _imgGenerating = false;
-  document.getElementById('aiImgBtn').disabled = false;
+/* ── CHAT ─────────────────────────────────────────────────── */
+function addMsg(role,content,container){
+  container=container||document.getElementById('chatMsgs');
+  const es=document.getElementById('emptyState');if(es)es.remove();
+  const w=document.createElement('div');w.className='vx-m '+(role==='user'?'u':'a');
+  if(role!=='user'){const av=document.createElement('div');av.className='vx-av';av.innerHTML=avSvg;w.appendChild(av)}
+  const b=document.createElement('div');b.className='vx-b';
+  b.innerHTML=role==='user'?esc(content):md(content);
+  w.appendChild(b);container.appendChild(w);scr(container);return w;
 }
-
-async function generateImagePollinations(prompt) {
-  const model = document.getElementById('aiPollinationsModel').value;
-  const size  = document.getElementById('aiPollinationsSize').value;
-  const [w, h] = size.split('x');
-  const encoded = encodeURIComponent(prompt);
-  let url = `https://image.pollinations.ai/prompt/${encoded}?width=${w}&height=${h}&nologo=true&enhance=false`;
-  if (model) url += `&model=${model}`;
-
-  // Pollinations returns the image directly at the URL — load it as an img
-  await new Promise((resolve, reject) => {
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.onload = () => {
-      // Try to create blob URL for download
-      try {
-        const canvas = document.createElement('canvas');
-        canvas.width = img.naturalWidth || parseInt(w);
-        canvas.height = img.naturalHeight || parseInt(h);
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0);
-        canvas.toBlob(blob => {
-          if (_imgBlobUrl) URL.revokeObjectURL(_imgBlobUrl);
-          _imgBlobUrl = URL.createObjectURL(blob);
-          setImgResultState('image', _imgBlobUrl);
-          resolve();
-        }, 'image/png');
-      } catch (e) {
-        // CORS might block canvas — just use the direct URL
-        setImgResultState('image', url);
-        resolve();
-      }
-    };
-    img.onerror = () => reject(new Error('Failed to load image from Pollinations.'));
-    img.src = url;
+function showTyp(container){
+  container=container||document.getElementById('chatMsgs');
+  const w=document.createElement('div');w.className='vx-m a';w.id='_typ';
+  const av=document.createElement('div');av.className='vx-av';av.innerHTML=avSvg;w.appendChild(av);
+  const b=document.createElement('div');b.className='vx-b';
+  b.innerHTML='<div class="vx-typing"><span></span><span></span><span></span></div>';
+  w.appendChild(b);container.appendChild(w);scr(container);typing=true;
+}
+function hideTyp(){const t=document.getElementById('_typ');if(t)t.remove();typing=false}
+async function sendChat(){
+  const inp=document.getElementById('chatTA'),text=inp.value.trim();
+  if(!text||typing)return;
+  inp.value='';inp.style.height='auto';
+  document.getElementById('chatSend').disabled=true;
+  particles(document.getElementById('chatSend'));
+  addMsg('user',text);hist.push({role:'user',content:text});showTyp();
+  try{
+    const res=await fetch(SRV+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:hist})});
+    hideTyp();
+    if(res.ok){const d=await res.json();const r=d.reply||d.message||(d.choices&&d.choices[0].message.content)||'No response.';hist.push({role:'assistant',content:r});addMsg('ai',r)}
+    else throw new Error(res.status);
+  }catch(e){hideTyp();addMsg('ai',"I couldn't reach the AI server. Make sure Vexis OS is running and your API key is configured.");hist.pop()}
+  document.getElementById('chatSend').disabled=false;
+  setTimeout(()=>document.getElementById('chatTA').focus(),50);
+}
+/* ── IMAGE ────────────────────────────────────────────────── */
+function imgProvChange(){
+  const p=document.getElementById('imgProv').value==='pollinations';
+  document.getElementById('imgModelG').style.display=p?'flex':'none';
+  document.getElementById('imgSizeG').style.display=p?'flex':'none';
+  document.getElementById('imgNote').textContent=p?'Pollinations · free · no API key needed':'DALL-E / gpt-image-1 · requires OpenAI API key on server';
+}
+function setImgState(s,src){
+  const res=document.getElementById('imgResult'),ph=document.getElementById('imgPH'),dl=document.getElementById('imgDL');
+  const prev=res.querySelector('img.vx-img-gen');if(prev)prev.remove();
+  const prevL=res.querySelector('.vx-img-loading');if(prevL)prevL.remove();
+  if(s==='ph'){ph.style.display='flex';dl.classList.remove('vis')}
+  else if(s==='load'){ph.style.display='none';dl.classList.remove('vis');
+    const ld=document.createElement('div');ld.className='vx-img-loading';
+    ld.innerHTML='<div class="spin-lg"></div><div class="vx-img-loading-txt">Generating image…</div>';res.appendChild(ld)}
+  else if(s==='done'){ph.style.display='none';
+    const img=document.createElement('img');img.className='vx-img-gen';img.src=src;img.alt='Generated';
+    res.appendChild(img);dl.href=src;dl.classList.add('vis')}
+}
+async function genImg(){
+  if(imgBusy)return;const inp=document.getElementById('imgTA'),pr=inp.value.trim();if(!pr)return;
+  imgBusy=true;document.getElementById('imgSend').disabled=true;
+  particles(document.getElementById('imgSend'));setImgState('load');
+  const prov=document.getElementById('imgProv').value;
+  try{if(prov==='pollinations')await genPoll(pr);else await genDalle(pr)}
+  catch(e){setImgState('ph');document.getElementById('imgNote').textContent='Error: '+(e.message||'Failed.')}
+  imgBusy=false;document.getElementById('imgSend').disabled=false;
+}
+async function genPoll(pr){
+  const m=document.getElementById('imgModel').value,sz=document.getElementById('imgSize').value;
+  const[w,h]=sz.split('x');let url='https://image.pollinations.ai/prompt/'+encodeURIComponent(pr)+'?width='+w+'&height='+h+'&nologo=true&enhance=false';
+  if(m)url+='&model='+m;
+  await new Promise((ok,no)=>{
+    const img=new Image();img.crossOrigin='anonymous';
+    img.onload=()=>{try{const c=document.createElement('canvas');c.width=img.naturalWidth||+w;c.height=img.naturalHeight||+h;c.getContext('2d').drawImage(img,0,0);c.toBlob(b=>{if(imgBlob)URL.revokeObjectURL(imgBlob);imgBlob=URL.createObjectURL(b);setImgState('done',imgBlob);ok()},'image/png')}catch(e){setImgState('done',url);ok()}};
+    img.onerror=()=>no(new Error('Failed to load from Pollinations.'));img.src=url;
   });
 }
-
-async function generateImageDalle(prompt) {
-  const res = await fetch(AI_SERVER + '/api/imagine', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ prompt })
-  });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.error || 'Server error ' + res.status);
-  }
-  const data = await res.json();
-  const imgUrl = data.url || (data.b64 ? 'data:image/png;base64,' + data.b64 : null);
-  if (!imgUrl) throw new Error('No image in response.');
-  setImgResultState('image', imgUrl);
-  document.getElementById('aiImgDownload').href = imgUrl;
+async function genDalle(pr){
+  const res=await fetch(SRV+'/api/imagine',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:pr})});
+  if(!res.ok){let e={};try{e=await res.json()}catch(x){}throw new Error(e.error||'Server error '+res.status)}
+  const d=await res.json();const u=d.url||(d.b64?'data:image/png;base64,'+d.b64:null);
+  if(!u)throw new Error('No image.');setImgState('done',u);document.getElementById('imgDL').href=u;
 }
-
-// ── Local AI (WebLLM) ──────────────────────────────────────────────────────
-
-function localAddMsg(role, content) {
-  const msgs = document.getElementById('aiLocalMessages');
-  const wrap = document.createElement('div');
-  wrap.className = 'ai-msg ' + (role === 'user' ? 'user' : 'ai');
-
-  if (role !== 'user') {
-    const av = document.createElement('div');
-    av.className = 'ai-avatar';
-    av.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a9 9 0 0 1 9 9c0 3.18-1.65 5.97-4.13 7.56L16 21H8l-.87-2.44A9 9 0 0 1 12 2z"/><path d="M9 12h6M9 8h6"/></svg>`;
-    wrap.appendChild(av);
-  }
-
-  const bubble = document.createElement('div');
-  bubble.className = 'ai-bubble';
-  bubble.innerHTML = role === 'user' ? escHtml(content) : markdownLite(content);
-  wrap.appendChild(bubble);
-  msgs.appendChild(wrap);
-  scrollAI(msgs);
-  return bubble;
+/* ── LOCAL AI ─────────────────────────────────────────────── */
+function localAdd(role,content){
+  const msgs=document.getElementById('localMsgs');
+  const w=document.createElement('div');w.className='vx-m '+(role==='user'?'u':'a');
+  if(role!=='user'){const av=document.createElement('div');av.className='vx-av';av.innerHTML=avSvg;w.appendChild(av)}
+  const b=document.createElement('div');b.className='vx-b';
+  b.innerHTML=role==='user'?esc(content):md(content);
+  w.appendChild(b);msgs.appendChild(w);scr(msgs);return b;
 }
-
-function localShowTyping() {
-  const msgs = document.getElementById('aiLocalMessages');
-  const wrap = document.createElement('div');
-  wrap.className = 'ai-msg ai';
-  wrap.id = '_localTypingBubble';
-
-  const av = document.createElement('div');
-  av.className = 'ai-avatar';
-  av.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a9 9 0 0 1 9 9c0 3.18-1.65 5.97-4.13 7.56L16 21H8l-.87-2.44A9 9 0 0 1 12 2z"/><path d="M9 12h6M9 8h6"/></svg>`;
-  wrap.appendChild(av);
-
-  const bubble = document.createElement('div');
-  bubble.className = 'ai-bubble';
-  bubble.innerHTML = `<div class="ai-typing"><span></span><span></span><span></span></div>`;
-  wrap.appendChild(bubble);
-  msgs.appendChild(wrap);
-  scrollAI(msgs);
-  return bubble;
+function localTypShow(){
+  const msgs=document.getElementById('localMsgs');
+  const w=document.createElement('div');w.className='vx-m a';w.id='_ltyp';
+  const av=document.createElement('div');av.className='vx-av';av.innerHTML=avSvg;w.appendChild(av);
+  const b=document.createElement('div');b.className='vx-b';
+  b.innerHTML='<div class="vx-typing"><span></span><span></span><span></span></div>';
+  w.appendChild(b);msgs.appendChild(w);scr(msgs);
 }
-
-function localHideTyping() {
-  const t = document.getElementById('_localTypingBubble');
-  if (t) t.remove();
+function localTypHide(){const t=document.getElementById('_ltyp');if(t)t.remove()}
+async function loadLocal(){
+  if(localBusy)return;localBusy=true;
+  const btn=document.getElementById('localBtn'),st=document.getElementById('localSt'),mid=document.getElementById('localModel').value;
+  btn.disabled=true;btn.textContent='Loading…';st.textContent='Importing WebLLM…';
+  try{
+    const wl=await import('https://esm.run/@mlc-ai/web-llm');st.textContent='Initializing engine…';
+    window._le=new wl.MLCEngine();
+    window._le.setInitProgressCallback(r=>{const p=r.progress?Math.round(r.progress*100):'';st.textContent=r.text+(p?' ('+p+'%)':'')});
+    await window._le.reload(mid);
+    st.textContent='Model loaded! You can now chat locally.';btn.textContent='Reload';btn.disabled=false;
+    document.getElementById('localMsgs').classList.remove('hide');
+    document.getElementById('localInp').classList.remove('hide');
+    setTimeout(()=>document.getElementById('localTA').focus(),80);
+    window._lh=[{role:'system',content:'You are Vexis AI, a helpful and concise assistant running locally in the browser.'}];
+    localAdd('ai','Local model loaded! Everything runs in your browser — no data leaves your device.');
+  }catch(e){st.textContent='Error: '+(e.message||'Failed.');btn.textContent='Load Model';btn.disabled=false;window._le=null}
+  localBusy=false;
 }
-
-async function loadLocalModel() {
-  if (_localLoading) return;
-  _localLoading = true;
-  const btn    = document.getElementById('aiLocalLoadBtn');
-  const status = document.getElementById('aiLocalStatus');
-  const modelId = document.getElementById('aiLocalModel').value;
-  btn.disabled = true;
-  btn.textContent = 'Loading…';
-  status.textContent = 'Importing WebLLM…';
-
-  try {
-    // Dynamically import WebLLM from CDN
-    const webllm = await import('https://esm.run/@mlc-ai/web-llm');
-    status.textContent = 'Initializing engine…';
-
-    window._localEngine = new webllm.MLCEngine();
-
-    window._localEngine.setInitProgressCallback((report) => {
-      const pct = report.progress ? Math.round(report.progress * 100) : '';
-      status.textContent = report.text + (pct ? ` (${pct}%)` : '');
-    });
-
-    await window._localEngine.reload(modelId);
-
-    status.textContent = 'Model loaded! You can now chat locally.';
-    btn.textContent    = 'Reload';
-    btn.disabled       = false;
-
-    // Show messages + input
-    document.getElementById('aiLocalMessages').style.display = 'flex';
-    document.getElementById('aiLocalInputRow').style.display  = 'flex';
-    setTimeout(() => document.getElementById('aiLocalInput').focus(), 60);
-
-    window._localHistory = [{
-      role: 'system',
-      content: 'You are Vexis AI, a helpful and concise assistant running locally in the browser.'
-    }];
-
-    localAddMsg('ai', 'Local model loaded! Everything runs in your browser — no data leaves your device.');
-  } catch (err) {
-    status.textContent = 'Error: ' + (err.message || 'Failed to load model.');
-    btn.textContent    = 'Load Model';
-    btn.disabled       = false;
-    window._localEngine = null;
-  }
-
-  _localLoading = false;
+async function sendLocal(){
+  if(!window._le){document.getElementById('localSt').textContent='Please load a model first.';return}
+  const inp=document.getElementById('localTA'),text=inp.value.trim();if(!text)return;
+  inp.value='';inp.style.height='auto';document.getElementById('localSend').disabled=true;
+  particles(document.getElementById('localSend'));
+  localAdd('user',text);window._lh.push({role:'user',content:text});localTypShow();
+  try{
+    let full='';const msgs=document.getElementById('localMsgs');
+    const reply=await window._le.chat.completions.create({messages:window._lh,stream:true,temperature:.7,max_tokens:1024});
+    localTypHide();const bub=localAdd('ai','');
+    for await(const ch of reply){const d=ch.choices[0]?.delta?.content||'';full+=d;bub.innerHTML=md(full);scr(msgs)}
+    window._lh.push({role:'assistant',content:full});
+  }catch(e){localTypHide();localAdd('ai','Error: '+(e.message||'Failed.'));window._lh.pop()}
+  document.getElementById('localSend').disabled=false;
+  setTimeout(()=>document.getElementById('localTA').focus(),50);
 }
-
-async function sendLocalAI() {
-  if (!window._localEngine) {
-    document.getElementById('aiLocalStatus').textContent = 'Please load a model first.';
-    return;
-  }
-  const inp = document.getElementById('aiLocalInput');
-  const text = inp.value.trim();
-  if (!text) return;
-
-  inp.value = '';
-  inp.style.height = 'auto';
-  document.getElementById('aiLocalSendBtn').disabled = true;
-
-  localAddMsg('user', text);
-  window._localHistory.push({ role: 'user', content: text });
-
-  const typingBubble = localShowTyping();
-
-  try {
-    let fullReply = '';
-    const msgs = document.getElementById('aiLocalMessages');
-
-    // Stream the response
-    const reply = await window._localEngine.chat.completions.create({
-      messages: window._localHistory,
-      stream: true,
-      temperature: 0.7,
-      max_tokens: 1024
-    });
-
-    localHideTyping();
-    const aiBubble = localAddMsg('ai', '');
-
-    for await (const chunk of reply) {
-      const delta = chunk.choices[0]?.delta?.content || '';
-      fullReply += delta;
-      aiBubble.innerHTML = markdownLite(fullReply);
-      scrollAI(msgs);
-    }
-
-    window._localHistory.push({ role: 'assistant', content: fullReply });
-  } catch (err) {
-    localHideTyping();
-    localAddMsg('ai', 'Error: ' + (err.message || 'Failed to generate response.'));
-    window._localHistory.pop();
-  }
-
-  document.getElementById('aiLocalSendBtn').disabled = false;
-  setTimeout(() => document.getElementById('aiLocalInput').focus(), 50);
-}
-
-// ── Init ───────────────────────────────────────────────────────────────────
-
-setTimeout(() => document.getElementById('aiInput').focus(), 100);
+/* init */
+setTimeout(()=>{const i=document.getElementById('chatTA');if(i)i.focus()},200);
 </script>
 </body>
 </html>
