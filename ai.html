@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vexis AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#111;--surf:#191919;--raise:#212121;--raise2:#2a2a2a;--bdr:#2c2c2c;--bdrhi:#383838;--dim:#7a7a7a;--muted:#4a4a4a;--text:#c8c8c8;--bright:#ececec;--white:#f5f5f5;--accent:#ffb84a}
+html,body{height:100%;overflow:hidden;font-family:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+
+/* HEADER */
+.ai-header{display:flex;flex-direction:row;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--bdr);flex-shrink:0}
+.ai-header-icon{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--raise2),var(--muted));border:1px solid var(--bdrhi);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--dim)}
+.ai-header-info{display:flex;flex-direction:column;gap:0px}
+.ai-header-name{font-size:.84rem;font-weight:700;color:var(--white)}
+.ai-header-sub{font-size:.62rem;color:var(--dim);margin-top:1px}
+.ai-badge{margin-left:auto;padding:3px 10px;border-radius:20px;font-size:.6rem;font-weight:700;font-family:'DM Mono',monospace;background:var(--raise2);border:1px solid var(--bdrhi);color:var(--dim);white-space:nowrap}
+
+/* MODE TABS */
+.ai-mode-tabs{display:flex;flex-direction:row;gap:3px;padding:10px 18px;border-bottom:1px solid var(--bdr);flex-shrink:0}
+.ai-mode-tab{padding:4px 13px;border-radius:7px;font-size:.67rem;font-weight:600;color:var(--dim);cursor:pointer;background:transparent;border:1px solid transparent;transition:all .14s;font-family:'DM Sans',sans-serif}
+.ai-mode-tab:hover{color:var(--text);background:var(--raise)}
+.ai-mode-tab.active{color:var(--white);background:var(--raise2);border-color:var(--bdrhi)}
+
+/* MESSAGES */
+.ai-messages{flex:1;overflow-y:auto;padding:16px 18px;display:flex;flex-direction:column;gap:12px}
+.ai-messages::-webkit-scrollbar{width:4px}
+.ai-messages::-webkit-scrollbar-track{background:transparent}
+.ai-messages::-webkit-scrollbar-thumb{background:var(--muted);border-radius:4px}
+.ai-msg{display:flex;gap:10px;max-width:88%;animation:up .2s ease both}
+.ai-msg.user{align-self:flex-end;flex-direction:row-reverse}
+.ai-msg.ai{align-self:flex-start}
+.ai-bubble{padding:9px 13px;border-radius:12px;font-size:.76rem;line-height:1.6;color:var(--text);word-break:break-word}
+.ai-msg.user .ai-bubble{background:var(--raise2);border:1px solid var(--bdrhi);border-radius:12px 12px 3px 12px;color:var(--bright)}
+.ai-msg.ai .ai-bubble{background:var(--bg);border:1px solid var(--bdr);border-radius:12px 12px 12px 3px}
+.ai-avatar{width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,var(--raise2),var(--muted));border:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;color:var(--dim)}
+.ai-typing{display:flex;gap:4px;align-items:center;padding:4px 0}
+.ai-typing span{width:5px;height:5px;border-radius:50%;background:var(--muted);animation:aiPulse 1.2s ease infinite}
+.ai-typing span:nth-child(2){animation-delay:.2s}
+.ai-typing span:nth-child(3){animation-delay:.4s}
+
+/* INPUT ROW */
+.ai-input-row{display:flex;align-items:flex-end;gap:8px;padding:12px 18px 16px;border-top:1px solid var(--bdr);flex-shrink:0}
+.ai-textarea{flex:1;background:var(--bg);border:1px solid var(--bdr);border-radius:10px;padding:9px 13px;font-family:'DM Sans',sans-serif;font-size:.78rem;color:var(--white);outline:none;resize:none;line-height:1.5;max-height:110px;overflow-y:auto;transition:border-color .14s}
+.ai-textarea::placeholder{color:var(--muted)}
+.ai-textarea:focus{border-color:var(--bdrhi)}
+.ai-textarea::-webkit-scrollbar{width:3px}
+.ai-textarea::-webkit-scrollbar-thumb{background:var(--muted);border-radius:3px}
+.ai-send{width:36px;height:36px;border-radius:9px;background:var(--raise2);border:1px solid var(--bdrhi);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all .15s;color:var(--dim)}
+.ai-send:hover{background:var(--raise);border-color:var(--dim);color:var(--text)}
+.ai-send:active{transform:scale(.95)}
+
+/* EMPTY STATE */
+.ai-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--muted);padding:20px}
+.ai-empty-ico{font-size:1.8rem;opacity:.4}
+.ai-empty-text{font-size:.72rem;text-align:center;line-height:1.6;color:var(--dim)}
+
+/* IMAGE MODE */
+.ai-img-body{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.ai-img-settings{display:flex;flex-direction:row;flex-wrap:wrap;gap:10px;padding:14px 18px;border-bottom:1px solid var(--bdr);flex-shrink:0}
+.ai-img-setting-group{display:flex;flex-direction:column;gap:4px}
+.ai-img-setting-label{font-size:.6rem;font-weight:600;color:var(--dim);text-transform:uppercase;letter-spacing:.04em}
+.ai-img-select{background:var(--raise);border:1px solid var(--bdr);border-radius:7px;padding:5px 10px;font-family:'DM Sans',sans-serif;font-size:.72rem;color:var(--text);outline:none;cursor:pointer;transition:border-color .14s}
+.ai-img-select:hover{border-color:var(--bdrhi)}
+.ai-img-select:focus{border-color:var(--bdrhi)}
+.ai-img-select option{background:var(--raise)}
+.ai-img-result{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;padding:16px 18px}
+.ai-img-placeholder{display:flex;flex-direction:column;align-items:center;gap:10px;color:var(--muted)}
+.ai-img-placeholder-ico{opacity:.35}
+.ai-img-placeholder-text{font-size:.72rem;text-align:center;line-height:1.7;color:var(--dim)}
+.ai-img-generated{max-width:100%;max-height:100%;border-radius:10px;border:1px solid var(--bdr);object-fit:contain}
+.ai-img-download{display:none;position:absolute;bottom:24px;right:26px;padding:5px 14px;border-radius:8px;background:var(--raise2);border:1px solid var(--bdrhi);color:var(--text);font-size:.66rem;font-weight:600;font-family:'DM Sans',sans-serif;text-decoration:none;cursor:pointer;transition:all .14s}
+.ai-img-download:hover{background:var(--raise);color:var(--white)}
+.ai-img-download.visible{display:block}
+.ai-img-prompt-row{display:flex;align-items:flex-end;gap:8px;padding:12px 18px 16px;border-top:1px solid var(--bdr);flex-shrink:0}
+.ai-img-generating{display:flex;flex-direction:column;align-items:center;gap:12px;color:var(--dim)}
+.ai-img-generating-text{font-size:.72rem}
+
+/* LOCAL AI MODE */
+.ai-local-body{flex:1;display:flex;flex-direction:column;overflow-y:auto;padding:18px}
+.ai-local-body::-webkit-scrollbar{width:4px}
+.ai-local-body::-webkit-scrollbar-thumb{background:var(--muted);border-radius:4px}
+.ai-local-warning{background:var(--raise);border:1px solid var(--bdrhi);border-radius:10px;padding:12px 14px;font-size:.72rem;color:var(--dim);line-height:1.6;margin-bottom:14px}
+.ai-local-warning strong{color:var(--text);font-weight:600}
+.ai-local-section{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.ai-local-label{font-size:.6rem;font-weight:600;color:var(--dim);text-transform:uppercase;letter-spacing:.04em}
+.ai-local-select{background:var(--raise);border:1px solid var(--bdr);border-radius:7px;padding:6px 10px;font-family:'DM Sans',sans-serif;font-size:.73rem;color:var(--text);outline:none;cursor:pointer;transition:border-color .14s;width:100%}
+.ai-local-select:hover{border-color:var(--bdrhi)}
+.ai-local-select:focus{border-color:var(--bdrhi)}
+.ai-local-select option{background:var(--raise)}
+.ai-local-load-btn{padding:7px 16px;border-radius:8px;background:var(--raise2);border:1px solid var(--bdrhi);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.72rem;font-weight:600;cursor:pointer;transition:all .15s;align-self:flex-start}
+.ai-local-load-btn:hover{background:var(--raise);color:var(--white)}
+.ai-local-load-btn:disabled{opacity:.4;cursor:not-allowed}
+.ai-local-status{font-size:.68rem;color:var(--dim);line-height:1.5;margin-top:4px}
+.ai-local-messages{flex:1;overflow-y:auto;padding:16px 18px;display:flex;flex-direction:column;gap:12px}
+.ai-local-messages::-webkit-scrollbar{width:4px}
+.ai-local-messages::-webkit-scrollbar-thumb{background:var(--muted);border-radius:4px}
+.ai-local-input-row{display:flex;align-items:flex-end;gap:8px;padding:12px 18px 16px;border-top:1px solid var(--bdr);flex-shrink:0}
+
+/* SPINNER */
+.spin-large{width:32px;height:32px;border-radius:50%;border:3px solid var(--bdr);border-top-color:var(--dim);animation:spin .7s linear infinite}
+
+/* MARKDOWN-LITE */
+.ai-bubble code{font-family:'DM Mono',monospace;font-size:.72rem;background:var(--raise2);border:1px solid var(--bdr);padding:1px 5px;border-radius:4px;color:var(--accent)}
+.ai-bubble pre{background:var(--raise);border:1px solid var(--bdr);border-radius:8px;padding:10px 12px;overflow-x:auto;margin:6px 0}
+.ai-bubble pre code{background:none;border:none;padding:0;font-size:.71rem;color:var(--text)}
+.ai-bubble strong{color:var(--bright);font-weight:600}
+.ai-bubble em{color:var(--text);font-style:italic}
+.ai-bubble a{color:var(--accent);text-decoration:none}
+.ai-bubble a:hover{text-decoration:underline}
+
+/* ANIMATIONS */
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes aiPulse{0%,80%,100%{transform:scale(1);opacity:.4}40%{transform:scale(1.3);opacity:1}}
+</style>
+</head>
+<body>
+<div id="app" style="display:flex;flex-direction:column;height:100%">
+
+  <!-- HEADER -->
+  <div class="ai-header">
+    <div class="ai-header-icon">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a9 9 0 0 1 9 9c0 3.18-1.65 5.97-4.13 7.56L16 21H8l-.87-2.44A9 9 0 0 1 12 2z"/><path d="M9 12h6M9 8h6"/></svg>
+    </div>
+    <div class="ai-header-info">
+      <div class="ai-header-name">Vexis AI</div>
+      <div class="ai-header-sub" id="aiHeaderSub">Powered by GPT-4o</div>
+    </div>
+    <span class="ai-badge" id="aiBadge">GPT-4o</span>
+  </div>
+
+  <!-- MODE TABS -->
+  <div class="ai-mode-tabs">
+    <button class="ai-mode-tab active" id="aiModeChat" onclick="switchAIMode('chat')">Chat</button>
+    <button class="ai-mode-tab" id="aiModeImage" onclick="switchAIMode('image')">Image</button>
+    <button class="ai-mode-tab" id="aiModeLocal" onclick="switchAIMode('local')">Local AI</button>
+  </div>
+
+  <!-- CHAT MESSAGES -->
+  <div class="ai-messages" id="aiMessages">
+    <div class="ai-empty" id="aiEmptyState">
+      <div class="ai-empty-ico">✦</div>
+      <div class="ai-empty-text">Hi! I'm Vexis AI.<br>Ask me anything — I'm here to help.</div>
+    </div>
+  </div>
+
+  <!-- CHAT INPUT -->
+  <div class="ai-input-row" id="aiChatInputRow">
+    <textarea class="ai-textarea" id="aiInput" rows="1" placeholder="Message Vexis AI…"
+      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAI();}"
+      oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,110)+'px'"></textarea>
+    <button class="ai-send" id="aiSendBtn" onclick="sendAI()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
+  </div>
+
+  <!-- IMAGE MODE BODY -->
+  <div class="ai-img-body" id="aiImgBody" style="display:none">
+    <div class="ai-img-settings">
+      <div class="ai-img-setting-group">
+        <label class="ai-img-setting-label">Provider</label>
+        <select class="ai-img-select" id="aiImgProvider" onchange="onImgProviderChange()">
+          <option value="pollinations">Pollinations (free)</option>
+          <option value="dalle3">DALL-E / gpt-image-1 (API key)</option>
+        </select>
+      </div>
+      <div class="ai-img-setting-group" id="aiPollinationsModelGroup">
+        <label class="ai-img-setting-label">Model</label>
+        <select class="ai-img-select" id="aiPollinationsModel">
+          <option value="flux">Flux — fast</option>
+          <option value="">Auto</option>
+          <option value="turbo">Turbo — speed</option>
+          <option value="sd">Stable Diffusion</option>
+        </select>
+      </div>
+      <div class="ai-img-setting-group" id="aiPollinationsSizeGroup">
+        <label class="ai-img-setting-label">Size</label>
+        <select class="ai-img-select" id="aiPollinationsSize">
+          <option value="1024x1024">1024×1024</option>
+          <option value="1024x768">1024×768</option>
+          <option value="768x1024">768×1024</option>
+          <option value="512x512">512×512</option>
+        </select>
+      </div>
+    </div>
+    <div class="ai-img-result" id="aiImgResult">
+      <div class="ai-img-placeholder" id="aiImgPlaceholder">
+        <div class="ai-img-placeholder-ico">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        </div>
+        <div class="ai-img-placeholder-text">Describe what you want to see and press Generate<br><span id="aiImgProviderNote" style="color:var(--muted)">Pollinations · free · no API key needed</span></div>
+      </div>
+      <a class="ai-img-download" id="aiImgDownload" download="vexis-image.png">Download</a>
+    </div>
+  </div>
+
+  <!-- IMAGE INPUT -->
+  <div class="ai-img-prompt-row" id="aiImgInputRow" style="display:none">
+    <textarea class="ai-textarea" id="aiImgInput" rows="1" placeholder="Describe an image…"
+      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();generateImage();}"
+      oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,110)+'px'"></textarea>
+    <button class="ai-send" id="aiImgBtn" onclick="generateImage()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+    </button>
+  </div>
+
+  <!-- LOCAL AI BODY -->
+  <div class="ai-local-body" id="aiLocalBody" style="display:none">
+    <div class="ai-local-warning">
+      <strong>About Local AI</strong><br>
+      Runs a language model entirely in your browser using WebLLM. No data leaves your device.
+      The first time you load a model it will be downloaded and cached — this may take several minutes depending on your connection and the model size.
+    </div>
+    <div class="ai-local-section">
+      <label class="ai-local-label">Model</label>
+      <select class="ai-local-select" id="aiLocalModel">
+        <option value="Llama-3.2-1B-Instruct-q4f32_1-MLC">Llama 3.2 1B — Instruct (fast, ~0.7 GB)</option>
+        <option value="Llama-3.2-3B-Instruct-q4f16_1-MLC">Llama 3.2 3B — Instruct (~1.8 GB)</option>
+        <option value="Phi-3.5-mini-instruct-q4f16_1-MLC">Phi-3.5 Mini — Instruct (~2.1 GB)</option>
+        <option value="gemma-2-2b-it-q4f16_1-MLC">Gemma 2 2B — IT (~1.4 GB)</option>
+        <option value="Mistral-7B-Instruct-v0.3-q4f16_1-MLC">Mistral 7B — Instruct v0.3 (~4.1 GB)</option>
+      </select>
+    </div>
+    <div class="ai-local-section">
+      <button class="ai-local-load-btn" id="aiLocalLoadBtn" onclick="loadLocalModel()">Load Model</button>
+      <div class="ai-local-status" id="aiLocalStatus">Select a model and click Load to begin.</div>
+    </div>
+  </div>
+
+  <!-- LOCAL AI MESSAGES -->
+  <div class="ai-local-messages" id="aiLocalMessages" style="display:none"></div>
+
+  <!-- LOCAL AI INPUT -->
+  <div class="ai-local-input-row" id="aiLocalInputRow" style="display:none">
+    <textarea class="ai-textarea" id="aiLocalInput" rows="1" placeholder="Chat with local model…"
+      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendLocalAI();}"
+      oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,110)+'px'"></textarea>
+    <button class="ai-send" id="aiLocalSendBtn" onclick="sendLocalAI()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
+  </div>
+
+</div>
+
+<script>
+const AI_SERVER = window.location.origin;
+let _aiHistory = [];
+let _aiTyping = false;
+let _aiMode = 'chat';
+let _imgGenerating = false;
+let _imgBlobUrl = null;
+window._localEngine = null;
+window._localHistory = [];
+let _localLoading = false;
+
+// ── Utility ────────────────────────────────────────────────────────────────
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function markdownLite(text) {
+  // Code blocks
+  text = text.replace(/```(\w*)\n?([\s\S]*?)```/g, (_, lang, code) =>
+    `<pre><code>${escHtml(code.trim())}</code></pre>`);
+  // Inline code
+  text = text.replace(/`([^`]+)`/g, (_, c) => `<code>${escHtml(c)}</code>`);
+  // Bold
+  text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  // Italic
+  text = text.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+  // Links
+  text = text.replace(/\[([^\]]+)\]\((https?:\/\/[^\)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+  // Line breaks
+  text = text.replace(/\n/g, '<br>');
+  return text;
+}
+
+function scrollAI(container) {
+  setTimeout(() => { container.scrollTop = container.scrollHeight; }, 30);
+}
+
+// ── Mode switching ─────────────────────────────────────────────────────────
+
+function switchAIMode(mode) {
+  _aiMode = mode;
+
+  // Tab states
+  document.getElementById('aiModeChat').classList.toggle('active', mode === 'chat');
+  document.getElementById('aiModeImage').classList.toggle('active', mode === 'image');
+  document.getElementById('aiModeLocal').classList.toggle('active', mode === 'local');
+
+  // Chat
+  document.getElementById('aiMessages').style.display        = mode === 'chat'  ? 'flex'  : 'none';
+  document.getElementById('aiChatInputRow').style.display    = mode === 'chat'  ? 'flex'  : 'none';
+
+  // Image
+  document.getElementById('aiImgBody').style.display         = mode === 'image' ? 'flex'  : 'none';
+  document.getElementById('aiImgInputRow').style.display     = mode === 'image' ? 'flex'  : 'none';
+
+  // Local
+  document.getElementById('aiLocalBody').style.display       = mode === 'local' ? 'flex'  : 'none';
+  document.getElementById('aiLocalMessages').style.display   = mode === 'local' ? 'flex'  : 'none';
+  document.getElementById('aiLocalInputRow').style.display   = mode === 'local' ? 'flex'  : 'none';
+
+  // Header badge + subtitle
+  const sub  = document.getElementById('aiHeaderSub');
+  const badge = document.getElementById('aiBadge');
+  if (mode === 'chat') {
+    sub.textContent   = 'Powered by GPT-4o';
+    badge.textContent = 'GPT-4o';
+  } else if (mode === 'image') {
+    sub.textContent   = 'AI Image Generation';
+    badge.textContent = 'Image';
+  } else {
+    sub.textContent   = 'Runs in your browser';
+    badge.textContent = 'Local';
+  }
+
+  // Focus appropriate input
+  setTimeout(() => {
+    if (mode === 'chat')  document.getElementById('aiInput').focus();
+    if (mode === 'image') document.getElementById('aiImgInput').focus();
+    if (mode === 'local' && window._localEngine) document.getElementById('aiLocalInput').focus();
+  }, 60);
+}
+
+// ── Chat ───────────────────────────────────────────────────────────────────
+
+function aiAddMsg(role, content) {
+  const empty = document.getElementById('aiEmptyState');
+  if (empty) empty.remove();
+
+  const msgs = document.getElementById('aiMessages');
+  const wrap = document.createElement('div');
+  wrap.className = 'ai-msg ' + (role === 'user' ? 'user' : 'ai');
+
+  if (role !== 'user') {
+    const av = document.createElement('div');
+    av.className = 'ai-avatar';
+    av.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a9 9 0 0 1 9 9c0 3.18-1.65 5.97-4.13 7.56L16 21H8l-.87-2.44A9 9 0 0 1 12 2z"/><path d="M9 12h6M9 8h6"/></svg>`;
+    wrap.appendChild(av);
+  }
+
+  const bubble = document.createElement('div');
+  bubble.className = 'ai-bubble';
+  bubble.innerHTML = role === 'user' ? escHtml(content) : markdownLite(content);
+  wrap.appendChild(bubble);
+
+  msgs.appendChild(wrap);
+  scrollAI(msgs);
+  return wrap;
+}
+
+function aiShowTyping() {
+  const msgs = document.getElementById('aiMessages');
+  const wrap = document.createElement('div');
+  wrap.className = 'ai-msg ai';
+  wrap.id = '_aiTypingBubble';
+
+  const av = document.createElement('div');
+  av.className = 'ai-avatar';
+  av.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a9 9 0 0 1 9 9c0 3.18-1.65 5.97-4.13 7.56L16 21H8l-.87-2.44A9 9 0 0 1 12 2z"/><path d="M9 12h6M9 8h6"/></svg>`;
+  wrap.appendChild(av);
+
+  const bubble = document.createElement('div');
+  bubble.className = 'ai-bubble';
+  bubble.innerHTML = `<div class="ai-typing"><span></span><span></span><span></span></div>`;
+  wrap.appendChild(bubble);
+
+  msgs.appendChild(wrap);
+  scrollAI(msgs);
+  _aiTyping = true;
+}
+
+function aiHideTyping() {
+  const t = document.getElementById('_aiTypingBubble');
+  if (t) t.remove();
+  _aiTyping = false;
+}
+
+async function sendAI() {
+  const inp = document.getElementById('aiInput');
+  const text = inp.value.trim();
+  if (!text || _aiTyping) return;
+
+  inp.value = '';
+  inp.style.height = 'auto';
+  document.getElementById('aiSendBtn').disabled = true;
+
+  aiAddMsg('user', text);
+  _aiHistory.push({ role: 'user', content: text });
+  aiShowTyping();
+
+  try {
+    // Try the parent Vexis OS server first, then fall back to a direct OpenAI call
+    const res = await fetch(AI_SERVER + '/api/ai/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: _aiHistory })
+    });
+
+    aiHideTyping();
+
+    if (res.ok) {
+      const data = await res.json();
+      const reply = data.reply || data.message || (data.choices && data.choices[0].message.content) || 'No response.';
+      _aiHistory.push({ role: 'assistant', content: reply });
+      aiAddMsg('ai', reply);
+    } else {
+      throw new Error('Server responded with ' + res.status);
+    }
+  } catch (err) {
+    aiHideTyping();
+    // Friendly offline / no-server message
+    const errMsg = 'I couldn\'t reach the AI server. Make sure Vexis OS is running and your API key is configured, then try again.';
+    aiAddMsg('ai', errMsg);
+    // Remove the failed user message from history to keep it clean
+    _aiHistory.pop();
+  }
+
+  document.getElementById('aiSendBtn').disabled = false;
+  setTimeout(() => document.getElementById('aiInput').focus(), 50);
+}
+
+// ── Image Generation ───────────────────────────────────────────────────────
+
+function onImgProviderChange() {
+  const provider = document.getElementById('aiImgProvider').value;
+  const isPollinations = provider === 'pollinations';
+  document.getElementById('aiPollinationsModelGroup').style.display = isPollinations ? 'flex' : 'none';
+  document.getElementById('aiPollinationsSizeGroup').style.display  = isPollinations ? 'flex' : 'none';
+  const note = document.getElementById('aiImgProviderNote');
+  if (isPollinations) {
+    note.textContent = 'Pollinations · free · no API key needed';
+  } else {
+    note.textContent = 'DALL-E / gpt-image-1 · requires OpenAI API key on server';
+  }
+}
+
+function setImgResultState(state, src) {
+  const result    = document.getElementById('aiImgResult');
+  const placeholder = document.getElementById('aiImgPlaceholder');
+  const download  = document.getElementById('aiImgDownload');
+
+  // Clear previous image if any
+  const prev = result.querySelector('img.ai-img-generated');
+  if (prev) prev.remove();
+  const prevSpin = result.querySelector('.ai-img-generating');
+  if (prevSpin) prevSpin.remove();
+
+  if (state === 'placeholder') {
+    placeholder.style.display = 'flex';
+    download.classList.remove('visible');
+  } else if (state === 'loading') {
+    placeholder.style.display = 'none';
+    download.classList.remove('visible');
+    const loading = document.createElement('div');
+    loading.className = 'ai-img-generating';
+    loading.innerHTML = `<div class="spin-large"></div><div class="ai-img-generating-text">Generating image…</div>`;
+    result.appendChild(loading);
+  } else if (state === 'image') {
+    placeholder.style.display = 'none';
+    const img = document.createElement('img');
+    img.className = 'ai-img-generated';
+    img.src = src;
+    img.alt = 'Generated image';
+    result.appendChild(img);
+    download.href = src;
+    download.classList.add('visible');
+  }
+}
+
+async function generateImage() {
+  if (_imgGenerating) return;
+  const inp = document.getElementById('aiImgInput');
+  const prompt = inp.value.trim();
+  if (!prompt) return;
+
+  _imgGenerating = true;
+  document.getElementById('aiImgBtn').disabled = true;
+  setImgResultState('loading');
+
+  const provider = document.getElementById('aiImgProvider').value;
+
+  try {
+    if (provider === 'pollinations') {
+      await generateImagePollinations(prompt);
+    } else {
+      await generateImageDalle(prompt);
+    }
+  } catch (err) {
+    setImgResultState('placeholder');
+    const note = document.getElementById('aiImgProviderNote');
+    note.textContent = 'Error: ' + (err.message || 'Failed to generate image.');
+  }
+
+  _imgGenerating = false;
+  document.getElementById('aiImgBtn').disabled = false;
+}
+
+async function generateImagePollinations(prompt) {
+  const model = document.getElementById('aiPollinationsModel').value;
+  const size  = document.getElementById('aiPollinationsSize').value;
+  const [w, h] = size.split('x');
+  const encoded = encodeURIComponent(prompt);
+  let url = `https://image.pollinations.ai/prompt/${encoded}?width=${w}&height=${h}&nologo=true&enhance=false`;
+  if (model) url += `&model=${model}`;
+
+  // Pollinations returns the image directly at the URL — load it as an img
+  await new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      // Try to create blob URL for download
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.naturalWidth || parseInt(w);
+        canvas.height = img.naturalHeight || parseInt(h);
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        canvas.toBlob(blob => {
+          if (_imgBlobUrl) URL.revokeObjectURL(_imgBlobUrl);
+          _imgBlobUrl = URL.createObjectURL(blob);
+          setImgResultState('image', _imgBlobUrl);
+          resolve();
+        }, 'image/png');
+      } catch (e) {
+        // CORS might block canvas — just use the direct URL
+        setImgResultState('image', url);
+        resolve();
+      }
+    };
+    img.onerror = () => reject(new Error('Failed to load image from Pollinations.'));
+    img.src = url;
+  });
+}
+
+async function generateImageDalle(prompt) {
+  const res = await fetch(AI_SERVER + '/api/ai/image', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ prompt, model: 'dall-e-3', size: '1024x1024' })
+  });
+  if (!res.ok) throw new Error('Server error ' + res.status);
+  const data = await res.json();
+  const imgUrl = data.url || (data.data && data.data[0] && data.data[0].url);
+  if (!imgUrl) throw new Error('No image URL in response.');
+  setImgResultState('image', imgUrl);
+  document.getElementById('aiImgDownload').href = imgUrl;
+}
+
+// ── Local AI (WebLLM) ──────────────────────────────────────────────────────
+
+function localAddMsg(role, content) {
+  const msgs = document.getElementById('aiLocalMessages');
+  const wrap = document.createElement('div');
+  wrap.className = 'ai-msg ' + (role === 'user' ? 'user' : 'ai');
+
+  if (role !== 'user') {
+    const av = document.createElement('div');
+    av.className = 'ai-avatar';
+    av.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a9 9 0 0 1 9 9c0 3.18-1.65 5.97-4.13 7.56L16 21H8l-.87-2.44A9 9 0 0 1 12 2z"/><path d="M9 12h6M9 8h6"/></svg>`;
+    wrap.appendChild(av);
+  }
+
+  const bubble = document.createElement('div');
+  bubble.className = 'ai-bubble';
+  bubble.innerHTML = role === 'user' ? escHtml(content) : markdownLite(content);
+  wrap.appendChild(bubble);
+  msgs.appendChild(wrap);
+  scrollAI(msgs);
+  return bubble;
+}
+
+function localShowTyping() {
+  const msgs = document.getElementById('aiLocalMessages');
+  const wrap = document.createElement('div');
+  wrap.className = 'ai-msg ai';
+  wrap.id = '_localTypingBubble';
+
+  const av = document.createElement('div');
+  av.className = 'ai-avatar';
+  av.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a9 9 0 0 1 9 9c0 3.18-1.65 5.97-4.13 7.56L16 21H8l-.87-2.44A9 9 0 0 1 12 2z"/><path d="M9 12h6M9 8h6"/></svg>`;
+  wrap.appendChild(av);
+
+  const bubble = document.createElement('div');
+  bubble.className = 'ai-bubble';
+  bubble.innerHTML = `<div class="ai-typing"><span></span><span></span><span></span></div>`;
+  wrap.appendChild(bubble);
+  msgs.appendChild(wrap);
+  scrollAI(msgs);
+  return bubble;
+}
+
+function localHideTyping() {
+  const t = document.getElementById('_localTypingBubble');
+  if (t) t.remove();
+}
+
+async function loadLocalModel() {
+  if (_localLoading) return;
+  _localLoading = true;
+  const btn    = document.getElementById('aiLocalLoadBtn');
+  const status = document.getElementById('aiLocalStatus');
+  const modelId = document.getElementById('aiLocalModel').value;
+  btn.disabled = true;
+  btn.textContent = 'Loading…';
+  status.textContent = 'Importing WebLLM…';
+
+  try {
+    // Dynamically import WebLLM from CDN
+    const webllm = await import('https://esm.run/@mlc-ai/web-llm');
+    status.textContent = 'Initializing engine…';
+
+    window._localEngine = new webllm.MLCEngine();
+
+    window._localEngine.setInitProgressCallback((report) => {
+      const pct = report.progress ? Math.round(report.progress * 100) : '';
+      status.textContent = report.text + (pct ? ` (${pct}%)` : '');
+    });
+
+    await window._localEngine.reload(modelId);
+
+    status.textContent = 'Model loaded! You can now chat locally.';
+    btn.textContent    = 'Reload';
+    btn.disabled       = false;
+
+    // Show messages + input
+    document.getElementById('aiLocalMessages').style.display = 'flex';
+    document.getElementById('aiLocalInputRow').style.display  = 'flex';
+    setTimeout(() => document.getElementById('aiLocalInput').focus(), 60);
+
+    window._localHistory = [{
+      role: 'system',
+      content: 'You are Vexis AI, a helpful and concise assistant running locally in the browser.'
+    }];
+
+    localAddMsg('ai', 'Local model loaded! Everything runs in your browser — no data leaves your device.');
+  } catch (err) {
+    status.textContent = 'Error: ' + (err.message || 'Failed to load model.');
+    btn.textContent    = 'Load Model';
+    btn.disabled       = false;
+    window._localEngine = null;
+  }
+
+  _localLoading = false;
+}
+
+async function sendLocalAI() {
+  if (!window._localEngine) {
+    document.getElementById('aiLocalStatus').textContent = 'Please load a model first.';
+    return;
+  }
+  const inp = document.getElementById('aiLocalInput');
+  const text = inp.value.trim();
+  if (!text) return;
+
+  inp.value = '';
+  inp.style.height = 'auto';
+  document.getElementById('aiLocalSendBtn').disabled = true;
+
+  localAddMsg('user', text);
+  window._localHistory.push({ role: 'user', content: text });
+
+  const typingBubble = localShowTyping();
+
+  try {
+    let fullReply = '';
+    const msgs = document.getElementById('aiLocalMessages');
+
+    // Stream the response
+    const reply = await window._localEngine.chat.completions.create({
+      messages: window._localHistory,
+      stream: true,
+      temperature: 0.7,
+      max_tokens: 1024
+    });
+
+    localHideTyping();
+    const aiBubble = localAddMsg('ai', '');
+
+    for await (const chunk of reply) {
+      const delta = chunk.choices[0]?.delta?.content || '';
+      fullReply += delta;
+      aiBubble.innerHTML = markdownLite(fullReply);
+      scrollAI(msgs);
+    }
+
+    window._localHistory.push({ role: 'assistant', content: fullReply });
+  } catch (err) {
+    localHideTyping();
+    localAddMsg('ai', 'Error: ' + (err.message || 'Failed to generate response.'));
+    window._localHistory.pop();
+  }
+
+  document.getElementById('aiLocalSendBtn').disabled = false;
+  setTimeout(() => document.getElementById('aiLocalInput').focus(), 50);
+}
+
+// ── Init ───────────────────────────────────────────────────────────────────
+
+setTimeout(() => document.getElementById('aiInput').focus(), 100);
+</script>
+</body>
+</html>
