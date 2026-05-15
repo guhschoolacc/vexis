@@ -1095,6 +1095,136 @@
   }
   .staff-search:focus { border-color: var(--bdrhi); }
   .staff-search::placeholder { color: var(--muted); }
+
+  /* ═══════════════ MAINTENANCE BANNER ═══════════════ */
+  #maintenanceBanner {
+    background: rgba(255,155,0,.1); border-bottom: 1px solid rgba(255,155,0,.28);
+    padding: 7px 16px; display: none; align-items: center; gap: 8px;
+    font-size: .72rem; color: rgba(255,200,80,.92); flex-shrink: 0; z-index: 45; position: relative;
+  }
+  #maintenanceBanner.on { display: flex; }
+  .banner-ico { flex-shrink: 0; }
+  .banner-text { flex: 1; line-height: 1.5; }
+  .banner-dismiss { background: none; border: none; color: rgba(255,200,80,.5); cursor: pointer; font-size: .95rem; flex-shrink: 0; transition: color .12s; }
+  .banner-dismiss:hover { color: rgba(255,200,80,.9); }
+
+  /* ═══════════════ HOME MOTD ═══════════════ */
+  .home-motd {
+    font-size: .7rem; color: var(--dim); text-align: center;
+    max-width: 360px; line-height: 1.55; margin-top: -36px; margin-bottom: 36px;
+    padding: 8px 16px; border-radius: 8px;
+    background: var(--raise); border: 1px solid var(--bdr);
+    animation: up .5s ease .1s both; display: none;
+  }
+  .home-motd.on { display: block; }
+
+  /* ═══════════════ BUG REPORT ═══════════════ */
+  #bugReportBtn {
+    position: fixed; bottom: 22px; left: 22px; z-index: 200;
+    background: var(--surf); border: 1px solid var(--bdrhi);
+    border-radius: 50%; width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all .15s;
+    box-shadow: 0 4px 14px rgba(0,0,0,.4);
+  }
+  #bugReportBtn:hover { background: var(--raise2); transform: scale(1.08); }
+  #bugReportBtn svg { color: var(--dim); }
+  #bugModal {
+    position: fixed; inset: 0; z-index: 550;
+    background: rgba(0,0,0,.65); backdrop-filter: blur(6px);
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px; opacity: 0; pointer-events: none; transition: opacity .18s;
+  }
+  #bugModal.open { opacity: 1; pointer-events: all; }
+  .bug-sheet {
+    width: 100%; max-width: 420px; background: var(--surf);
+    border: 1px solid var(--bdrhi); border-radius: 14px; padding: 22px;
+    box-shadow: 0 24px 64px rgba(0,0,0,.6);
+    transform: scale(.96); transition: transform .2s cubic-bezier(.34,1.3,.64,1);
+  }
+  #bugModal.open .bug-sheet { transform: scale(1); }
+  .bug-sheet-title { font-size: .88rem; font-weight: 700; color: var(--white); margin-bottom: 3px; }
+  .bug-sheet-sub   { font-size: .66rem; color: var(--dim); margin-bottom: 18px; }
+  .bug-fields { display: flex; flex-direction: column; gap: 12px; }
+  .bug-field-label { font-size: .6rem; font-weight: 700; text-transform: uppercase; letter-spacing: .09em; color: var(--muted); margin-bottom: 4px; display: block; }
+  .bug-input, .bug-textarea {
+    background: var(--bg); border: 1px solid var(--bdr); border-radius: 8px;
+    padding: 9px 12px; font-family: 'DM Sans', sans-serif; font-size: .78rem;
+    color: var(--white); outline: none; width: 100%; transition: border-color .18s;
+  }
+  .bug-textarea { resize: none; min-height: 90px; line-height: 1.5; }
+  .bug-input:focus, .bug-textarea:focus { border-color: var(--bdrhi); }
+  .bug-footer { display: flex; gap: 8px; margin-top: 18px; }
+
+  /* ═══════════════ STAFF ANALYTICS ═══════════════ */
+  .analytics-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(130px,1fr)); gap: 9px; margin-bottom: 14px; }
+  .analytics-box { background: var(--bg); border: 1px solid var(--bdr); border-radius: 9px; padding: 14px 16px; }
+  .analytics-box-val { font-size: 1.5rem; font-weight: 700; color: var(--white); font-family: 'DM Mono', monospace; line-height: 1; }
+  .analytics-box-lbl { font-size: .61rem; color: var(--dim); text-transform: uppercase; letter-spacing: .07em; margin-top: 5px; }
+  .analytics-list-title { font-size: .62rem; font-weight: 700; text-transform: uppercase; letter-spacing: .09em; color: var(--muted); margin-bottom: 8px; }
+  .analytics-user-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--bdr); }
+  .analytics-user-row:last-child { border-bottom: none; }
+  .analytics-user-name { flex: 1; font-size: .75rem; color: var(--text); }
+  .analytics-user-count { font-size: .7rem; color: var(--muted); font-family: 'DM Mono', monospace; }
+
+  /* ═══════════════ STAFF PLATFORM ═══════════════ */
+  .platform-section { margin-bottom: 20px; }
+  .platform-section-hd { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .platform-section-title { font-size: .62rem; font-weight: 700; text-transform: uppercase; letter-spacing: .09em; color: var(--muted); }
+  .platform-item-row { display: flex; align-items: center; gap: 8px; background: var(--bg); border: 1px solid var(--bdr); border-radius: 8px; padding: 8px 12px; margin-bottom: 5px; }
+  .platform-item-name { flex: 1; font-size: .74rem; color: var(--text); font-weight: 500; }
+  .platform-item-url  { font-size: .62rem; color: var(--muted); font-family: 'DM Mono', monospace; flex: 1.5; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .platform-item-del  { background: none; border: none; cursor: pointer; color: var(--dim); padding: 3px 6px; border-radius: 5px; transition: all .12s; }
+  .platform-item-del:hover { background: rgba(248,81,73,.1); color: #f85149; }
+  .platform-add-form { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .platform-add-form .modal-input { font-size: .72rem; padding: 7px 10px; }
+  .platform-add-form .mbtn-add { grid-column: 1 / -1; height: 32px; font-size: .72rem; }
+
+  /* ═══════════════ STAFF FEATURE FLAGS ═══════════════ */
+  .flag-row { display: flex; align-items: center; justify-content: space-between; background: var(--bg); border: 1px solid var(--bdr); border-radius: 8px; padding: 11px 14px; }
+  .flag-info .flag-label { font-size: .76rem; color: var(--text); font-weight: 500; }
+  .flag-info .flag-sub   { font-size: .62rem; color: var(--dim); margin-top: 2px; }
+  .flag-toggle { width: 36px; height: 20px; border-radius: 10px; background: var(--raise2); border: 1px solid var(--bdr); cursor: pointer; transition: background .2s; position: relative; flex-shrink: 0; }
+  .flag-toggle.on { background: #1e5c1e; border-color: #2d8a2d; }
+  .flag-toggle::after { content: ''; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%; background: var(--dim); transition: transform .2s, background .2s; }
+  .flag-toggle.on::after { transform: translateX(16px); background: #6fda6f; }
+
+  /* ═══════════════ STAFF AUTOMOD ═══════════════ */
+  .automod-wrap { background: var(--bg); border: 1px solid var(--bdr); border-radius: 9px; padding: 13px 15px; }
+  .automod-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; min-height: 28px; }
+  .automod-tag { display: flex; align-items: center; gap: 4px; background: rgba(248,81,73,.1); border: 1px solid rgba(248,81,73,.25); border-radius: 5px; padding: 2px 8px; font-size: .7rem; color: #f85149; }
+  .automod-tag-x { background: none; border: none; cursor: pointer; color: inherit; font-size: .85rem; padding: 0 2px; transition: opacity .12s; }
+  .automod-tag-x:hover { opacity: .6; }
+  .automod-add-row { display: flex; gap: 6px; }
+
+  /* ═══════════════ STAFF ANNOUNCEMENTS ═══════════════ */
+  .announce-compose { background: var(--bg); border: 1px solid var(--bdr); border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+  .announce-history-item { background: var(--bg); border: 1px solid var(--bdr); border-radius: 9px; padding: 10px 14px; display: flex; gap: 10px; align-items: flex-start; }
+  .announce-badge { padding: 2px 8px; border-radius: 5px; font-size: .6rem; font-weight: 700; background: rgba(255,160,30,.12); border: 1px solid rgba(255,160,30,.3); color: #ffb84a; flex-shrink: 0; margin-top: 2px; }
+  .announce-text { font-size: .76rem; color: var(--text); flex: 1; line-height: 1.5; }
+  .announce-time { font-size: .6rem; color: var(--muted); margin-top: 4px; }
+
+  /* ═══════════════ STAFF CHAT MOD ═══════════════ */
+  .chat-mod-msg { background: var(--bg); border: 1px solid var(--bdr); border-radius: 8px; padding: 9px 13px; display: flex; gap: 10px; align-items: flex-start; }
+  .chat-mod-info { flex: 1; min-width: 0; }
+  .chat-mod-name { font-size: .68rem; font-weight: 600; color: var(--bright); }
+  .chat-mod-text { font-size: .74rem; color: var(--text); line-height: 1.45; word-break: break-word; margin-top: 2px; }
+  .chat-mod-del  { background: none; border: none; cursor: pointer; color: var(--dim); padding: 3px 7px; border-radius: 5px; transition: all .12s; flex-shrink: 0; font-size: .95rem; }
+  .chat-mod-del:hover { background: rgba(248,81,73,.1); color: #f85149; }
+  .chat-mod-time { font-size: .6rem; color: var(--muted); flex-shrink: 0; }
+
+  /* ═══════════════ STAFF BUGS ═══════════════ */
+  .bug-card { background: var(--bg); border: 1px solid var(--bdr); border-radius: 10px; padding: 13px 15px; display: flex; flex-direction: column; gap: 8px; transition: border-color .14s; }
+  .bug-card:hover { border-color: var(--bdrhi); }
+  .bug-card.resolved { opacity: .42; }
+  .bug-card-title { font-size: .78rem; font-weight: 600; color: var(--bright); }
+  .bug-card-desc  { font-size: .72rem; color: var(--text); line-height: 1.5; }
+  .bug-card-meta  { font-size: .62rem; color: var(--muted); }
+
+  /* Scrollable tabs */
+  .staff-tabs { overflow-x: auto; flex-wrap: nowrap; }
+  .staff-tabs::-webkit-scrollbar { height: 0; }
+  .staff-tab { white-space: nowrap; }
 </style>
 </head>
 <body style="display:flex;flex-direction:column;height:100%">
@@ -1145,6 +1275,40 @@
   </div>
 </div>
 
+<!-- MAINTENANCE BANNER -->
+<div id="maintenanceBanner">
+  <span class="banner-ico">⚠</span>
+  <span class="banner-text" id="bannerText">Maintenance in progress.</span>
+  <button class="banner-dismiss" onclick="document.getElementById('maintenanceBanner').classList.remove('on')" title="Dismiss">✕</button>
+</div>
+
+<!-- BUG REPORT BUTTON -->
+<button id="bugReportBtn" onclick="openBugModal()" title="Report a bug">
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+</button>
+
+<!-- BUG REPORT MODAL -->
+<div id="bugModal" onclick="if(event.target===this)closeBugModal()">
+  <div class="bug-sheet">
+    <div class="bug-sheet-title">Report a Bug</div>
+    <div class="bug-sheet-sub">Your report goes directly to the Vexis owners. Be as specific as possible.</div>
+    <div class="bug-fields">
+      <div>
+        <label class="bug-field-label">Title</label>
+        <input class="bug-input" id="bugTitle" placeholder="Short description of the issue…" maxlength="120">
+      </div>
+      <div>
+        <label class="bug-field-label">Details</label>
+        <textarea class="bug-textarea" id="bugDesc" placeholder="What happened? What were you doing? What did you expect?&#10;Include any error messages you saw."></textarea>
+      </div>
+    </div>
+    <div class="bug-footer">
+      <button class="mbtn mbtn-cancel" onclick="closeBugModal()">Cancel</button>
+      <button class="mbtn mbtn-add" id="bugSubmitBtn" onclick="submitBugReport()">Submit Report</button>
+    </div>
+  </div>
+</div>
+
 <!-- CHROME -->
 <div id="chrome">
   <div class="tab-strip">
@@ -1184,6 +1348,7 @@
       <div class="home-greeting" id="homeGreeting">Welcome to Vexis</div>
       <div class="home-time" id="homeClock">--:--</div>
       <div class="home-date"  id="homeDate">--</div>
+      <div class="home-motd" id="homeMOTD"></div>
       <div class="nav-circles" id="navCircles"></div>
 
       <!-- Vexis AI Quick-Access Bar -->
@@ -1586,32 +1751,104 @@
       </button>
     </div>
 
-    <div class="staff-tabs" id="staffTabs">
-      <button class="staff-tab active" id="stab-reports" onclick="switchStaffTab('reports')">Reports</button>
-      <button class="staff-tab" id="stab-users" style="display:none" onclick="switchStaffTab('users')">Users</button>
+    <div class="staff-tabs">
+      <button class="staff-tab active" id="stab-reports"   onclick="switchStaffTab('reports')">Reports</button>
+      <button class="staff-tab"        id="stab-chat"      onclick="switchStaffTab('chat')">Chat Mod</button>
+      <button class="staff-tab"        id="stab-bugs"      onclick="switchStaffTab('bugs')"      style="display:none">Bugs</button>
+      <button class="staff-tab"        id="stab-users"     onclick="switchStaffTab('users')"     style="display:none">Users</button>
+      <button class="staff-tab"        id="stab-announce"  onclick="switchStaffTab('announce')"  style="display:none">Announce</button>
+      <button class="staff-tab"        id="stab-analytics" onclick="switchStaffTab('analytics')" style="display:none">Analytics</button>
+      <button class="staff-tab"        id="stab-platform"  onclick="switchStaffTab('platform')"  style="display:none">Platform</button>
     </div>
 
-    <!-- Reports tab -->
-    <div class="staff-body" id="staffReportsBody">
-      <div class="staff-empty" id="staffReportsEmpty">
-        <div class="staff-empty-ico">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        </div>
-        <div class="staff-empty-text">Loading reports…</div>
-      </div>
+    <!-- REPORTS -->
+    <div class="staff-body" id="staffBody-reports">
+      <div class="staff-empty"><div class="staff-empty-ico" style="font-size:1.4rem">⏳</div><div class="staff-empty-text">Loading…</div></div>
     </div>
 
-    <!-- Users tab (owner only) -->
-    <div class="staff-body" id="staffUsersBody" style="display:none">
-      <input class="staff-search" id="staffUserSearch" placeholder="Search users…" oninput="filterStaffUsers(this.value)">
-      <div id="staffUsersList">
-        <div class="staff-empty">
-          <div class="staff-empty-ico">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          </div>
-          <div class="staff-empty-text">Loading users…</div>
+    <!-- CHAT MOD -->
+    <div class="staff-body" id="staffBody-chat" style="display:none">
+      <div style="display:flex;gap:6px;margin-bottom:4px">
+        <input class="staff-search" id="chatModSearch" placeholder="Search messages by keyword or @username…" style="margin-bottom:0;flex:1">
+        <button class="mbtn mbtn-add" style="height:36px;padding:0 14px;font-size:.72rem;flex-shrink:0" onclick="runChatSearch()">Search</button>
+      </div>
+      <div id="chatModResults"><div class="staff-empty"><div class="staff-empty-text">Enter a keyword or username and press Search.</div></div></div>
+    </div>
+
+    <!-- BUGS -->
+    <div class="staff-body" id="staffBody-bugs" style="display:none">
+      <div class="staff-empty"><div class="staff-empty-ico" style="font-size:1.4rem">⏳</div><div class="staff-empty-text">Loading…</div></div>
+    </div>
+
+    <!-- USERS -->
+    <div class="staff-body" id="staffBody-users" style="display:none">
+      <input class="staff-search" id="staffUserSearch" placeholder="Search by name or email…" oninput="filterStaffUsers(this.value)">
+      <div id="staffUsersList"><div class="staff-empty"><div class="staff-empty-ico" style="font-size:1.4rem">⏳</div><div class="staff-empty-text">Loading…</div></div></div>
+    </div>
+
+    <!-- ANNOUNCE -->
+    <div class="staff-body" id="staffBody-announce" style="display:none">
+      <div class="announce-compose">
+        <div style="font-size:.72rem;font-weight:600;color:var(--text)">Broadcast to Global Chat</div>
+        <textarea class="bug-textarea" id="announceText" placeholder="Write an official announcement…" style="min-height:70px"></textarea>
+        <div style="display:flex;gap:8px;align-items:center">
+          <label style="font-size:.67rem;color:var(--dim);display:flex;align-items:center;gap:5px;cursor:pointer">
+            <input type="checkbox" id="announcePinned"> Pin to top of chat
+          </label>
+          <button class="mbtn mbtn-add" style="margin-left:auto;height:32px;padding:0 16px;font-size:.72rem" onclick="sendAnnouncement()">Send</button>
         </div>
       </div>
+      <div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);margin-bottom:8px">Recent Announcements</div>
+      <div id="announceHistory"><div class="staff-empty"><div class="staff-empty-text">No announcements yet.</div></div></div>
+    </div>
+
+    <!-- ANALYTICS -->
+    <div class="staff-body" id="staffBody-analytics" style="display:none">
+      <div class="analytics-grid" id="analyticsGrid">
+        <div class="analytics-box"><div class="analytics-box-val">—</div><div class="analytics-box-lbl">Total Users</div></div>
+        <div class="analytics-box"><div class="analytics-box-val">—</div><div class="analytics-box-lbl">Total Messages</div></div>
+        <div class="analytics-box"><div class="analytics-box-val">—</div><div class="analytics-box-lbl">Open Reports</div></div>
+        <div class="analytics-box"><div class="analytics-box-val">—</div><div class="analytics-box-lbl">Open Bugs</div></div>
+      </div>
+      <div class="analytics-list-title">Most Active Users (last 80 msgs)</div>
+      <div id="analyticsTopUsers"><div class="staff-empty" style="padding:16px 0"><div class="staff-empty-text">Loading…</div></div></div>
+    </div>
+
+    <!-- PLATFORM -->
+    <div class="staff-body" id="staffBody-platform" style="display:none">
+      <!-- Feature flags -->
+      <div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);margin-bottom:8px">Feature Flags</div>
+      <div class="feature-flags" id="featureFlagsList" style="margin-bottom:18px"></div>
+
+      <!-- MOTD -->
+      <div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);margin-bottom:6px">Message of the Day</div>
+      <div style="display:flex;gap:6px;margin-bottom:18px">
+        <input class="staff-search" id="motdInput" placeholder="Shown on the home screen for all users…" style="margin-bottom:0;flex:1">
+        <button class="mbtn mbtn-add" style="height:36px;padding:0 14px;font-size:.72rem;flex-shrink:0" onclick="saveMOTD()">Save</button>
+        <button class="mbtn mbtn-cancel" style="height:36px;padding:0 12px;font-size:.72rem;flex-shrink:0" onclick="clearMOTD()">Clear</button>
+      </div>
+
+      <!-- Maintenance banner -->
+      <div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);margin-bottom:6px">Maintenance Banner</div>
+      <div style="display:flex;gap:6px;margin-bottom:18px">
+        <input class="staff-search" id="bannerInput" placeholder="Banner message text…" style="margin-bottom:0;flex:1">
+        <button class="mbtn mbtn-add" style="height:36px;padding:0 14px;font-size:.72rem;flex-shrink:0" onclick="saveBanner(true)">Show</button>
+        <button class="mbtn mbtn-cancel" style="height:36px;padding:0 12px;font-size:.72rem;flex-shrink:0" onclick="saveBanner(false)">Hide</button>
+      </div>
+
+      <!-- Auto-mod -->
+      <div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);margin-bottom:6px">Auto-Mod Keywords</div>
+      <div class="automod-wrap" style="margin-bottom:18px">
+        <div class="automod-tags" id="automodTags"></div>
+        <div class="automod-add-row">
+          <input class="staff-search" id="automodInput" placeholder="Add a blocked word…" style="margin-bottom:0;flex:1" onkeydown="if(event.key==='Enter')addAutomodWord()">
+          <button class="mbtn mbtn-add" style="height:34px;padding:0 14px;font-size:.72rem;flex-shrink:0" onclick="addAutomodWord()">Add</button>
+        </div>
+      </div>
+
+      <!-- Items per section -->
+      <div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);margin-bottom:8px">Platform Items</div>
+      <div id="platformItemsSections"></div>
     </div>
   </div>
 </div>
@@ -1693,6 +1930,97 @@
       setUserRole: async (uid, role) => {
         await fsUpdate(fsDoc(fdb,'users',uid), { role });
       },
+      adjustCoins: async (uid, amount) => {
+        await fsUpdate(fsDoc(fdb,'users',uid), { coins: fsInc(amount) });
+      },
+      resetDisplayName: async (uid, name) => {
+        await fsUpdate(fsDoc(fdb,'users',uid), { displayName: name });
+      },
+
+      // ── Site config ─────────────────────────────
+      getSiteConfig: async () => {
+        const snap = await fsGet(fsDoc(fdb,'siteConfig','main'));
+        return snap.exists() ? snap.data() : {};
+      },
+      setSiteConfig: async (data) => {
+        await fsSet(fsDoc(fdb,'siteConfig','main'), data, { merge: true });
+      },
+
+      // ── Bug reports ──────────────────────────────
+      getBugs: async () => {
+        const q = fsQuery(fsCol(fdb,'bugReports'), fsOrder('timestamp','desc'), fsLimit(80));
+        const snap = await fsGetAll(q);
+        return snap.docs.map(d => ({id: d.id, ...d.data()}));
+      },
+      resolveBug: async (bugId) => {
+        await fsUpdate(fsDoc(fdb,'bugReports',bugId), {
+          status: 'resolved',
+          resolvedBy: auth.currentUser?.uid || 'unknown',
+        });
+      },
+      submitBug: async (title, desc, userId, userName) => {
+        await fsAdd(fsCol(fdb,'bugReports'), {
+          title, desc, userId, userName,
+          timestamp: new Date(),
+          status: 'open',
+        });
+      },
+
+      // ── Analytics ────────────────────────────────
+      getAnalytics: async () => {
+        const [uSnap, mSnap, rSnap, bSnap] = await Promise.all([
+          fsGetAll(fsCol(fdb,'users')),
+          fsGetAll(fsQuery(fsCol(fdb,'socialMessages'), fsOrder('timestamp','desc'), fsLimit(1000))),
+          fsGetAll(fsQuery(fsCol(fdb,'reports'), fsWhere('status','==','pending'))),
+          fsGetAll(fsQuery(fsCol(fdb,'bugReports'), fsWhere('status','==','open'))),
+        ]);
+        return { users: uSnap.size, messages: mSnap.size, openReports: rSnap.size, openBugs: bSnap.size };
+      },
+      getTopUsers: async () => {
+        const snap = await fsGetAll(fsQuery(fsCol(fdb,'socialMessages'), fsOrder('timestamp','desc'), fsLimit(300)));
+        const counts = {};
+        snap.docs.forEach(d => {
+          const data = d.data();
+          if (!data.userId) return;
+          if (!counts[data.userId]) counts[data.userId] = { name: data.displayName || 'Unknown', count: 0 };
+          counts[data.userId].count++;
+        });
+        return Object.values(counts).sort((a,b) => b.count - a.count).slice(0,10);
+      },
+
+      // ── Chat mod ─────────────────────────────────
+      searchMessages: async (query) => {
+        const snap = await fsGetAll(fsQuery(fsCol(fdb,'socialMessages'), fsOrder('timestamp','desc'), fsLimit(300)));
+        const q = query.toLowerCase();
+        return snap.docs.map(d => ({id: d.id, ...d.data()}))
+          .filter(d => (d.text||'').toLowerCase().includes(q) || (d.displayName||'').toLowerCase().includes(q))
+          .slice(0,50);
+      },
+      deleteMessage: async (msgId) => {
+        await fsDel(fsDoc(fdb,'socialMessages',msgId));
+      },
+
+      // ── Announcements ────────────────────────────
+      sendAnnouncement: async (text, pinned) => {
+        await fsAdd(fsCol(fdb,'announcements'), {
+          text, pinned: !!pinned,
+          sentBy: auth.currentUser?.uid || 'unknown',
+          sentByName: auth.currentUser?.displayName || 'Owner',
+          timestamp: new Date(),
+        });
+        await fsAdd(fsCol(fdb,'socialMessages'), {
+          text, userId: auth.currentUser?.uid || 'system',
+          displayName: auth.currentUser?.displayName || 'Vexis',
+          photoURL: null, timestamp: new Date(),
+          reactions: {}, replyTo: null, gifUrl: null, imageBase64: null,
+          isOfficial: true, pinned: !!pinned,
+        });
+      },
+      getAnnouncements: async () => {
+        const q = fsQuery(fsCol(fdb,'announcements'), fsOrder('timestamp','desc'), fsLimit(20));
+        const snap = await fsGetAll(q);
+        return snap.docs.map(d => ({id: d.id, ...d.data()}));
+      },
     };
 
     // Global notification dot updater (accessible outside this closure via window)
@@ -1715,6 +2043,7 @@
           window._userRole = snap.data()?.role || 'user';
         } catch(e) { window._userRole = 'user'; }
         window.onFirebaseLogin(user);
+        loadSiteConfig();
         if (user.photoURL) {
           window.setAvatarPhoto(user.photoURL);
           localStorage.setItem('vexis-profile-photo', user.photoURL);
@@ -3617,32 +3946,36 @@ async function sendLocalAI() {
 let _staffTab  = 'reports';
 let _allUsers  = [];
 
+const _OWNER_TABS = ['bugs','users','announce','analytics','platform'];
+const _ALL_TABS   = ['reports','chat',..._OWNER_TABS];
+
 function openStaffPanel(mode) {
   const role = window._userRole || 'user';
   if (role !== 'moderator' && role !== 'owner') { toast('Access denied'); return; }
 
-  // Determine which "view" was requested; default mods to reports
-  const viewMode = mode === 'owner' ? 'owner' : 'mod';
+  const isOwner = role === 'owner';
 
-  // Configure header
   const icon  = document.getElementById('staffHeaderIcon');
   const title = document.getElementById('staffPanelTitle');
   const badge = document.getElementById('staffRoleBadge');
-  const usersTab = document.getElementById('stab-users');
 
-  if (viewMode === 'owner') {
-    icon.className  = 'staff-header-icon own';
+  if (isOwner) {
+    icon.className    = 'staff-header-icon own';
     title.textContent = 'Owner Panel';
-    badge.className = 'staff-badge own';
+    badge.className   = 'staff-badge own';
     badge.textContent = 'Owner';
-    usersTab.style.display = '';
   } else {
-    icon.className  = 'staff-header-icon mod';
+    icon.className    = 'staff-header-icon mod';
     title.textContent = 'Mod Panel';
-    badge.className = 'staff-badge mod';
+    badge.className   = 'staff-badge mod';
     badge.textContent = 'Moderator';
-    usersTab.style.display = role === 'owner' ? '' : 'none';
   }
+
+  // Show/hide owner-only tabs
+  _OWNER_TABS.forEach(t => {
+    const btn = document.getElementById('stab-' + t);
+    if (btn) btn.style.display = isOwner ? '' : 'none';
+  });
 
   document.getElementById('staffPanel').classList.add('open');
   switchStaffTab('reports');
@@ -3654,19 +3987,23 @@ function closeStaffPanel() {
 
 function switchStaffTab(tab) {
   _staffTab = tab;
-  ['reports','users'].forEach(t => {
+  _ALL_TABS.forEach(t => {
     const btn  = document.getElementById('stab-' + t);
-    const body = document.getElementById('staffReportsBody');
-    if (btn) btn.classList.toggle('active', t === tab);
-    if (t === 'reports') document.getElementById('staffReportsBody').style.display = tab === 'reports' ? '' : 'none';
-    if (t === 'users')   document.getElementById('staffUsersBody').style.display   = tab === 'users'   ? '' : 'none';
+    const body = document.getElementById('staffBody-' + t);
+    if (btn)  btn.classList.toggle('active', t === tab);
+    if (body) body.style.display = t === tab ? '' : 'none';
   });
-  if (tab === 'reports') loadStaffReports();
-  if (tab === 'users')   loadStaffUsers();
+  if (tab === 'reports')   loadStaffReports();
+  if (tab === 'chat')      { /* search is user-triggered */ }
+  if (tab === 'bugs')      loadStaffBugs();
+  if (tab === 'users')     loadStaffUsers();
+  if (tab === 'announce')  loadStaffAnnouncements();
+  if (tab === 'analytics') loadStaffAnalytics();
+  if (tab === 'platform')  loadStaffPlatform();
 }
 
 async function loadStaffReports() {
-  const body = document.getElementById('staffReportsBody');
+  const body = document.getElementById('staffBody-reports');
   body.innerHTML = '<div class="staff-empty"><div class="staff-empty-ico" style="font-size:1.4rem">⏳</div><div class="staff-empty-text">Loading reports…</div></div>';
 
   if (!window._fb?.ready) {
@@ -3812,6 +4149,8 @@ function buildUserRow(u, myUid) {
           : `<button class="user-action-btn promote" onclick="staffSetRole('${u.uid}','moderator',this)">Make Mod</button>`
       }
       ${!isBanned ? `<button class="user-action-btn danger" onclick="staffSetRole('${u.uid}','banned',this)">Ban</button>` : ''}
+      <button class="user-action-btn" onclick="staffAdjustCoins('${u.uid}',this)" title="Adjust coins">Coins</button>
+      <button class="user-action-btn" onclick="staffResetName('${u.uid}','${_esc(u.displayName||'').replace(/'/g,"\\'")}',this)" title="Reset display name">Rename</button>
     </div>`;
 
   row.innerHTML = `
@@ -3823,6 +4162,34 @@ function buildUserRow(u, myUid) {
     <span class="user-row-role ${role}">${role}</span>
     ${actions}`;
   return row;
+}
+
+async function staffAdjustCoins(uid, btn) {
+  const input = prompt('Enter coin amount to add (use negative to subtract):');
+  if (input === null) return;
+  const amount = parseInt(input);
+  if (isNaN(amount)) { toast('Invalid number'); return; }
+  if (!window._fb?.ready) return;
+  btn.disabled = true;
+  try {
+    await window._fb.adjustCoins(uid, amount);
+    toast(`${amount >= 0 ? '+' : ''}${amount} coins applied`);
+  } catch(e) { toast('Error: ' + e.message); }
+  finally { btn.disabled = false; }
+}
+
+async function staffResetName(uid, currentName, btn) {
+  const name = prompt('Enter new display name:', currentName);
+  if (!name || name.trim() === currentName) return;
+  if (!window._fb?.ready) return;
+  btn.disabled = true;
+  try {
+    await window._fb.resetDisplayName(uid, name.trim());
+    const u = _allUsers.find(x => x.uid === uid);
+    if (u) u.displayName = name.trim();
+    renderStaffUsers(_allUsers);
+    toast('Display name updated');
+  } catch(e) { toast('Error: ' + e.message); btn.disabled = false; }
 }
 
 async function staffSetRole(uid, newRole, btn) {
@@ -3841,6 +4208,373 @@ async function staffSetRole(uid, newRole, btn) {
       : _allUsers);
     toast(newRole === 'banned' ? 'User banned' : newRole === 'moderator' ? 'Promoted to moderator' : 'Role updated');
   } catch(e) { toast('Error: ' + e.message); btn.disabled = false; btn.textContent = 'Retry'; }
+}
+
+/* ── Bugs tab ── */
+async function loadStaffBugs() {
+  const body = document.getElementById('staffBody-bugs');
+  body.innerHTML = '<div class="staff-empty"><div class="staff-empty-ico" style="font-size:1.4rem">⏳</div><div class="staff-empty-text">Loading bug reports…</div></div>';
+  if (!window._fb?.ready) { body.innerHTML = '<div class="staff-empty"><div class="staff-empty-text">Firebase not connected.</div></div>'; return; }
+  try {
+    const bugs = await window._fb.getBugs();
+    if (!bugs.length) {
+      body.innerHTML = '<div class="staff-empty"><div class="staff-empty-ico" style="opacity:.3">✓</div><div class="staff-empty-text">No bug reports yet.</div></div>';
+      return;
+    }
+    body.innerHTML = '';
+    bugs.forEach(b => body.appendChild(buildBugCard(b)));
+  } catch(e) { body.innerHTML = `<div class="staff-empty"><div class="staff-empty-text">Error: ${e.message}</div></div>`; }
+}
+
+function buildBugCard(b) {
+  const card = document.createElement('div');
+  card.className = 'bug-card' + (b.status === 'resolved' ? ' resolved' : '');
+  card.id = 'bcard-' + b.id;
+  const ts = b.timestamp ? new Date(b.timestamp?.toDate ? b.timestamp.toDate() : b.timestamp) : null;
+  const timeStr = ts ? ts.toLocaleString([],{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
+  const isResolved = b.status === 'resolved';
+  card.innerHTML = `
+    <div style="display:flex;align-items:flex-start;gap:8px">
+      <span class="report-tag ${b.status||'open'}" style="flex-shrink:0">${b.status||'open'}</span>
+      <div style="flex:1;min-width:0">
+        <div class="bug-card-title">${_esc(b.title||'Untitled')}</div>
+        <div class="bug-card-desc" style="margin-top:4px">${_esc(b.desc||'')}</div>
+        <div class="bug-card-meta" style="margin-top:6px">By <strong>${_esc(b.userName||'?')}</strong> · ${timeStr}</div>
+      </div>
+    </div>
+    <div class="report-actions">
+      <button class="report-btn" ${isResolved?'disabled':''} onclick="staffResolveBug('${b.id}',this)">
+        ${isResolved ? 'Resolved' : 'Mark Resolved'}
+      </button>
+    </div>`;
+  return card;
+}
+
+async function staffResolveBug(bugId, btn) {
+  if (!window._fb?.ready) return;
+  btn.disabled = true; btn.textContent = 'Resolving…';
+  try {
+    await window._fb.resolveBug(bugId);
+    const card = document.getElementById('bcard-' + bugId);
+    if (card) {
+      card.classList.add('resolved');
+      card.querySelectorAll('.report-btn').forEach(b => b.disabled = true);
+      const tag = card.querySelector('.report-tag');
+      if (tag) { tag.className = 'report-tag resolved'; tag.textContent = 'resolved'; }
+    }
+  } catch(e) { toast('Error: ' + e.message); btn.disabled = false; btn.textContent = 'Mark Resolved'; }
+}
+
+/* ── Announcements tab ── */
+async function loadStaffAnnouncements() {
+  const el = document.getElementById('announceHistory');
+  el.innerHTML = '<div class="staff-empty"><div class="staff-empty-text">Loading…</div></div>';
+  if (!window._fb?.ready) return;
+  try {
+    const list = await window._fb.getAnnouncements();
+    if (!list.length) { el.innerHTML = '<div class="staff-empty"><div class="staff-empty-text">No announcements yet.</div></div>'; return; }
+    el.innerHTML = '';
+    list.forEach(a => {
+      const ts = a.timestamp ? new Date(a.timestamp?.toDate ? a.timestamp.toDate() : a.timestamp) : null;
+      const timeStr = ts ? ts.toLocaleString([],{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
+      const item = document.createElement('div');
+      item.className = 'announce-history-item';
+      item.innerHTML = `<span class="announce-badge">OFFICIAL</span>
+        <div><div class="announce-text">${_esc(a.text||'')}</div>
+        <div class="announce-time">${timeStr}${a.pinned?' · 📌 pinned':''}</div></div>`;
+      el.appendChild(item);
+    });
+  } catch(e) { el.innerHTML = `<div class="staff-empty"><div class="staff-empty-text">Error: ${e.message}</div></div>`; }
+}
+
+async function sendAnnouncement() {
+  const text = document.getElementById('announceText').value.trim();
+  const pinned = document.getElementById('announcePinned').checked;
+  if (!text) { toast('Write a message first'); return; }
+  if (!window._fb?.ready) return;
+  const btn = document.querySelector('#staffBody-announce .mbtn-add');
+  btn.disabled = true; btn.textContent = 'Sending…';
+  try {
+    await window._fb.sendAnnouncement(text, pinned);
+    document.getElementById('announceText').value = '';
+    document.getElementById('announcePinned').checked = false;
+    toast('Announcement sent!');
+    loadStaffAnnouncements();
+  } catch(e) { toast('Error: ' + e.message); }
+  finally { btn.disabled = false; btn.textContent = 'Send'; }
+}
+
+/* ── Analytics tab ── */
+async function loadStaffAnalytics() {
+  if (!window._fb?.ready) return;
+  try {
+    const [stats, top] = await Promise.all([window._fb.getAnalytics(), window._fb.getTopUsers()]);
+    const grid = document.getElementById('analyticsGrid');
+    const vals = grid.querySelectorAll('.analytics-box-val');
+    vals[0].textContent = stats.users;
+    vals[1].textContent = stats.messages;
+    vals[2].textContent = stats.openReports;
+    vals[3].textContent = stats.openBugs;
+
+    const topEl = document.getElementById('analyticsTopUsers');
+    if (!top.length) { topEl.innerHTML = '<div class="staff-empty" style="padding:12px 0"><div class="staff-empty-text">No messages yet.</div></div>'; return; }
+    topEl.innerHTML = '';
+    top.forEach((u, i) => {
+      const row = document.createElement('div');
+      row.className = 'analytics-user-row';
+      row.innerHTML = `<span style="font-size:.62rem;color:var(--muted);font-family:'DM Mono',monospace;width:18px">${i+1}</span>
+        <span class="analytics-user-name">${_esc(u.name)}</span>
+        <span class="analytics-user-count">${u.count} msg${u.count===1?'':'s'}</span>`;
+      topEl.appendChild(row);
+    });
+  } catch(e) { toast('Analytics error: ' + e.message); }
+}
+
+/* ── Platform tab ── */
+let _siteConfig = {};
+let _automodWords = [];
+
+async function loadStaffPlatform() {
+  if (!window._fb?.ready) return;
+  try {
+    _siteConfig = await window._fb.getSiteConfig();
+    // MOTD
+    const motd = _siteConfig.motd || '';
+    document.getElementById('motdInput').value = motd;
+    // Banner
+    document.getElementById('bannerInput').value = _siteConfig.bannerText || '';
+    // Automod
+    _automodWords = _siteConfig.automodWords || [];
+    renderAutomodTags();
+    // Feature flags
+    renderFeatureFlags(_siteConfig.flags || {});
+    // Platform items
+    renderPlatformItems(_siteConfig.items || { games:[], apps:[], tools:[] });
+  } catch(e) { toast('Platform load error: ' + e.message); }
+}
+
+async function saveMOTD() {
+  const val = document.getElementById('motdInput').value.trim();
+  if (!window._fb?.ready) return;
+  await window._fb.setSiteConfig({ motd: val });
+  // Apply locally
+  const el = document.getElementById('homeMOTD');
+  if (el) { el.textContent = val; el.classList.toggle('on', !!val); }
+  toast(val ? 'MOTD saved' : 'MOTD cleared');
+}
+
+async function clearMOTD() {
+  document.getElementById('motdInput').value = '';
+  await saveMOTD();
+}
+
+async function saveBanner(show) {
+  const text = document.getElementById('bannerInput').value.trim();
+  if (!window._fb?.ready) return;
+  await window._fb.setSiteConfig({ bannerText: text, bannerOn: show });
+  const banner = document.getElementById('maintenanceBanner');
+  const bannerTextEl = document.getElementById('bannerText');
+  bannerTextEl.textContent = text || 'Maintenance in progress.';
+  banner.classList.toggle('on', show);
+  toast(show ? 'Banner shown' : 'Banner hidden');
+}
+
+function renderAutomodTags() {
+  const container = document.getElementById('automodTags');
+  container.innerHTML = '';
+  if (!_automodWords.length) {
+    container.innerHTML = '<span style="font-size:.68rem;color:var(--muted)">No blocked words yet.</span>';
+    return;
+  }
+  _automodWords.forEach(w => {
+    const tag = document.createElement('span');
+    tag.className = 'automod-tag';
+    tag.innerHTML = `${_esc(w)}<button class="automod-tag-x" onclick="removeAutomodWord('${_esc(w).replace(/'/g,"\\'")}')">×</button>`;
+    container.appendChild(tag);
+  });
+}
+
+async function addAutomodWord() {
+  const input = document.getElementById('automodInput');
+  const word = input.value.trim().toLowerCase();
+  if (!word || _automodWords.includes(word)) { input.value = ''; return; }
+  _automodWords.push(word);
+  input.value = '';
+  await window._fb.setSiteConfig({ automodWords: _automodWords });
+  renderAutomodTags();
+}
+
+async function removeAutomodWord(word) {
+  _automodWords = _automodWords.filter(w => w !== word);
+  await window._fb.setSiteConfig({ automodWords: _automodWords });
+  renderAutomodTags();
+}
+
+const _FLAG_DEFS = [
+  { key: 'globalChat',    label: 'Global Chat',    sub: 'Allow users to send messages in global chat' },
+  { key: 'guestLogin',    label: 'Guest Login',     sub: 'Allow users to continue without an account' },
+  { key: 'imageGen',      label: 'Image Generation',sub: 'AI image generation in Vexis AI' },
+  { key: 'localAI',       label: 'Local AI',        sub: 'Download and run AI models in the browser' },
+];
+
+function renderFeatureFlags(flags) {
+  const el = document.getElementById('featureFlagsList');
+  el.innerHTML = '';
+  const frag = document.createDocumentFragment();
+  _FLAG_DEFS.forEach(def => {
+    const on = flags[def.key] !== false; // default true
+    const row = document.createElement('div');
+    row.className = 'flag-row';
+    row.style.marginBottom = '6px';
+    row.innerHTML = `<div class="flag-info"><div class="flag-label">${def.label}</div><div class="flag-sub">${def.sub}</div></div>
+      <button class="flag-toggle ${on?'on':''}" id="flag-${def.key}" onclick="toggleFlag('${def.key}',this)"></button>`;
+    frag.appendChild(row);
+  });
+  el.appendChild(frag);
+}
+
+async function toggleFlag(key, btn) {
+  const isOn = btn.classList.toggle('on');
+  const flags = _siteConfig.flags || {};
+  flags[key] = isOn;
+  _siteConfig.flags = flags;
+  await window._fb.setSiteConfig({ flags });
+  toast(`${key}: ${isOn ? 'enabled' : 'disabled'}`);
+}
+
+function renderPlatformItems(items) {
+  const container = document.getElementById('platformItemsSections');
+  container.innerHTML = '';
+  ['games','apps','tools'].forEach(cat => {
+    const list = items[cat] || [];
+    const sec = document.createElement('div');
+    sec.className = 'platform-section';
+    sec.innerHTML = `<div class="platform-section-hd"><span class="platform-section-title">${cat.charAt(0).toUpperCase()+cat.slice(1)}</span></div>
+      <div id="pitems-${cat}">
+        ${list.map((item,i) => `<div class="platform-item-row">
+          <span class="platform-item-name">${_esc(item.name)}</span>
+          <span class="platform-item-url">${_esc(item.url)}</span>
+          <button class="platform-item-del" onclick="removePlatformItem('${cat}',${i})">✕</button>
+        </div>`).join('') || '<div style="font-size:.68rem;color:var(--muted);padding:4px 0">No items yet.</div>'}
+      </div>
+      <div class="platform-add-form" style="margin-top:8px">
+        <input class="modal-input" id="pname-${cat}" placeholder="Name">
+        <input class="modal-input" id="purl-${cat}" placeholder="URL (https://…)">
+        <button class="mbtn mbtn-add" onclick="addPlatformItem('${cat}')">Add ${cat.slice(0,-1)}</button>
+      </div>`;
+    container.appendChild(sec);
+  });
+}
+
+async function addPlatformItem(cat) {
+  const name = document.getElementById('pname-'+cat).value.trim();
+  const url  = document.getElementById('purl-'+cat).value.trim();
+  if (!name || !url) { toast('Name and URL required'); return; }
+  const items = _siteConfig.items || { games:[], apps:[], tools:[] };
+  items[cat] = [...(items[cat]||[]), { name, url }];
+  _siteConfig.items = items;
+  await window._fb.setSiteConfig({ items });
+  toast(`Added to ${cat}`);
+  renderPlatformItems(items);
+}
+
+async function removePlatformItem(cat, idx) {
+  const items = _siteConfig.items || { games:[], apps:[], tools:[] };
+  items[cat] = (items[cat]||[]).filter((_,i) => i !== idx);
+  _siteConfig.items = items;
+  await window._fb.setSiteConfig({ items });
+  renderPlatformItems(items);
+}
+
+/* ── Chat Mod tab ── */
+async function runChatSearch() {
+  const q = document.getElementById('chatModSearch').value.trim();
+  const results = document.getElementById('chatModResults');
+  if (!q) { results.innerHTML = '<div class="staff-empty"><div class="staff-empty-text">Enter a keyword or username and press Search.</div></div>'; return; }
+  if (!window._fb?.ready) return;
+  results.innerHTML = '<div class="staff-empty"><div class="staff-empty-text">Searching…</div></div>';
+  try {
+    const msgs = await window._fb.searchMessages(q);
+    if (!msgs.length) { results.innerHTML = '<div class="staff-empty"><div class="staff-empty-text">No messages matched.</div></div>'; return; }
+    results.innerHTML = '';
+    msgs.forEach(m => {
+      const ts = m.timestamp ? new Date(m.timestamp?.toDate ? m.timestamp.toDate() : m.timestamp) : null;
+      const timeStr = ts ? ts.toLocaleString([],{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
+      const row = document.createElement('div');
+      row.className = 'chat-mod-msg';
+      row.style.marginBottom = '5px';
+      row.innerHTML = `<div class="chat-mod-info">
+          <span class="chat-mod-name">${_esc(m.displayName||'?')}</span>
+          <div class="chat-mod-text">${_esc(m.text||'[no text]')}</div>
+        </div>
+        <span class="chat-mod-time">${timeStr}</span>
+        <button class="chat-mod-del" title="Delete" onclick="staffModDeleteMsg('${m.id}',this)">🗑</button>`;
+      results.appendChild(row);
+    });
+  } catch(e) { results.innerHTML = `<div class="staff-empty"><div class="staff-empty-text">Error: ${e.message}</div></div>`; }
+}
+
+async function staffModDeleteMsg(msgId, btn) {
+  if (!confirm('Delete this message?')) return;
+  if (!window._fb?.ready) return;
+  btn.disabled = true;
+  try {
+    await window._fb.deleteMessage(msgId);
+    btn.closest('.chat-mod-msg').remove();
+    toast('Message deleted');
+  } catch(e) { toast('Error: ' + e.message); btn.disabled = false; }
+}
+
+/* ── Bug report modal (user-facing) ── */
+function openBugModal() {
+  document.getElementById('bugModal').classList.add('open');
+  setTimeout(() => document.getElementById('bugTitle').focus(), 120);
+}
+
+function closeBugModal() {
+  document.getElementById('bugModal').classList.remove('open');
+}
+
+async function submitBugReport() {
+  const title = document.getElementById('bugTitle').value.trim();
+  const desc  = document.getElementById('bugDesc').value.trim();
+  if (!title) { toast('Please enter a title'); return; }
+  if (!window._fb?.ready) { toast('Not connected to Firebase'); return; }
+  const btn = document.getElementById('bugSubmitBtn');
+  btn.disabled = true; btn.textContent = 'Submitting…';
+  try {
+    const uid  = window._fbUser?.uid || 'guest';
+    const name = window._fbUser?.displayName || 'Guest';
+    await window._fb.submitBug(title, desc, uid, name);
+    document.getElementById('bugTitle').value = '';
+    document.getElementById('bugDesc').value  = '';
+    closeBugModal();
+    toast('Bug report submitted — thanks!');
+  } catch(e) { toast('Error: ' + e.message); }
+  finally { btn.disabled = false; btn.textContent = 'Submit Report'; }
+}
+
+/* ── Site config loader (on login) ── */
+async function loadSiteConfig() {
+  if (!window._fb?.ready) return;
+  try {
+    const cfg = await window._fb.getSiteConfig();
+    _siteConfig = cfg;
+    // MOTD
+    const motd = cfg.motd || '';
+    const motdEl = document.getElementById('homeMOTD');
+    if (motdEl) { motdEl.textContent = motd; motdEl.classList.toggle('on', !!motd); }
+    // Maintenance banner
+    if (cfg.bannerOn) {
+      const banner = document.getElementById('maintenanceBanner');
+      const bannerTextEl = document.getElementById('bannerText');
+      bannerTextEl.textContent = cfg.bannerText || 'Maintenance in progress.';
+      banner.classList.add('on');
+    }
+    // Automod words
+    _automodWords = cfg.automodWords || [];
+    window._automodWords = _automodWords;
+  } catch(e) {}
 }
 
 function _esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
