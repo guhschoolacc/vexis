@@ -544,8 +544,8 @@
   #aiPanel {
     position: fixed; inset: 0; z-index: 450;
     background: rgba(0,0,0,.65); backdrop-filter: blur(8px);
-    display: flex; align-items: flex-end; justify-content: center;
-    padding-bottom: 0; opacity: 0; pointer-events: none;
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px; opacity: 0; pointer-events: none;
     transition: opacity .2s;
   }
   #aiPanel.open { opacity: 1; pointer-events: all; }
@@ -553,13 +553,13 @@
   .ai-sheet {
     width: 100%; max-width: 680px;
     background: var(--surf); border: 1px solid var(--bdrhi);
-    border-radius: 18px 18px 0 0;
-    box-shadow: 0 -20px 60px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.04);
+    border-radius: 18px;
+    box-shadow: 0 24px 80px rgba(0,0,0,.7), 0 0 0 1px rgba(255,255,255,.04);
     display: flex; flex-direction: column;
-    height: 72vh; max-height: 640px;
-    transform: translateY(30px); transition: transform .22s cubic-bezier(.34,1.3,.64,1);
+    height: 78vh; max-height: 700px;
+    transform: scale(.96) translateY(-10px); transition: transform .22s cubic-bezier(.34,1.3,.64,1);
   }
-  #aiPanel.open .ai-sheet { transform: translateY(0); }
+  #aiPanel.open .ai-sheet { transform: scale(1) translateY(0); }
 
   .ai-header {
     display: flex; align-items: center; gap: 10px;
@@ -671,6 +671,23 @@
   }
   .ai-mode-tab:hover { color: var(--text); background: var(--raise); }
   .ai-mode-tab.active { color: var(--white); background: var(--raise2); border-color: var(--bdrhi); }
+
+  /* ═══════════════ AI IMAGE SETTINGS BAR ═══════════════ */
+  .ai-img-settings {
+    display: flex; gap: 8px; flex-wrap: wrap; flex-shrink: 0;
+  }
+  .ai-img-setting-group { display: flex; flex-direction: column; gap: 4px; }
+  .ai-img-setting-label {
+    font-size: .58rem; font-weight: 600; text-transform: uppercase;
+    letter-spacing: .09em; color: var(--muted);
+  }
+  .ai-img-select {
+    background: var(--bg); border: 1px solid var(--bdr);
+    border-radius: 7px; padding: 5px 9px;
+    font-family: 'DM Sans', sans-serif; font-size: .72rem;
+    color: var(--text); outline: none; transition: border-color .15s; cursor: pointer;
+  }
+  .ai-img-select:focus { border-color: var(--bdrhi); }
 
   /* ═══════════════ AI IMAGE MODE ═══════════════ */
   .ai-img-body {
@@ -1082,18 +1099,47 @@
 
       <!-- ── IMAGE MODE ── -->
       <div class="ai-img-body" id="aiImgBody" style="display:none">
+        <!-- Model / settings bar -->
+        <div class="ai-img-settings">
+          <div class="ai-img-setting-group">
+            <label class="ai-img-setting-label">Provider</label>
+            <select class="ai-img-select" id="aiImgProvider" onchange="onImgProviderChange()">
+              <option value="pollinations">Pollinations (free)</option>
+              <option value="dalle3">DALL-E 3 (API key)</option>
+            </select>
+          </div>
+          <div class="ai-img-setting-group" id="aiPollinationsModelGroup">
+            <label class="ai-img-setting-label">Model</label>
+            <select class="ai-img-select" id="aiPollinationsModel">
+              <option value="flux">Flux — fast</option>
+              <option value="">Auto</option>
+              <option value="turbo">Turbo — speed</option>
+              <option value="sd">Stable Diffusion</option>
+            </select>
+          </div>
+          <div class="ai-img-setting-group" id="aiPollinationsSizeGroup">
+            <label class="ai-img-setting-label">Size</label>
+            <select class="ai-img-select" id="aiPollinationsSize">
+              <option value="1024x1024">1024×1024</option>
+              <option value="1024x768">1024×768</option>
+              <option value="768x1024">768×1024</option>
+              <option value="512x512">512×512</option>
+            </select>
+          </div>
+        </div>
+        <!-- Image result area -->
         <div class="ai-img-result" id="aiImgResult">
           <div class="ai-img-placeholder" id="aiImgPlaceholder">
             <div class="ai-img-placeholder-ico">
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
             </div>
-            <div class="ai-img-placeholder-text">Describe what you want to see<br>and press Generate — powered by DALL-E 3</div>
+            <div class="ai-img-placeholder-text">Describe what you want to see and press Generate<br><span id="aiImgProviderNote" style="color:var(--muted)">Pollinations · free · no API key needed</span></div>
           </div>
           <a class="ai-img-download" id="aiImgDownload" download="vexis-image.png">Download</a>
         </div>
       </div>
       <div class="ai-img-prompt-row" id="aiImgInputRow" style="display:none">
-        <textarea class="ai-textarea" id="aiImgInput" rows="1" placeholder="Describe an image… (DALL-E 3)"
+        <textarea class="ai-textarea" id="aiImgInput" rows="1" placeholder="Describe an image…"
           onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();generateImage();}"
           oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,110)+'px'"></textarea>
         <button class="ai-send" id="aiImgBtn" onclick="generateImage()">
@@ -3119,55 +3165,101 @@ function switchAIMode(mode) {
   if (localVisible && localLoaded) setTimeout(() => document.getElementById('aiLocalInput').focus(), 150);
 }
 
-/* ── Image generation (DALL-E 3) ── */
+/* ── Image generation (Pollinations + DALL-E 3) ── */
 let _imgGenerating = false;
+let _imgBlobUrl    = null;
+
+function onImgProviderChange() {
+  const provider = document.getElementById('aiImgProvider').value;
+  const isPoll   = provider === 'pollinations';
+  document.getElementById('aiPollinationsModelGroup').style.display = isPoll ? '' : 'none';
+  document.getElementById('aiPollinationsSizeGroup').style.display  = isPoll ? '' : 'none';
+  document.getElementById('aiImgProviderNote').textContent = isPoll
+    ? 'Pollinations · free · no API key needed'
+    : 'DALL-E 3 · requires OpenAI API key on server';
+}
 
 async function generateImage() {
   if (_imgGenerating) return;
-  const input = document.getElementById('aiImgInput');
-  const prompt = input.value.trim();
+  const input    = document.getElementById('aiImgInput');
+  const prompt   = input.value.trim();
   if (!prompt) return;
 
   _imgGenerating = true;
-  const btn = document.getElementById('aiImgBtn');
+  const btn    = document.getElementById('aiImgBtn');
+  const result = document.getElementById('aiImgResult');
+  const ph     = document.getElementById('aiImgPlaceholder');
+  const dlBtn  = document.getElementById('aiImgDownload');
+
   btn.disabled = true;
   input.disabled = true;
-
-  const result  = document.getElementById('aiImgResult');
-  const ph      = document.getElementById('aiImgPlaceholder');
-  const dlBtn   = document.getElementById('aiImgDownload');
-
-  ph.innerHTML = `<div class="ai-img-spin"><div class="spin-large"></div></div>`;
+  result.querySelector('img')?.remove();
   dlBtn.style.display = 'none';
+  ph.style.display = 'flex';
+  ph.innerHTML = `<div class="ai-img-spin"><div class="spin-large"></div></div>`;
 
-  const existingImg = result.querySelector('img');
-  if (existingImg) existingImg.remove();
+  if (_imgBlobUrl) { URL.revokeObjectURL(_imgBlobUrl); _imgBlobUrl = null; }
+
+  const provider = document.getElementById('aiImgProvider').value;
 
   try {
-    const res = await fetch(`${AI_SERVER}/api/imagine`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt }),
-    });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err.error || `Server error ${res.status}`);
+    let imgSrc = '';
+
+    if (provider === 'pollinations') {
+      const model    = document.getElementById('aiPollinationsModel').value;
+      const sizeVal  = document.getElementById('aiPollinationsSize').value;
+      const [w, h]   = sizeVal.split('x').map(Number);
+      const params   = new URLSearchParams({
+        width:    w,
+        height:   h,
+        guidance: 7,
+        steps:    30,
+        nologo:   'true',
+        seed:     Math.floor(Math.random() * 999999),
+      });
+      if (model) params.append('model', model);
+      const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?${params}`;
+      const res = await fetch(url, { headers: { Accept: 'image/jpeg,image/png,image/webp,*/*' } });
+      if (!res.ok) throw new Error(`Pollinations error ${res.status}`);
+      const blob = await res.blob();
+      if (!blob.type.startsWith('image/')) throw new Error('No image returned — try a different prompt.');
+      _imgBlobUrl = URL.createObjectURL(blob);
+      imgSrc = _imgBlobUrl;
+      dlBtn.href     = _imgBlobUrl;
+      dlBtn.download = `vexis-${Date.now()}.png`;
+    } else {
+      const res = await fetch(`${AI_SERVER}/api/imagine`, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ prompt }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || `Server error ${res.status}`);
+      }
+      const data = await res.json();
+      imgSrc         = data.url;
+      dlBtn.href     = data.url;
+      dlBtn.download = `vexis-dalle-${Date.now()}.png`;
     }
-    const data = await res.json();
-    ph.innerHTML = '';
+
+    ph.style.display = 'none';
     const img = document.createElement('img');
-    img.src = data.url;
+    img.src = imgSrc;
     img.alt = prompt;
     result.insertBefore(img, dlBtn);
-    dlBtn.href = data.url;
     dlBtn.style.display = '';
     input.value = '';
     input.style.height = 'auto';
+
   } catch (err) {
-    ph.innerHTML = `<div class="ai-img-placeholder"><div class="ai-img-placeholder-ico" style="font-size:1.4rem">⚠</div><div class="ai-img-placeholder-text">${err.message}</div></div>`;
+    ph.innerHTML = `<div class="ai-img-placeholder">
+      <div class="ai-img-placeholder-ico" style="font-size:1.6rem;opacity:.5">⚠</div>
+      <div class="ai-img-placeholder-text">${err.message}</div>
+    </div>`;
   } finally {
     _imgGenerating = false;
-    btn.disabled = false;
+    btn.disabled   = false;
     input.disabled = false;
     input.focus();
   }
