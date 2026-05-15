@@ -64,6 +64,33 @@ app.post('/api/chat', async (req, res) => {
   }
 });
 
+// ── Image generation endpoint (DALL-E 3) ─────
+app.post('/api/imagine', async (req, res) => {
+  const { prompt } = req.body;
+
+  if (!prompt || typeof prompt !== 'string' || !prompt.trim()) {
+    return res.status(400).json({ error: 'prompt is required.' });
+  }
+
+  try {
+    const response = await openai.images.generate({
+      model: 'dall-e-3',
+      prompt: prompt.trim(),
+      n: 1,
+      size: '1024x1024',
+      quality: 'standard',
+    });
+
+    const url = response.data[0]?.url;
+    if (!url) throw new Error('No image returned.');
+    res.json({ url });
+
+  } catch (err) {
+    console.error('[Vexis AI] DALL-E error:', err.message);
+    res.status(err.status || 500).json({ error: err.message || 'Image generation failed.' });
+  }
+});
+
 // ── Start ─────────────────────────────────────
 app.listen(PORT, () => {
   console.log('\n  ✦ Vexis AI server running → http://localhost:' + PORT + '\n');
