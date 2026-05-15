@@ -13,7 +13,7 @@ const OpenAI  = require('openai').default;
 const PORT    = process.env.PORT || 3000;
 const API_KEY = process.env.OPENAI_API_KEY;
 const MODEL   = 'gpt-4o';
-const IMG_MODEL = 'gpt-image-1';
+const IMG_MODEL = 'gpt-image-1-mini';
 
 if (!API_KEY) {
   console.error('\n[Vexis AI] ERROR: OPENAI_API_KEY is missing from your .env file.');
@@ -79,12 +79,20 @@ app.post('/api/imagine', async (req, res) => {
       prompt: prompt.trim(),
       n: 1,
       size: '1024x1024',
-      quality: 'standard',
+      quality: 'auto',
     });
 
-    const url = response.data[0]?.url;
-    if (!url) throw new Error('No image returned.');
-    res.json({ url });
+    const item = response.data[0];
+    if (!item) throw new Error('No image returned.');
+
+    // gpt-image-1 returns base64; DALL-E 3 returns a URL
+    if (item.b64_json) {
+      res.json({ b64: item.b64_json });
+    } else if (item.url) {
+      res.json({ url: item.url });
+    } else {
+      throw new Error('No image data in response.');
+    }
 
   } catch (err) {
     console.error('[Vexis AI] DALL-E error:', err.message);
