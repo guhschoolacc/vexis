@@ -363,6 +363,7 @@ const SVG={
   reply:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg>`,
   react:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9" stroke-width="3"/><line x1="15" y1="9" x2="15.01" y2="9" stroke-width="3"/></svg>`,
   trash:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>`,
+  flag:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>`,
   x:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`,
 };
 
@@ -587,6 +588,11 @@ function addMsgEl(id,data){
     ddDel.onclick=()=>{closeAllDropdowns();delMsg(id);};
     dd.appendChild(ddDel);
   }
+  if(!isOwn){
+    const ddReport=document.createElement('button');ddReport.className='dd-item danger';ddReport.innerHTML=SVG.flag+'<span>Report</span>';
+    ddReport.onclick=()=>{closeAllDropdowns();reportMsg(id,data);};
+    dd.appendChild(ddReport);
+  }
   wrap.appendChild(dd);
 
   // Quick react floater
@@ -621,6 +627,24 @@ function updateMsgEl(id,data){
 async function delMsg(id){
   if(!confirm('Delete this message?')) return;
   try{await db.collection(COL).doc(id).delete();}catch(e){toast('Could not delete');}
+}
+
+async function reportMsg(id,data){
+  if(!me||me.isGuest){toast('Sign in to report messages');return;}
+  if(data.userId===me.uid){toast("You can't report your own message");return;}
+  try{
+    await db.collection('reports').add({
+      messageId:         id,
+      messageText:       data.text||'[image/gif]',
+      reportedUserId:    data.userId||'unknown',
+      reportedDisplayName: data.displayName||'Unknown',
+      reportedByUserId:  me.uid,
+      reportedByName:    me.displayName||'Unknown',
+      timestamp:         FS.FieldValue.serverTimestamp(),
+      status:            'pending',
+    });
+    toast('Message reported — staff will review it');
+  }catch(e){toast('Failed to submit report');}
 }
 
 async function toggleReact(msgId,em){
