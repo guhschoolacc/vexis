@@ -1057,10 +1057,6 @@
   <button class="banner-dismiss" onclick="document.getElementById('maintenanceBanner').classList.remove('on')" title="Dismiss">✕</button>
 </div>
 
-<!-- BUG REPORT BUTTON -->
-<button id="bugReportBtn" onclick="openBugModal()" title="Report a bug">
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-</button>
 
 <!-- BUG REPORT MODAL -->
 <div id="bugModal" onclick="if(event.target===this)closeBugModal()">
@@ -1413,6 +1409,12 @@
     <div style="display:flex;justify-content:space-between;font-size:.6rem;color:var(--muted);margin-top:4px">
       <span>12px</span><span>18px</span>
     </div>
+  </div>
+  <div class="settings-section" style="border-top:1px solid var(--bdr);padding-top:14px;margin-top:4px">
+    <button onclick="openBugModal()" style="width:100%;padding:8px 12px;border-radius:8px;background:var(--raise);border:1px solid var(--bdr);color:var(--dim);font-family:'DM Sans',sans-serif;font-size:.72rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;transition:all .14s" onmouseover="this.style.background='var(--raise2)';this.style.color='var(--text)'" onmouseout="this.style.background='var(--raise)';this.style.color='var(--dim)'">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Report a Bug
+    </button>
   </div>
 </div>
 
@@ -1980,6 +1982,8 @@ function openIframe(name, url, returnPage) {
   iframePage.classList.add('active');
   setActiveTabLabel('iframe', name);
   _currentPage = 'iframe';
+  const _cashFab = document.getElementById('cashFab');
+  if (_cashFab) _cashFab.style.display = 'none';
   const id = getActiveTabId();
   if (_tabState[id]) {
     _tabState[id].page = 'iframe';
