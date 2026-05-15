@@ -956,6 +956,145 @@
     font-size: .67rem; color: rgba(255, 200, 80, .85); line-height: 1.55;
   }
   .firebase-notice strong { color: rgba(255,210,100,1); }
+
+  /* ═══════════════ STAFF PANEL ═══════════════ */
+  #staffPanel {
+    position: fixed; inset: 0; z-index: 600;
+    background: rgba(0,0,0,.72); backdrop-filter: blur(8px);
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px; opacity: 0; pointer-events: none; transition: opacity .2s;
+  }
+  #staffPanel.open { opacity: 1; pointer-events: all; }
+  .staff-sheet {
+    width: 100%; max-width: 780px; height: 82vh; max-height: 740px;
+    background: var(--surf); border: 1px solid var(--bdrhi);
+    border-radius: 16px; display: flex; flex-direction: column;
+    box-shadow: 0 28px 80px rgba(0,0,0,.75), 0 0 0 1px rgba(255,255,255,.04);
+    transform: scale(.96) translateY(-10px);
+    transition: transform .22s cubic-bezier(.34,1.3,.64,1);
+  }
+  #staffPanel.open .staff-sheet { transform: scale(1) translateY(0); }
+  .staff-header {
+    display: flex; align-items: center; gap: 10px;
+    padding: 16px 20px; border-bottom: 1px solid var(--bdr); flex-shrink: 0;
+  }
+  .staff-header-icon {
+    width: 32px; height: 32px; border-radius: 9px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; border: 1px solid var(--bdrhi);
+  }
+  .staff-header-icon.mod { background: linear-gradient(135deg,#1a2a4a,#2a3a6a); }
+  .staff-header-icon.own { background: linear-gradient(135deg,#2a1a0a,#5a3000); }
+  .staff-header-icon svg { color: var(--bright); }
+  .staff-header-info { flex: 1; }
+  .staff-header-title { font-size: .84rem; font-weight: 700; color: var(--white); }
+  .staff-header-sub   { font-size: .61rem; color: var(--dim); margin-top: 1px; }
+  .staff-badge {
+    padding: 3px 10px; border-radius: 20px; font-size: .62rem; font-weight: 700;
+    letter-spacing: .06em; text-transform: uppercase; flex-shrink: 0;
+  }
+  .staff-badge.mod { background: rgba(88,130,255,.15); border: 1px solid rgba(88,130,255,.35); color: #7aa0ff; }
+  .staff-badge.own { background: rgba(255,160,30,.12); border: 1px solid rgba(255,160,30,.35); color: #ffb84a; }
+  .staff-close {
+    width: 28px; height: 28px; border-radius: 7px; background: transparent;
+    border: 1px solid transparent; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all .12s; flex-shrink: 0;
+  }
+  .staff-close:hover { background: var(--raise2); border-color: var(--bdr); }
+  .staff-close svg { color: var(--dim); }
+  .staff-tabs {
+    display: flex; gap: 3px; padding: 10px 20px;
+    border-bottom: 1px solid var(--bdr); flex-shrink: 0;
+  }
+  .staff-tab {
+    padding: 5px 16px; border-radius: 7px; font-family: 'DM Sans', sans-serif;
+    font-size: .7rem; font-weight: 600; color: var(--dim); cursor: pointer;
+    background: transparent; border: 1px solid transparent; transition: all .14s;
+  }
+  .staff-tab:hover { color: var(--text); background: var(--raise); }
+  .staff-tab.active { color: var(--white); background: var(--raise2); border-color: var(--bdrhi); }
+  .staff-body {
+    flex: 1; overflow-y: auto; padding: 16px 20px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .staff-body::-webkit-scrollbar { width: 3px; }
+  .staff-body::-webkit-scrollbar-thumb { background: var(--bdrhi); border-radius: 3px; }
+  .staff-empty {
+    flex: 1; display: flex; flex-direction: column; align-items: center;
+    justify-content: center; gap: 8px; color: var(--muted); padding: 40px;
+  }
+  .staff-empty-ico { font-size: 2rem; opacity: .3; }
+  .staff-empty-text { font-size: .74rem; text-align: center; line-height: 1.6; color: var(--dim); }
+  .report-card {
+    background: var(--bg); border: 1px solid var(--bdr); border-radius: 10px;
+    padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; transition: border-color .14s;
+  }
+  .report-card:hover { border-color: var(--bdrhi); }
+  .report-card.resolved { opacity: .42; }
+  .report-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .report-tag {
+    padding: 2px 8px; border-radius: 5px; font-size: .6rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em;
+  }
+  .report-tag.pending  { background: rgba(248,81,73,.12); color: #f85149; border: 1px solid rgba(248,81,73,.25); }
+  .report-tag.resolved { background: rgba(86,211,100,.1); color: #56d364; border: 1px solid rgba(86,211,100,.22); }
+  .report-who { font-size: .68rem; color: var(--dim); }
+  .report-who strong { color: var(--text); }
+  .report-time { font-size: .62rem; color: var(--muted); margin-left: auto; }
+  .report-msg {
+    background: var(--raise); border: 1px solid var(--bdr); border-radius: 7px;
+    padding: 8px 12px; font-size: .76rem; color: var(--text); line-height: 1.5; word-break: break-word;
+  }
+  .report-actions { display: flex; gap: 7px; }
+  .report-btn {
+    padding: 5px 13px; border-radius: 7px; font-family: 'DM Sans', sans-serif;
+    font-size: .7rem; font-weight: 600; cursor: pointer; transition: all .14s;
+    border: 1px solid var(--bdr); background: var(--raise); color: var(--dim);
+  }
+  .report-btn:hover { background: var(--raise2); color: var(--text); border-color: var(--bdrhi); }
+  .report-btn.danger { color: #f85149; border-color: rgba(248,81,73,.25); background: rgba(248,81,73,.06); }
+  .report-btn.danger:hover { background: rgba(248,81,73,.14); border-color: rgba(248,81,73,.4); }
+  .report-btn:disabled { opacity: .35; cursor: not-allowed; }
+  .user-row {
+    background: var(--bg); border: 1px solid var(--bdr); border-radius: 10px;
+    padding: 12px 16px; display: flex; align-items: center; gap: 12px; transition: border-color .14s;
+  }
+  .user-row:hover { border-color: var(--bdrhi); }
+  .user-row-av {
+    width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
+    background: var(--raise2); border: 1px solid var(--bdrhi);
+    display: flex; align-items: center; justify-content: center;
+    font-size: .78rem; font-weight: 700; color: var(--bright);
+    background-size: cover; background-position: center;
+  }
+  .user-row-info { flex: 1; min-width: 0; }
+  .user-row-name  { font-size: .78rem; font-weight: 600; color: var(--bright); }
+  .user-row-email { font-size: .63rem; color: var(--dim); margin-top: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .user-row-role {
+    padding: 2px 9px; border-radius: 20px; font-size: .6rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .06em; flex-shrink: 0;
+  }
+  .user-row-role.owner     { background: rgba(255,160,30,.12); border: 1px solid rgba(255,160,30,.3); color: #ffb84a; }
+  .user-row-role.moderator { background: rgba(88,130,255,.12); border: 1px solid rgba(88,130,255,.28); color: #7aa0ff; }
+  .user-row-role.user      { background: var(--raise); border: 1px solid var(--bdr); color: var(--dim); }
+  .user-row-role.banned    { background: rgba(248,81,73,.1); border: 1px solid rgba(248,81,73,.25); color: #f85149; }
+  .user-row-actions { display: flex; gap: 5px; flex-shrink: 0; }
+  .user-action-btn {
+    padding: 4px 11px; border-radius: 6px; font-family: 'DM Sans', sans-serif;
+    font-size: .67rem; font-weight: 600; cursor: pointer; transition: all .13s;
+    border: 1px solid var(--bdr); background: var(--raise); color: var(--dim);
+  }
+  .user-action-btn:hover  { background: var(--raise2); color: var(--text); }
+  .user-action-btn.danger  { color: #f85149; }
+  .user-action-btn.danger:hover  { background: rgba(248,81,73,.1); border-color: rgba(248,81,73,.3); }
+  .user-action-btn.promote { color: #7aa0ff; }
+  .user-action-btn.promote:hover { background: rgba(88,130,255,.1); border-color: rgba(88,130,255,.3); }
+  .staff-search {
+    background: var(--bg); border: 1px solid var(--bdr); border-radius: 8px;
+    padding: 8px 12px; font-family: 'DM Sans', sans-serif; font-size: .76rem;
+    color: var(--white); outline: none; width: 100%; flex-shrink: 0;
+    transition: border-color .18s; margin-bottom: 2px;
+  }
+  .staff-search:focus { border-color: var(--bdrhi); }
+  .staff-search::placeholder { color: var(--muted); }
 </style>
 </head>
 <body style="display:flex;flex-direction:column;height:100%">
@@ -1149,6 +1288,10 @@
 
       <!-- ── LOCAL AI MODE ── -->
       <div class="ai-local-body" id="aiLocalBody" style="display:none">
+        <div class="ai-local-note" style="border-color:rgba(248,81,73,.3);background:rgba(248,81,73,.06);">
+          <strong style="color:#f85149">⚠ Not for low-end devices.</strong><br>
+          Running AI locally uses <strong style="color:var(--text)">1–4 GB of RAM</strong> and maxes out your CPU/GPU while generating. It <strong style="color:var(--text)">will lag your browser</strong> and may make your whole device slow. If your PC has less than 8 GB RAM or no dedicated GPU, expect heavy slowdowns. Close other tabs and apps before loading.
+        </div>
         <div class="ai-local-note">
           <strong style="color:var(--text)">Run AI right in your browser — no server needed.</strong><br>
           Models are downloaded once and cached. Requires a modern browser with WebGPU support (Chrome 113+).
@@ -1426,6 +1569,53 @@
 
 <div id="toast"></div>
 
+<!-- STAFF PANEL -->
+<div id="staffPanel" onclick="if(event.target===this)closeStaffPanel()">
+  <div class="staff-sheet">
+    <div class="staff-header">
+      <div class="staff-header-icon mod" id="staffHeaderIcon">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <div class="staff-header-info">
+        <div class="staff-header-title" id="staffPanelTitle">Mod Panel</div>
+        <div class="staff-header-sub">Whitelist-gated — role assigned in Firebase</div>
+      </div>
+      <span class="staff-badge mod" id="staffRoleBadge">Moderator</span>
+      <button class="staff-close" onclick="closeStaffPanel()">
+        <svg width="11" height="11" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="1" y1="1" x2="9" y2="9"/><line x1="9" y1="1" x2="1" y2="9"/></svg>
+      </button>
+    </div>
+
+    <div class="staff-tabs" id="staffTabs">
+      <button class="staff-tab active" id="stab-reports" onclick="switchStaffTab('reports')">Reports</button>
+      <button class="staff-tab" id="stab-users" style="display:none" onclick="switchStaffTab('users')">Users</button>
+    </div>
+
+    <!-- Reports tab -->
+    <div class="staff-body" id="staffReportsBody">
+      <div class="staff-empty" id="staffReportsEmpty">
+        <div class="staff-empty-ico">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div class="staff-empty-text">Loading reports…</div>
+      </div>
+    </div>
+
+    <!-- Users tab (owner only) -->
+    <div class="staff-body" id="staffUsersBody" style="display:none">
+      <input class="staff-search" id="staffUserSearch" placeholder="Search users…" oninput="filterStaffUsers(this.value)">
+      <div id="staffUsersList">
+        <div class="staff-empty">
+          <div class="staff-empty-ico">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div class="staff-empty-text">Loading users…</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- FIREBASE SDK -->
 <script type="module">
   const FIREBASE_CONFIG = {
@@ -1450,7 +1640,8 @@
       = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js");
 
     const { getFirestore, doc: fsDoc, onSnapshot: fsSnap, setDoc: fsSet, updateDoc: fsUpdate,
-            increment: fsInc, collection: fsCol, query: fsQuery, orderBy: fsOrder, limit: fsLimit }
+            increment: fsInc, collection: fsCol, query: fsQuery, orderBy: fsOrder, limit: fsLimit,
+            getDoc: fsGet, getDocs: fsGetAll, where: fsWhere, deleteDoc: fsDel, addDoc: fsAdd }
       = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
 
     const app     = initializeApp(FIREBASE_CONFIG);
@@ -1474,7 +1665,34 @@
       ready: true,
       clearNotifs: async (uid) => {
         try { await fsUpdate(fsDoc(fdb,'notifications',uid),{unread:0}); } catch(e){}
-      }
+      },
+
+      // ── Staff panel ops ──────────────────────────────
+      getReports: async () => {
+        const q = fsQuery(fsCol(fdb,'reports'), fsOrder('timestamp','desc'), fsLimit(80));
+        const snap = await fsGetAll(q);
+        return snap.docs.map(d => ({id: d.id, ...d.data()}));
+      },
+      resolveReport: async (reportId) => {
+        await fsUpdate(fsDoc(fdb,'reports',reportId), {
+          status: 'resolved',
+          resolvedBy: auth.currentUser?.uid || 'unknown',
+        });
+      },
+      deleteReportedMessage: async (reportId, messageId) => {
+        try { await fsDel(fsDoc(fdb,'socialMessages',messageId)); } catch(e){}
+        await fsUpdate(fsDoc(fdb,'reports',reportId), {
+          status: 'resolved',
+          resolvedBy: auth.currentUser?.uid || 'unknown',
+        });
+      },
+      getUsers: async () => {
+        const snap = await fsGetAll(fsCol(fdb,'users'));
+        return snap.docs.map(d => ({id: d.id, ...d.data()}));
+      },
+      setUserRole: async (uid, role) => {
+        await fsUpdate(fsDoc(fdb,'users',uid), { role });
+      },
     };
 
     // Global notification dot updater (accessible outside this closure via window)
@@ -1488,9 +1706,14 @@
 
     let _notifUnsub = null, _gcUnsub = null;
 
-    onAuthStateChanged(auth, user => {
+    onAuthStateChanged(auth, async user => {
       if (user) {
         window._fbUser = user;
+        // Read role from Firestore before building the UI
+        try {
+          const snap = await fsGet(fsDoc(fdb, 'users', user.uid));
+          window._userRole = snap.data()?.role || 'user';
+        } catch(e) { window._userRole = 'user'; }
         window.onFirebaseLogin(user);
         if (user.photoURL) {
           window.setAvatarPhoto(user.photoURL);
@@ -2020,13 +2243,20 @@ function buildNotifs() {
 
 function buildUserMenu(user) {
   const isGuest = !user || user.uid === 'guest';
+  const role    = window._userRole || 'user';
   const items = [
-    {icon:'user',   label:'Profile',    cb:"openProfile();toggleUser()"},
-    {icon:'gear',   label:'Settings',   cb:"openSettings();toggleUser()"},
-    {icon:'signout',label: isGuest ? 'Exit Guest' : 'Sign out', cb:"doSignOut()", dim:true},
+    {icon:'user',   label:'Profile',  cb:"openProfile();toggleUser()"},
+    {icon:'gear',   label:'Settings', cb:"openSettings();toggleUser()"},
   ];
+  if ((role === 'moderator' || role === 'owner') && !isGuest) {
+    items.push({icon:'shield', label:'Mod Panel', cb:"openStaffPanel();toggleUser()", accent:'#7aa0ff'});
+  }
+  if (role === 'owner' && !isGuest) {
+    items.push({icon:'star', label:'Owner Panel', cb:"openStaffPanel('owner');toggleUser()", accent:'#ffb84a'});
+  }
+  items.push({icon:'signout', label: isGuest ? 'Exit Guest' : 'Sign out', cb:"doSignOut()", dim:true});
   document.getElementById('userMenu').innerHTML = items.map(m =>
-    `<div class="mi" onclick="${m.cb}" style="${m.dim?'color:var(--muted);margin-top:2px':''}">${ico(m.icon,14)} ${m.label}</div>`
+    `<div class="mi" onclick="${m.cb}" style="${m.dim?'color:var(--muted);margin-top:2px':m.accent?`color:${m.accent}`:''}">${ico(m.icon,14)} ${m.label}</div>`
   ).join('');
 }
 
@@ -3380,6 +3610,241 @@ async function sendLocalAI() {
     input.focus();
   }
 }
+
+/* ══════════════════════════════════════════════
+   STAFF PANEL
+══════════════════════════════════════════════ */
+let _staffTab  = 'reports';
+let _allUsers  = [];
+
+function openStaffPanel(mode) {
+  const role = window._userRole || 'user';
+  if (role !== 'moderator' && role !== 'owner') { toast('Access denied'); return; }
+
+  // Determine which "view" was requested; default mods to reports
+  const viewMode = mode === 'owner' ? 'owner' : 'mod';
+
+  // Configure header
+  const icon  = document.getElementById('staffHeaderIcon');
+  const title = document.getElementById('staffPanelTitle');
+  const badge = document.getElementById('staffRoleBadge');
+  const usersTab = document.getElementById('stab-users');
+
+  if (viewMode === 'owner') {
+    icon.className  = 'staff-header-icon own';
+    title.textContent = 'Owner Panel';
+    badge.className = 'staff-badge own';
+    badge.textContent = 'Owner';
+    usersTab.style.display = '';
+  } else {
+    icon.className  = 'staff-header-icon mod';
+    title.textContent = 'Mod Panel';
+    badge.className = 'staff-badge mod';
+    badge.textContent = 'Moderator';
+    usersTab.style.display = role === 'owner' ? '' : 'none';
+  }
+
+  document.getElementById('staffPanel').classList.add('open');
+  switchStaffTab('reports');
+}
+
+function closeStaffPanel() {
+  document.getElementById('staffPanel').classList.remove('open');
+}
+
+function switchStaffTab(tab) {
+  _staffTab = tab;
+  ['reports','users'].forEach(t => {
+    const btn  = document.getElementById('stab-' + t);
+    const body = document.getElementById('staffReportsBody');
+    if (btn) btn.classList.toggle('active', t === tab);
+    if (t === 'reports') document.getElementById('staffReportsBody').style.display = tab === 'reports' ? '' : 'none';
+    if (t === 'users')   document.getElementById('staffUsersBody').style.display   = tab === 'users'   ? '' : 'none';
+  });
+  if (tab === 'reports') loadStaffReports();
+  if (tab === 'users')   loadStaffUsers();
+}
+
+async function loadStaffReports() {
+  const body = document.getElementById('staffReportsBody');
+  body.innerHTML = '<div class="staff-empty"><div class="staff-empty-ico" style="font-size:1.4rem">⏳</div><div class="staff-empty-text">Loading reports…</div></div>';
+
+  if (!window._fb?.ready) {
+    body.innerHTML = '<div class="staff-empty"><div class="staff-empty-text">Firebase not connected.</div></div>';
+    return;
+  }
+
+  try {
+    const reports = await window._fb.getReports();
+    if (!reports.length) {
+      body.innerHTML = '<div class="staff-empty"><div class="staff-empty-ico" style="opacity:.3">✓</div><div class="staff-empty-text">No reports yet. Everything is clean.</div></div>';
+      return;
+    }
+    body.innerHTML = '';
+    reports.forEach(r => body.appendChild(buildReportCard(r)));
+  } catch(e) {
+    body.innerHTML = `<div class="staff-empty"><div class="staff-empty-text">Error: ${e.message}</div></div>`;
+  }
+}
+
+function buildReportCard(r) {
+  const card = document.createElement('div');
+  card.className = 'report-card' + (r.status === 'resolved' ? ' resolved' : '');
+  card.id = 'rcard-' + r.id;
+
+  const ts = r.timestamp?.toDate ? r.timestamp.toDate() : (r.timestamp ? new Date(r.timestamp) : null);
+  const timeStr = ts ? ts.toLocaleString([], {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
+
+  const isResolved = r.status === 'resolved';
+  const role = window._userRole || 'user';
+
+  card.innerHTML = `
+    <div class="report-meta">
+      <span class="report-tag ${r.status || 'pending'}">${r.status || 'pending'}</span>
+      <span class="report-who">Reported by <strong>${_esc(r.reportedByName||'?')}</strong> — targeting <strong>${_esc(r.reportedDisplayName||'?')}</strong></span>
+      <span class="report-time">${timeStr}</span>
+    </div>
+    <div class="report-msg">${_esc(r.messageText || '[no text content]')}</div>
+    <div class="report-actions">
+      <button class="report-btn" ${isResolved?'disabled':''} onclick="staffResolve('${r.id}',this)">
+        ${isResolved ? 'Resolved' : 'Dismiss'}
+      </button>
+      <button class="report-btn danger" ${isResolved?'disabled':''} onclick="staffDeleteMsg('${r.id}','${r.messageId||''}',this)">
+        Delete Message
+      </button>
+    </div>`;
+  return card;
+}
+
+async function staffResolve(reportId, btn) {
+  if (!window._fb?.ready) return;
+  btn.disabled = true; btn.textContent = 'Resolving…';
+  try {
+    await window._fb.resolveReport(reportId);
+    const card = document.getElementById('rcard-' + reportId);
+    if (card) {
+      card.classList.add('resolved');
+      card.querySelectorAll('.report-btn').forEach(b => b.disabled = true);
+      card.querySelector('.report-tag').className = 'report-tag resolved';
+      card.querySelector('.report-tag').textContent = 'resolved';
+    }
+  } catch(e) { toast('Error: ' + e.message); btn.disabled = false; btn.textContent = 'Dismiss'; }
+}
+
+async function staffDeleteMsg(reportId, messageId, btn) {
+  if (!messageId) { toast('No message ID attached to this report'); return; }
+  if (!confirm('Delete this message from the chat? This cannot be undone.')) return;
+  if (!window._fb?.ready) return;
+  btn.disabled = true; btn.textContent = 'Deleting…';
+  try {
+    await window._fb.deleteReportedMessage(reportId, messageId);
+    const card = document.getElementById('rcard-' + reportId);
+    if (card) {
+      card.classList.add('resolved');
+      card.querySelectorAll('.report-btn').forEach(b => b.disabled = true);
+      card.querySelector('.report-tag').className = 'report-tag resolved';
+      card.querySelector('.report-tag').textContent = 'resolved';
+    }
+    toast('Message deleted');
+  } catch(e) { toast('Error: ' + e.message); btn.disabled = false; btn.textContent = 'Delete Message'; }
+}
+
+async function loadStaffUsers() {
+  const list = document.getElementById('staffUsersList');
+  list.innerHTML = '<div class="staff-empty"><div class="staff-empty-ico" style="font-size:1.4rem">⏳</div><div class="staff-empty-text">Loading users…</div></div>';
+
+  if (!window._fb?.ready) {
+    list.innerHTML = '<div class="staff-empty"><div class="staff-empty-text">Firebase not connected.</div></div>';
+    return;
+  }
+  if (window._userRole !== 'owner') {
+    list.innerHTML = '<div class="staff-empty"><div class="staff-empty-text">Owner access required.</div></div>';
+    return;
+  }
+
+  try {
+    _allUsers = await window._fb.getUsers();
+    renderStaffUsers(_allUsers);
+  } catch(e) {
+    list.innerHTML = `<div class="staff-empty"><div class="staff-empty-text">Error: ${e.message}</div></div>`;
+  }
+}
+
+function renderStaffUsers(users) {
+  const list = document.getElementById('staffUsersList');
+  if (!users.length) {
+    list.innerHTML = '<div class="staff-empty"><div class="staff-empty-text">No users found.</div></div>';
+    return;
+  }
+  list.innerHTML = '';
+  const myUid = window._fbUser?.uid;
+  users.forEach(u => list.appendChild(buildUserRow(u, myUid)));
+}
+
+function filterStaffUsers(q) {
+  const filtered = q
+    ? _allUsers.filter(u =>
+        (u.displayName||'').toLowerCase().includes(q.toLowerCase()) ||
+        (u.email||'').toLowerCase().includes(q.toLowerCase()))
+    : _allUsers;
+  renderStaffUsers(filtered);
+}
+
+function buildUserRow(u, myUid) {
+  const row = document.createElement('div');
+  row.className = 'user-row';
+  const role    = u.role || 'user';
+  const isMe    = u.uid === myUid;
+  const isMod   = role === 'moderator';
+  const isOwner = role === 'owner';
+  const isBanned = role === 'banned';
+
+  const avStyle = u.photoURL
+    ? `background-image:url('${u.photoURL}');color:transparent`
+    : `background:${_strCol(u.uid||'')}`;
+
+  const actions = isMe || isOwner ? '' : `
+    <div class="user-row-actions">
+      ${isMod
+        ? `<button class="user-action-btn" onclick="staffSetRole('${u.uid}','user',this)">Remove Mod</button>`
+        : isBanned
+          ? `<button class="user-action-btn promote" onclick="staffSetRole('${u.uid}','user',this)">Unban</button>`
+          : `<button class="user-action-btn promote" onclick="staffSetRole('${u.uid}','moderator',this)">Make Mod</button>`
+      }
+      ${!isBanned ? `<button class="user-action-btn danger" onclick="staffSetRole('${u.uid}','banned',this)">Ban</button>` : ''}
+    </div>`;
+
+  row.innerHTML = `
+    <div class="user-row-av" style="${avStyle}">${u.photoURL ? '' : (u.displayName||'?')[0].toUpperCase()}</div>
+    <div class="user-row-info">
+      <div class="user-row-name">${_esc(u.displayName||'Unknown')}${isMe?' <span style="color:var(--muted);font-weight:400">(you)</span>':''}</div>
+      <div class="user-row-email">${_esc(u.email||u.uid)}</div>
+    </div>
+    <span class="user-row-role ${role}">${role}</span>
+    ${actions}`;
+  return row;
+}
+
+async function staffSetRole(uid, newRole, btn) {
+  if (!window._fb?.ready) return;
+  const label = {moderator:'Making mod…', user:'Updating…', banned:'Banning…'}[newRole] || 'Updating…';
+  btn.disabled = true; btn.textContent = label;
+  try {
+    await window._fb.setUserRole(uid, newRole);
+    // Update local cache and re-render
+    const u = _allUsers.find(x => x.uid === uid);
+    if (u) u.role = newRole;
+    renderStaffUsers(document.getElementById('staffUserSearch').value
+      ? _allUsers.filter(x =>
+          (x.displayName||'').toLowerCase().includes(document.getElementById('staffUserSearch').value.toLowerCase()) ||
+          (x.email||'').toLowerCase().includes(document.getElementById('staffUserSearch').value.toLowerCase()))
+      : _allUsers);
+    toast(newRole === 'banned' ? 'User banned' : newRole === 'moderator' ? 'Promoted to moderator' : 'Role updated');
+  } catch(e) { toast('Error: ' + e.message); btn.disabled = false; btn.textContent = 'Retry'; }
+}
+
+function _esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function _strCol(s) { let h=0; for(let i=0;i<s.length;i++) h=((h<<5)-h)+s.charCodeAt(i); return `hsl(${Math.abs(h)%360},42%,32%)`; }
 
 /* ══════════════════════════════════════════════
    INIT
