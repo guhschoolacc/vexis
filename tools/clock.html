@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CLOCK 1.0</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0e0e0e;
+      --bg2: #161616;
+      --bg3: #1e1e1e;
+      --border: #2e2e2e;
+      --border-light: #3a3a3a;
+      --text: #e0e0e0;
+      --text-dim: #888;
+      --text-dimmer: #555;
+      --accent: #2563eb;
+      --accent2: #1d4ed8;
+      --white: #ffffff;
+      --pixel: 'Press Start 2P', monospace;
+      --mono: 'Share Tech Mono', monospace;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--mono);
+      min-height: 100vh;
+      /* Grid background like the reference site */
+      background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+
+    /* ── NAV ── */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      height: 56px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .nav-logo {
+      font-family: var(--pixel);
+      font-size: 0.6rem;
+      color: var(--white);
+      letter-spacing: 0.05em;
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 0;
+    }
+
+    .nav-tab {
+      font-family: var(--pixel);
+      font-size: 0.45rem;
+      letter-spacing: 0.08em;
+      padding: 10px 16px;
+      border: 1px solid var(--border);
+      border-right: none;
+      background: var(--bg);
+      color: var(--text-dim);
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .nav-tab:first-child { border-left: 1px solid var(--border); }
+    .nav-tab:last-child  { border-right: 1px solid var(--border); }
+    .nav-tab:hover { background: var(--bg3); color: var(--white); }
+    .nav-tab.active { background: var(--bg3); color: var(--white); border-color: var(--border-light); }
+    .nav-tab .icon { font-size: 0.7rem; }
+
+    /* ── MAIN CLOCK HERO ── */
+    .hero {
+      text-align: center;
+      padding: 56px 16px 40px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .hero-label {
+      font-family: var(--pixel);
+      font-size: 0.5rem;
+      color: var(--text-dimmer);
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    .main-clock {
+      font-family: var(--pixel);
+      font-size: clamp(1.8rem, 6vw, 4.5rem);
+      color: var(--white);
+      letter-spacing: 0.04em;
+      line-height: 1.2;
+    }
+
+    .main-date {
+      font-family: var(--mono);
+      font-size: clamp(0.8rem, 2vw, 1rem);
+      color: var(--text-dim);
+      margin-top: 14px;
+      letter-spacing: 0.12em;
+    }
+
+    .main-tz {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--text-dimmer);
+      margin-top: 6px;
+      letter-spacing: 0.08em;
+    }
+
+    .live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 14px;
+      border: 1px solid var(--border-light);
+      padding: 4px 12px;
+      font-family: var(--pixel);
+      font-size: 0.4rem;
+      color: var(--text-dim);
+      letter-spacing: 0.1em;
+    }
+
+    .pulse-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #22c55e;
+      animation: blink 1.2s step-start infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    /* ── CONTENT AREA ── */
+    .content {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 32px 20px 80px;
+    }
+
+    .content-wide {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 32px 20px 80px;
+    }
+
+    /* ── SECTION LABEL ── */
+    .section-label {
+      font-family: var(--pixel);
+      font-size: 0.45rem;
+      color: var(--text-dimmer);
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── NEXT PERIOD BANNER ── */
+    .next-banner {
+      border: 1px solid var(--border-light);
+      background: var(--bg2);
+      padding: 16px 20px;
+      margin-bottom: 24px;
+    }
+
+    .next-banner-tag {
+      font-family: var(--pixel);
+      font-size: 0.4rem;
+      color: var(--text-dimmer);
+      letter-spacing: 0.2em;
+      margin-bottom: 8px;
+    }
+
+    .next-banner-name {
+      font-family: var(--pixel);
+      font-size: 0.75rem;
+      color: var(--white);
+      margin-bottom: 6px;
+    }
+
+    .next-banner-time {
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      margin-bottom: 4px;
+    }
+
+    .next-banner-countdown {
+      font-family: var(--pixel);
+      font-size: 0.6rem;
+      color: #2563eb;
+    }
+
+    /* ── SCHEDULE CONTROLS ── */
+    .controls-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    /* ── BUTTONS ── */
+    .btn {
+      font-family: var(--pixel);
+      font-size: 0.4rem;
+      letter-spacing: 0.08em;
+      padding: 10px 16px;
+      border: 1px solid var(--border-light);
+      background: var(--bg2);
+      color: var(--text);
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn:hover { background: var(--bg3); color: var(--white); border-color: #555; }
+
+    .btn-blue {
+      background: var(--accent);
+      color: var(--white);
+      border-color: var(--accent2);
+    }
+    .btn-blue:hover { background: var(--accent2); border-color: #1e40af; }
+
+    .btn-red {
+      background: transparent;
+      color: #ef4444;
+      border-color: #3f1313;
+    }
+    .btn-red:hover { background: #1f0a0a; border-color: #ef4444; }
+
+    .btn-green {
+      background: transparent;
+      color: #22c55e;
+      border-color: #14532d40;
+    }
+    .btn-green:hover { background: #052e1640; border-color: #22c55e; }
+
+    .btn-yellow {
+      background: transparent;
+      color: #f59e0b;
+      border-color: #78350f40;
+    }
+    .btn-yellow:hover { background: #451a0340; border-color: #f59e0b; }
+
+    /* ── ADD PERIOD FORM ── */
+    .add-form {
+      border: 1px solid var(--border);
+      background: var(--bg2);
+      padding: 16px 20px;
+      margin-bottom: 24px;
+    }
+
+    .form-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .dark-input {
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 12px;
+      outline: none;
+      transition: border-color 0.15s;
+      min-width: 0;
+    }
+    .dark-input:focus { border-color: var(--border-light); }
+    .dark-input::placeholder { color: var(--text-dimmer); }
+
+    select.dark-input option { background: var(--bg); }
+
+    /* ── SCHEDULE PERIODS ── */
+    .period-item {
+      border: 1px solid var(--border);
+      background: var(--bg2);
+      padding: 14px 18px;
+      margin-bottom: 6px;
+      position: relative;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .period-item.active {
+      border-color: var(--accent);
+      background: #0d1a2e;
+    }
+
+    .period-item.past {
+      opacity: 0.38;
+    }
+
+    .period-label {
+      font-family: var(--pixel);
+      font-size: 0.6rem;
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .period-label .active-tag {
+      font-size: 0.38rem;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      padding: 2px 6px;
+      letter-spacing: 0.1em;
+    }
+
+    .period-time {
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      color: var(--text-dim);
+    }
+
+    .period-remaining {
+      font-family: var(--pixel);
+      font-size: 0.45rem;
+      color: var(--accent);
+      margin-top: 8px;
+    }
+
+    .period-done {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--text-dimmer);
+      margin-top: 4px;
+    }
+
+    .period-remove {
+      position: absolute;
+      top: 12px; right: 14px;
+      background: none;
+      border: none;
+      color: var(--text-dimmer);
+      cursor: pointer;
+      font-size: 1rem;
+      line-height: 1;
+      font-family: var(--mono);
+      transition: color 0.15s;
+    }
+    .period-remove:hover { color: #ef4444; }
+
+    /* Progress bar */
+    .prog-bg {
+      height: 2px;
+      background: var(--border);
+      margin-top: 8px;
+    }
+    .prog-fill {
+      height: 2px;
+      background: var(--accent);
+      transition: width 1s linear;
+    }
+
+    /* Break row */
+    .break-row {
+      border: 1px dashed var(--border);
+      background: transparent;
+      padding: 7px 18px;
+      margin-bottom: 6px;
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      color: var(--text-dimmer);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .break-row.on-break {
+      border-color: #f59e0b55;
+      color: #f59e0b;
+      background: #0f0900;
+    }
+
+    /* ── WORLD CLOCK GRID ── */
+    .region-header {
+      font-family: var(--pixel);
+      font-size: 0.4rem;
+      color: var(--text-dimmer);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      padding: 10px 0 8px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 10px;
+      margin-top: 24px;
+      grid-column: 1 / -1;
+    }
+
+    .wc-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 6px;
+    }
+
+    .tz-card {
+      border: 1px solid var(--border);
+      background: var(--bg2);
+      padding: 10px 14px;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .tz-card:hover { border-color: var(--border-light); background: var(--bg3); }
+
+    .tz-city {
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      color: var(--white);
+      margin-bottom: 4px;
+    }
+
+    .tz-time {
+      font-family: var(--pixel);
+      font-size: 0.5rem;
+      color: #2563eb;
+      letter-spacing: 0.04em;
+    }
+
+    .tz-date {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      color: var(--text-dimmer);
+      margin-top: 3px;
+    }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.75);
+      z-index: 200;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .modal-box {
+      background: var(--bg);
+      border: 1px solid var(--border-light);
+      padding: 28px 32px;
+      width: 90%;
+      max-width: 460px;
+    }
+
+    .modal-title {
+      font-family: var(--pixel);
+      font-size: 0.65rem;
+      color: var(--white);
+      margin-bottom: 16px;
+      letter-spacing: 0.05em;
+    }
+
+    .modal-sub {
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      margin-bottom: 12px;
+    }
+
+    .modal-actions {
+      display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px;
+    }
+
+    /* Saved schedule row */
+    .saved-row {
+      border: 1px solid var(--border);
+      background: var(--bg2);
+      padding: 10px 14px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .saved-row-name {
+      font-family: var(--pixel);
+      font-size: 0.5rem;
+      color: var(--white);
+      margin-bottom: 4px;
+    }
+    .saved-row-meta {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--text-dimmer);
+    }
+    .saved-row-btns { display: flex; gap: 6px; flex-shrink: 0; }
+
+    /* ── TOAST ── */
+    #toast {
+      position: fixed;
+      bottom: 24px; right: 24px;
+      background: var(--bg3);
+      border: 1px solid var(--border-light);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      padding: 12px 20px;
+      z-index: 999;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+    #toast.show { opacity: 1; }
+
+    /* scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border-light); }
+    ::-webkit-scrollbar-thumb:hover { background: #555; }
+
+    @media (max-width: 600px) {
+      .nav-tab { padding: 10px 10px; font-size: 0.38rem; }
+      .main-clock { font-size: 1.8rem; }
+      .wc-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">CLOCK 1.0</div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showTab('schedule')" id="ntab-schedule">
+      <span class="icon">◆</span> SCHEDULE
+    </button>
+    <button class="nav-tab" onclick="showTab('worldclock')" id="ntab-worldclock">
+      <span class="icon">◈</span> WORLD CLOCKS
+    </button>
+  </div>
+</nav>
+
+<!-- HERO CLOCK -->
+<div class="hero">
+  <div class="hero-label">◆ YOUR LOCAL TIME ◆</div>
+  <div class="main-clock" id="mainClock">--:--:--</div>
+  <div class="main-date" id="mainDate">— — —</div>
+  <div class="main-tz" id="mainTz">detecting timezone...</div>
+  <div style="margin-top:14px;">
+    <span class="live-badge"><span class="pulse-dot"></span> LIVE</span>
+  </div>
+</div>
+
+<!-- ══════════════ SCHEDULE TAB ══════════════ -->
+<div id="tab-schedule" class="content">
+
+  <!-- Next period banner -->
+  <div class="next-banner" id="nextBanner">
+    <div class="next-banner-tag">◆ STATUS</div>
+    <div class="next-banner-name" id="nextName">—</div>
+    <div class="next-banner-time" id="nextTime">—</div>
+    <div class="next-banner-countdown" id="nextCountdown">—</div>
+  </div>
+
+  <!-- Controls -->
+  <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-bottom:16px;">
+    <div class="section-label" style="margin-bottom:0; flex:1;">TODAY'S SCHEDULE</div>
+    <div class="controls-row" style="margin-bottom:0;">
+      <button class="btn btn-green" onclick="saveSchedule()">+ SAVE</button>
+      <button class="btn" onclick="openLoadModal()">◈ LOAD</button>
+      <button class="btn btn-yellow" onclick="restoreDefault()">↺ RESTORE</button>
+      <button class="btn btn-red" onclick="clearSchedule()">✕ CLEAR</button>
+    </div>
+  </div>
+
+  <!-- Add form -->
+  <div class="add-form">
+    <div class="section-label" style="margin-bottom:12px; font-size:0.38rem;">ADD PERIOD</div>
+    <div class="form-row">
+      <input type="text" class="dark-input" id="newLabel" placeholder="Label (e.g. Period 1)" style="flex:2; min-width:120px;" />
+      <input type="time" class="dark-input" id="newStart" style="flex:1; min-width:110px;" />
+      <input type="time" class="dark-input" id="newEnd" style="flex:1; min-width:110px;" />
+      <select class="dark-input" id="newColor" style="flex:1; min-width:100px;">
+        <option value="blue">Blue</option>
+        <option value="green">Green</option>
+        <option value="yellow">Yellow</option>
+        <option value="red">Red</option>
+        <option value="white">White</option>
+      </select>
+      <button class="btn btn-blue" onclick="addPeriod()">+ ADD</button>
+    </div>
+  </div>
+
+  <!-- Schedule list -->
+  <div id="scheduleList"></div>
+
+</div>
+
+<!-- ══════════════ WORLD CLOCKS TAB ══════════════ -->
+<div id="tab-worldclock" class="content-wide" style="display:none;">
+  <div class="section-label">WORLD CLOCKS</div>
+  <div id="worldClockContainer"></div>
+</div>
+
+<!-- SAVE MODAL -->
+<div id="saveModal" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeSaveModal()">
+  <div class="modal-box">
+    <div class="modal-title">◆ SAVE SCHEDULE</div>
+    <div class="modal-sub">Enter a name for this schedule:</div>
+    <input type="text" class="dark-input" id="saveNameInput" placeholder="e.g. Monday Schedule" style="width:100%; margin-bottom:4px;" />
+    <div class="modal-actions">
+      <button class="btn btn-red" onclick="closeSaveModal()">✕ CANCEL</button>
+      <button class="btn btn-blue" onclick="confirmSave()">+ SAVE</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOAD MODAL -->
+<div id="loadModal" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeLoadModal()">
+  <div class="modal-box">
+    <div class="modal-title">◈ LOAD SCHEDULE</div>
+    <div id="savedSchedulesList" style="max-height:280px; overflow-y:auto; margin-bottom:4px;"></div>
+    <div class="modal-actions">
+      <button class="btn btn-red" onclick="closeLoadModal()">✕ CLOSE</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════
+//  DATA
+// ═══════════════════════════════════════════════
+
+const DEFAULT_SCHEDULE = [
+  { id:1,  label:"Period 1", start:"08:00", end:"08:59", color:"blue"   },
+  { id:2,  label:"Period 2", start:"09:02", end:"09:45", color:"green"  },
+  { id:3,  label:"Period 3", start:"09:48", end:"10:31", color:"yellow" },
+  { id:4,  label:"Period 4", start:"10:34", end:"11:17", color:"blue"   },
+  { id:5,  label:"WYN",      start:"11:20", end:"11:48", color:"white"  },
+  { id:6,  label:"Lunch",    start:"11:48", end:"12:24", color:"yellow" },
+  { id:7,  label:"Period 5", start:"12:27", end:"13:26", color:"green"  },
+  { id:8,  label:"Period 6", start:"13:29", end:"14:28", color:"blue"   },
+  { id:9,  label:"Period 7", start:"14:31", end:"15:30", color:"red"    },
+];
+
+const COLOR_ACCENT = {
+  blue:   "#2563eb",
+  green:  "#22c55e",
+  yellow: "#f59e0b",
+  red:    "#ef4444",
+  white:  "#e0e0e0",
+};
+
+let schedule = JSON.parse(JSON.stringify(DEFAULT_SCHEDULE));
+let nextId = 10;
+
+// ═══════════════════════════════════════════════
+//  TIMEZONE DATA
+// ═══════════════════════════════════════════════
+const TIMEZONES = [
+  // Americas
+  {region:"Americas", city:"Honolulu",      tz:"Pacific/Honolulu"},
+  {region:"Americas", city:"Anchorage",     tz:"America/Anchorage"},
+  {region:"Americas", city:"Los Angeles",   tz:"America/Los_Angeles"},
+  {region:"Americas", city:"Denver",        tz:"America/Denver"},
+  {region:"Americas", city:"Phoenix",       tz:"America/Phoenix"},
+  {region:"Americas", city:"Chicago",       tz:"America/Chicago"},
+  {region:"Americas", city:"New York",      tz:"America/New_York"},
+  {region:"Americas", city:"Toronto",       tz:"America/Toronto"},
+  {region:"Americas", city:"Halifax",       tz:"America/Halifax"},
+  {region:"Americas", city:"St. John's",    tz:"America/St_Johns"},
+  {region:"Americas", city:"Mexico City",   tz:"America/Mexico_City"},
+  {region:"Americas", city:"Bogotá",        tz:"America/Bogota"},
+  {region:"Americas", city:"Lima",          tz:"America/Lima"},
+  {region:"Americas", city:"Caracas",       tz:"America/Caracas"},
+  {region:"Americas", city:"Santiago",      tz:"America/Santiago"},
+  {region:"Americas", city:"Buenos Aires",  tz:"America/Argentina/Buenos_Aires"},
+  {region:"Americas", city:"São Paulo",     tz:"America/Sao_Paulo"},
+  {region:"Americas", city:"Manaus",        tz:"America/Manaus"},
+  {region:"Americas", city:"Montevideo",    tz:"America/Montevideo"},
+  {region:"Americas", city:"La Paz",        tz:"America/La_Paz"},
+  {region:"Americas", city:"Panama City",   tz:"America/Panama"},
+  {region:"Americas", city:"San José",      tz:"America/Costa_Rica"},
+  {region:"Americas", city:"Havana",        tz:"America/Havana"},
+  {region:"Americas", city:"Paramaribo",    tz:"America/Paramaribo"},
+  // Europe
+  {region:"Europe", city:"London",      tz:"Europe/London"},
+  {region:"Europe", city:"Lisbon",      tz:"Europe/Lisbon"},
+  {region:"Europe", city:"Dublin",      tz:"Europe/Dublin"},
+  {region:"Europe", city:"Reykjavik",   tz:"Atlantic/Reykjavik"},
+  {region:"Europe", city:"Paris",       tz:"Europe/Paris"},
+  {region:"Europe", city:"Berlin",      tz:"Europe/Berlin"},
+  {region:"Europe", city:"Madrid",      tz:"Europe/Madrid"},
+  {region:"Europe", city:"Rome",        tz:"Europe/Rome"},
+  {region:"Europe", city:"Amsterdam",   tz:"Europe/Amsterdam"},
+  {region:"Europe", city:"Brussels",    tz:"Europe/Brussels"},
+  {region:"Europe", city:"Vienna",      tz:"Europe/Vienna"},
+  {region:"Europe", city:"Zurich",      tz:"Europe/Zurich"},
+  {region:"Europe", city:"Stockholm",   tz:"Europe/Stockholm"},
+  {region:"Europe", city:"Oslo",        tz:"Europe/Oslo"},
+  {region:"Europe", city:"Copenhagen",  tz:"Europe/Copenhagen"},
+  {region:"Europe", city:"Helsinki",    tz:"Europe/Helsinki"},
+  {region:"Europe", city:"Warsaw",      tz:"Europe/Warsaw"},
+  {region:"Europe", city:"Prague",      tz:"Europe/Prague"},
+  {region:"Europe", city:"Budapest",    tz:"Europe/Budapest"},
+  {region:"Europe", city:"Bucharest",   tz:"Europe/Bucharest"},
+  {region:"Europe", city:"Athens",      tz:"Europe/Athens"},
+  {region:"Europe", city:"Sofia",       tz:"Europe/Sofia"},
+  {region:"Europe", city:"Kiev",        tz:"Europe/Kiev"},
+  {region:"Europe", city:"Minsk",       tz:"Europe/Minsk"},
+  {region:"Europe", city:"Riga",        tz:"Europe/Riga"},
+  {region:"Europe", city:"Vilnius",     tz:"Europe/Vilnius"},
+  {region:"Europe", city:"Tallinn",     tz:"Europe/Tallinn"},
+  {region:"Europe", city:"Moscow",      tz:"Europe/Moscow"},
+  {region:"Europe", city:"Istanbul",    tz:"Europe/Istanbul"},
+  // Africa
+  {region:"Africa", city:"Cairo",         tz:"Africa/Cairo"},
+  {region:"Africa", city:"Lagos",         tz:"Africa/Lagos"},
+  {region:"Africa", city:"Nairobi",       tz:"Africa/Nairobi"},
+  {region:"Africa", city:"Johannesburg",  tz:"Africa/Johannesburg"},
+  {region:"Africa", city:"Casablanca",    tz:"Africa/Casablanca"},
+  {region:"Africa", city:"Accra",         tz:"Africa/Accra"},
+  {region:"Africa", city:"Dakar",         tz:"Africa/Dakar"},
+  {region:"Africa", city:"Addis Ababa",   tz:"Africa/Addis_Ababa"},
+  {region:"Africa", city:"Dar es Salaam", tz:"Africa/Dar_es_Salaam"},
+  {region:"Africa", city:"Khartoum",      tz:"Africa/Khartoum"},
+  {region:"Africa", city:"Kinshasa",      tz:"Africa/Kinshasa"},
+  {region:"Africa", city:"Tunis",         tz:"Africa/Tunis"},
+  {region:"Africa", city:"Algiers",       tz:"Africa/Algiers"},
+  // Middle East
+  {region:"Middle East", city:"Riyadh",     tz:"Asia/Riyadh"},
+  {region:"Middle East", city:"Dubai",      tz:"Asia/Dubai"},
+  {region:"Middle East", city:"Doha",       tz:"Asia/Qatar"},
+  {region:"Middle East", city:"Kuwait City",tz:"Asia/Kuwait"},
+  {region:"Middle East", city:"Baghdad",    tz:"Asia/Baghdad"},
+  {region:"Middle East", city:"Beirut",     tz:"Asia/Beirut"},
+  {region:"Middle East", city:"Tel Aviv",   tz:"Asia/Jerusalem"},
+  {region:"Middle East", city:"Amman",      tz:"Asia/Amman"},
+  {region:"Middle East", city:"Muscat",     tz:"Asia/Muscat"},
+  {region:"Middle East", city:"Tehran",     tz:"Asia/Tehran"},
+  {region:"Middle East", city:"Baku",       tz:"Asia/Baku"},
+  {region:"Middle East", city:"Tbilisi",    tz:"Asia/Tbilisi"},
+  // Asia
+  {region:"Asia", city:"Kabul",        tz:"Asia/Kabul"},
+  {region:"Asia", city:"Karachi",      tz:"Asia/Karachi"},
+  {region:"Asia", city:"Kolkata",      tz:"Asia/Kolkata"},
+  {region:"Asia", city:"Colombo",      tz:"Asia/Colombo"},
+  {region:"Asia", city:"Kathmandu",    tz:"Asia/Kathmandu"},
+  {region:"Asia", city:"Dhaka",        tz:"Asia/Dhaka"},
+  {region:"Asia", city:"Bangkok",      tz:"Asia/Bangkok"},
+  {region:"Asia", city:"Ho Chi Minh",  tz:"Asia/Ho_Chi_Minh"},
+  {region:"Asia", city:"Jakarta",      tz:"Asia/Jakarta"},
+  {region:"Asia", city:"Kuala Lumpur", tz:"Asia/Kuala_Lumpur"},
+  {region:"Asia", city:"Singapore",    tz:"Asia/Singapore"},
+  {region:"Asia", city:"Manila",       tz:"Asia/Manila"},
+  {region:"Asia", city:"Hong Kong",    tz:"Asia/Hong_Kong"},
+  {region:"Asia", city:"Taipei",       tz:"Asia/Taipei"},
+  {region:"Asia", city:"Shanghai",     tz:"Asia/Shanghai"},
+  {region:"Asia", city:"Beijing",      tz:"Asia/Shanghai"},
+  {region:"Asia", city:"Seoul",        tz:"Asia/Seoul"},
+  {region:"Asia", city:"Tokyo",        tz:"Asia/Tokyo"},
+  {region:"Asia", city:"Ulaanbaatar",  tz:"Asia/Ulaanbaatar"},
+  {region:"Asia", city:"Vladivostok",  tz:"Asia/Vladivostok"},
+  {region:"Asia", city:"Novosibirsk",  tz:"Asia/Novosibirsk"},
+  {region:"Asia", city:"Almaty",       tz:"Asia/Almaty"},
+  {region:"Asia", city:"Phnom Penh",   tz:"Asia/Phnom_Penh"},
+  {region:"Asia", city:"Yangon",       tz:"Asia/Rangoon"},
+  // Pacific
+  {region:"Pacific", city:"Sydney",       tz:"Australia/Sydney"},
+  {region:"Pacific", city:"Melbourne",    tz:"Australia/Melbourne"},
+  {region:"Pacific", city:"Brisbane",     tz:"Australia/Brisbane"},
+  {region:"Pacific", city:"Perth",        tz:"Australia/Perth"},
+  {region:"Pacific", city:"Adelaide",     tz:"Australia/Adelaide"},
+  {region:"Pacific", city:"Darwin",       tz:"Australia/Darwin"},
+  {region:"Pacific", city:"Auckland",     tz:"Pacific/Auckland"},
+  {region:"Pacific", city:"Fiji",         tz:"Pacific/Fiji"},
+  {region:"Pacific", city:"Port Moresby", tz:"Pacific/Port_Moresby"},
+  {region:"Pacific", city:"Guam",         tz:"Pacific/Guam"},
+  {region:"Pacific", city:"Apia",         tz:"Pacific/Apia"},
+  {region:"Pacific", city:"Nuku'alofa",   tz:"Pacific/Tongatapu"},
+  {region:"Pacific", city:"Pago Pago",    tz:"Pacific/Pago_Pago"},
+  {region:"Pacific", city:"Honolulu",     tz:"Pacific/Honolulu"},
+];
+
+// ═══════════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════════
+const pad = n => String(n).padStart(2,'0');
+
+function toMin(hhmm) {
+  const [h,m] = hhmm.split(':').map(Number);
+  return h*60+m;
+}
+
+function toSec(hhmm) { return toMin(hhmm)*60; }
+
+function nowSec() {
+  const n=new Date();
+  return n.getHours()*3600+n.getMinutes()*60+n.getSeconds();
+}
+
+function fmtCountdown(s) {
+  if(s<=0) return '0:00';
+  const h=Math.floor(s/3600), m=Math.floor((s%3600)/60), sec=s%60;
+  if(h>0) return `${h}h ${pad(m)}m ${pad(sec)}s`;
+  if(m>0) return `${m}m ${pad(sec)}s`;
+  return `${sec}s`;
+}
+
+function fmt12(hhmm) {
+  let [h,m]=hhmm.split(':').map(Number);
+  const ap=h>=12?'PM':'AM';
+  h=h%12||12;
+  return `${h}:${pad(m)} ${ap}`;
+}
+
+// ═══════════════════════════════════════════════
+//  MAIN CLOCK
+// ═══════════════════════════════════════════════
+function updateMainClock() {
+  const now=new Date();
+  document.getElementById('mainClock').textContent=
+    `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+  const days=['SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY'];
+  const months=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  document.getElementById('mainDate').textContent=
+    `${days[now.getDay()]} ${months[now.getMonth()]} ${now.getDate()} ${now.getFullYear()}`;
+  try {
+    const tz=Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const off=-now.getTimezoneOffset();
+    const sign=off>=0?'+':'-';
+    document.getElementById('mainTz').textContent=
+      `${tz}  (UTC${sign}${pad(Math.floor(Math.abs(off)/60))}:${pad(Math.abs(off)%60)})`;
+  } catch(e){}
+}
+
+// ═══════════════════════════════════════════════
+//  WORLD CLOCKS — build DOM once
+// ═══════════════════════════════════════════════
+function buildWorldClocks() {
+  const container = document.getElementById('worldClockContainer');
+  container.innerHTML = '';
+
+  const regions = [...new Set(TIMEZONES.map(t=>t.region))];
+  regions.forEach(region => {
+    const rh = document.createElement('div');
+    rh.style.cssText = 'grid-column:1/-1; font-family:var(--pixel); font-size:0.4rem; color:var(--text-dimmer); letter-spacing:0.2em; text-transform:uppercase; padding:10px 0 8px; border-bottom:1px solid var(--border); margin-bottom:10px; margin-top:20px;';
+    rh.textContent = '◆ ' + region;
+
+    const grid = document.createElement('div');
+    grid.className = 'wc-grid';
+
+    TIMEZONES.filter(t=>t.region===region).forEach(tzData => {
+      const safeId = (tzData.tz+tzData.city).replace(/[^a-zA-Z0-9]/g,'_');
+      const card = document.createElement('div');
+      card.className = 'tz-card';
+      card.innerHTML = `
+        <div class="tz-city">${tzData.city}</div>
+        <div class="tz-time" id="tt_${safeId}">--:--</div>
+        <div class="tz-date" id="td_${safeId}"></div>
+      `;
+      grid.appendChild(card);
+    });
+
+    container.appendChild(rh);
+    container.appendChild(grid);
+  });
+}
+
+function updateWorldClocks() {
+  const now = new Date();
+  TIMEZONES.forEach(tzData => {
+    const safeId = (tzData.tz+tzData.city).replace(/[^a-zA-Z0-9]/g,'_');
+    const te = document.getElementById('tt_'+safeId);
+    const de = document.getElementById('td_'+safeId);
+    if(!te) return;
+    try {
+      te.textContent = now.toLocaleTimeString('en-US',{timeZone:tzData.tz,hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true});
+      if(de) de.textContent = now.toLocaleDateString('en-US',{timeZone:tzData.tz,weekday:'short',month:'short',day:'numeric'});
+    } catch(e){ te.textContent='N/A'; }
+  });
+}
+
+// ═══════════════════════════════════════════════
+//  SCHEDULE RENDER
+// ═══════════════════════════════════════════════
+function renderSchedule() {
+  const list = document.getElementById('scheduleList');
+  list.innerHTML = '';
+
+  if(!schedule.length) {
+    list.innerHTML = `<div style="font-family:var(--mono);color:var(--text-dimmer);padding:24px;text-align:center;border:1px dashed var(--border);">NO PERIODS — ADD ONE ABOVE OR RESTORE DEFAULT.</div>`;
+    renderBanner();
+    return;
+  }
+
+  const sorted = [...schedule].sort((a,b)=>toMin(a.start)-toMin(b.start));
+  const ns = nowSec();
+
+  for(let i=0; i<sorted.length; i++) {
+    const p = sorted[i];
+    const ps = toSec(p.start), pe = toSec(p.end);
+    const isActive = ns>=ps && ns<pe;
+    const isPast   = ns>=pe;
+    const accent   = COLOR_ACCENT[p.color]||COLOR_ACCENT.blue;
+
+    // Break gap
+    if(i>0) {
+      const prevE = toSec(sorted[i-1].end);
+      if(ps > prevE) {
+        const onBreak = ns>=prevE && ns<ps;
+        const breakEl = document.createElement('div');
+        breakEl.className = 'break-row' + (onBreak?' on-break':'');
+        if(onBreak) {
+          breakEl.innerHTML = `☕ ON BREAK &mdash; ${fmtCountdown(ps-ns)} until ${p.label}`;
+        } else {
+          const bm=Math.round((ps-prevE)/60);
+          breakEl.innerHTML = `☕ BREAK &mdash; ${bm} min &nbsp;(${fmt12(sorted[i-1].end)} &ndash; ${fmt12(p.start)})`;
+        }
+        list.appendChild(breakEl);
+      }
+    }
+
+    const pct = isActive ? Math.min(100,Math.round(((ns-ps)/(pe-ps))*100)) : 0;
+    const rem = isActive ? pe-ns : 0;
+
+    const div = document.createElement('div');
+    div.className = 'period-item' + (isActive?' active':'') + (isPast?' past':'');
+    div.style.borderLeftColor = accent;
+    div.style.borderLeftWidth = '3px';
+
+    div.innerHTML = `
+      <div class="period-label">
+        ${isActive?`<span class="pulse-dot"></span>`:''}
+        ${p.label}
+        ${isActive?`<span class="active-tag">IN PROGRESS</span>`:''}
+      </div>
+      <div class="period-time">${fmt12(p.start)} &ndash; ${fmt12(p.end)}</div>
+      ${isActive?`
+        <div class="period-remaining">${fmtCountdown(rem)} REMAINING</div>
+        <div class="prog-bg"><div class="prog-fill" style="width:${pct}%"></div></div>
+      `:''}
+      ${isPast?`<div class="period-done">COMPLETED ✓</div>`:''}
+      <button class="period-remove" onclick="removePeriod(${p.id})" title="Remove">✕</button>
+    `;
+    list.appendChild(div);
+  }
+
+  renderBanner();
+}
+
+function renderBanner() {
+  const ns = nowSec();
+  const sorted = [...schedule].sort((a,b)=>toMin(a.start)-toMin(b.start));
+  const nameEl  = document.getElementById('nextName');
+  const timeEl  = document.getElementById('nextTime');
+  const countEl = document.getElementById('nextCountdown');
+  const banner  = document.getElementById('nextBanner');
+
+  // Currently in period?
+  const cur = sorted.find(p=>ns>=toSec(p.start)&&ns<toSec(p.end));
+  if(cur) {
+    const rem = toSec(cur.end)-ns;
+    nameEl.textContent  = `▶ NOW: ${cur.label}`;
+    timeEl.textContent  = `${fmt12(cur.start)} – ${fmt12(cur.end)}`;
+    countEl.textContent = `${fmtCountdown(rem)} REMAINING`;
+    banner.style.borderColor = '#22c55e44';
+    banner.style.background  = '#051a0d';
+    countEl.style.color = '#22c55e';
+    return;
+  }
+
+  // On break?
+  for(let i=0;i<sorted.length-1;i++) {
+    const be = toSec(sorted[i].end), bs = toSec(sorted[i+1].start);
+    if(ns>=be&&ns<bs) {
+      nameEl.textContent  = `☕ ON BREAK`;
+      timeEl.textContent  = `NEXT: ${sorted[i+1].label} AT ${fmt12(sorted[i+1].start)}`;
+      countEl.textContent = `${fmtCountdown(bs-ns)} UNTIL NEXT PERIOD`;
+      banner.style.borderColor = '#f59e0b44';
+      banner.style.background  = '#0f0900';
+      countEl.style.color = '#f59e0b';
+      return;
+    }
+  }
+
+  // Next upcoming
+  const next = sorted.find(p=>toSec(p.start)>ns);
+  if(next) {
+    nameEl.textContent  = `⏳ NEXT: ${next.label}`;
+    timeEl.textContent  = `${fmt12(next.start)} – ${fmt12(next.end)}`;
+    countEl.textContent = `STARTS IN ${fmtCountdown(toSec(next.start)-ns)}`;
+    banner.style.borderColor = '#2563eb44';
+    banner.style.background  = '#0a0f1a';
+    countEl.style.color = '#2563eb';
+  } else {
+    nameEl.textContent  = 'NO MORE PERIODS TODAY';
+    timeEl.textContent  = '';
+    countEl.textContent = '';
+    banner.style.borderColor = 'var(--border-light)';
+    banner.style.background  = 'var(--bg2)';
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  SCHEDULE ACTIONS
+// ═══════════════════════════════════════════════
+function addPeriod() {
+  const label = document.getElementById('newLabel').value.trim();
+  const start = document.getElementById('newStart').value;
+  const end   = document.getElementById('newEnd').value;
+  const color = document.getElementById('newColor').value;
+  if(!label||!start||!end){ toast('Fill in all fields.'); return; }
+  if(toMin(start)>=toMin(end)){ toast('Start must be before end.'); return; }
+  schedule.push({id:nextId++,label,start,end,color});
+  document.getElementById('newLabel').value='';
+  document.getElementById('newStart').value='';
+  document.getElementById('newEnd').value='';
+  renderSchedule();
+}
+
+function removePeriod(id) {
+  schedule = schedule.filter(p=>p.id!==id);
+  renderSchedule();
+}
+
+function clearSchedule() {
+  if(confirm('Clear all periods?')) { schedule=[]; renderSchedule(); }
+}
+
+function restoreDefault() {
+  if(confirm('Restore the default schedule?')) {
+    schedule=JSON.parse(JSON.stringify(DEFAULT_SCHEDULE));
+    renderSchedule();
+    toast('↺ DEFAULT SCHEDULE RESTORED');
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  SAVE / LOAD
+// ═══════════════════════════════════════════════
+function getSaved() {
+  try { return JSON.parse(localStorage.getItem('sched_saves')||'{}'); }
+  catch(e){ return {}; }
+}
+
+function saveSchedule() {
+  document.getElementById('saveNameInput').value='';
+  document.getElementById('saveModal').style.display='flex';
+  setTimeout(()=>document.getElementById('saveNameInput').focus(),50);
+}
+
+function closeSaveModal() { document.getElementById('saveModal').style.display='none'; }
+
+function confirmSave() {
+  const name=document.getElementById('saveNameInput').value.trim();
+  if(!name){ toast('Enter a name.'); return; }
+  const s=getSaved();
+  s[name]={schedule:JSON.parse(JSON.stringify(schedule)),savedAt:new Date().toISOString()};
+  localStorage.setItem('sched_saves',JSON.stringify(s));
+  closeSaveModal();
+  toast(`✓ SAVED "${name}"`);
+}
+
+function openLoadModal() {
+  renderSavedList();
+  document.getElementById('loadModal').style.display='flex';
+}
+
+function closeLoadModal() { document.getElementById('loadModal').style.display='none'; }
+
+function renderSavedList() {
+  const c=document.getElementById('savedSchedulesList');
+  const s=getSaved(); const keys=Object.keys(s);
+  if(!keys.length){ c.innerHTML='<div style="font-family:var(--mono);color:var(--text-dimmer);padding:16px;text-align:center;">NO SAVED SCHEDULES</div>'; return; }
+  c.innerHTML=keys.map(name=>{
+    const d=new Date(s[name].savedAt);
+    const ds=d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    const safe=name.replace(/'/g,"\\'");
+    return `<div class="saved-row">
+      <div>
+        <div class="saved-row-name">${name}</div>
+        <div class="saved-row-meta">${ds} · ${s[name].schedule.length} period(s)</div>
+      </div>
+      <div class="saved-row-btns">
+        <button class="btn btn-green" style="font-size:0.38rem;padding:7px 12px;" onclick="loadSched('${safe}')">LOAD</button>
+        <button class="btn btn-red" style="font-size:0.38rem;padding:7px 12px;" onclick="deleteSaved('${safe}')">DEL</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function loadSched(name) {
+  const s=getSaved();
+  if(!s[name]) return;
+  schedule=JSON.parse(JSON.stringify(s[name].schedule));
+  nextId=Math.max(...schedule.map(p=>p.id),9)+1;
+  closeLoadModal();
+  renderSchedule();
+  toast(`◈ LOADED "${name}"`);
+}
+
+function deleteSaved(name) {
+  if(!confirm(`Delete "${name}"?`)) return;
+  const s=getSaved(); delete s[name];
+  localStorage.setItem('sched_saves',JSON.stringify(s));
+  renderSavedList();
+}
+
+// ═══════════════════════════════════════════════
+//  TOAST
+// ═══════════════════════════════════════════════
+function toast(msg) {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(t._t);
+  t._t=setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+// ═══════════════════════════════════════════════
+//  TABS
+// ═══════════════════════════════════════════════
+function showTab(tab) {
+  document.getElementById('tab-schedule').style.display   = tab==='schedule'   ? '' : 'none';
+  document.getElementById('tab-worldclock').style.display = tab==='worldclock' ? '' : 'none';
+  ['schedule','worldclock'].forEach(t=>{
+    document.getElementById('ntab-'+t).classList.toggle('active', t===tab);
+  });
+}
+
+// Enter key in save modal
+document.getElementById('saveNameInput').addEventListener('keydown',e=>{ if(e.key==='Enter') confirmSave(); });
+
+// ═══════════════════════════════════════════════
+//  TICK
+// ═══════════════════════════════════════════════
+function tick() {
+  updateMainClock();
+  updateWorldClocks();
+  renderSchedule();
+}
+
+// ═══════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════
+buildWorldClocks();
+tick();
+setInterval(tick, 1000);
+</script>
+</body>
+</html>

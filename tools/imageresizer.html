@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Image Resizer</title>
+  <meta name="theme-color" content="#f6f8fb" id="metaThemeColor" />
+  <style>
+    :root{
+      --bg: #f6f8fb;
+      --card: #ffffff;
+      --muted: #6b7280;
+      --text: #0f172a;
+      --accent: #2563eb;
+      --accent-contrast: #ffffff;
+      --muted-border: rgba(37,99,235,0.08);
+      --shadow: 0 6px 18px rgba(15,23,42,0.06);
+      --glass: rgba(255,255,255,0.6);
+      --danger: #ef4444;
+      --radius: 12px;
+    }
+
+    .dark {
+      --bg: #0b1220;
+      --card: #0f1724;
+      --muted: #9aa6b2;
+      --text: #e6eef8;
+      --accent: #60a5fa;
+      --accent-contrast: #07203a;
+      --muted-border: rgba(96,165,250,0.12);
+      --shadow: 0 8px 28px rgba(2,6,23,0.6);
+      --glass: rgba(255,255,255,0.02);
+      --danger: #fb7185;
+      --radius: 12px;
+    }
+
+    /* Ensure html/body background follows theme */
+    html, body { height: 100%; margin: 0; background: var(--bg); color: var(--text); font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; }
+
+    .dark html, .dark body { background: var(--bg); }
+
+    .container{max-width:980px;margin:28px auto;padding:20px}
+    .card{background:var(--card);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);border:1px solid var(--glass)}
+    header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+    h1{font-size:18px;margin:0}
+    .small{font-size:13px;color:var(--muted)}
+    .grid{display:grid;grid-template-columns:1fr 360px;gap:16px}
+    .uploader{display:flex;flex-direction:column;gap:12px}
+    .preview{display:flex;align-items:center;justify-content:center;border:1px dashed var(--muted-border);border-radius:10px;padding:12px;min-height:320px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent)}
+    img#previewImg{max-width:100%;max-height:100%;border-radius:8px;display:block}
+    label{font-size:13px;color:var(--muted);display:block;margin-bottom:6px}
+    input[type="file"]{padding:6px}
+    .controls{display:flex;flex-direction:column;gap:10px}
+    .row{display:flex;gap:10px;align-items:center}
+    /* Fixed: give inputs a solid background so text is always visible and typeable */
+    .row input[type="number"]{
+      width:120px;padding:8px;border-radius:8px;border:1px solid var(--muted-border);
+      background:var(--card);color:var(--text);
+      -webkit-appearance: none;appearance: none;
+    }
+    select, input[type="range"]{background:transparent;color:var(--text)}
+    .actions{display:flex;gap:10px;margin-top:8px}
+    button{cursor:pointer;padding:10px 14px;border-radius:10px;border:0;background:var(--accent);color:var(--accent-contrast);font-weight:600}
+    button.secondary{background:transparent;color:var(--accent);border:1px solid var(--muted-border)}
+    button:disabled{opacity:0.6;cursor:not-allowed}
+    .meta{font-size:13px;color:var(--muted);margin-top:6px}
+    .footer-note{font-size:13px;color:var(--muted);margin-top:12px}
+    .inline{display:inline-flex;gap:8px;align-items:center}
+    .quality{width:160px}
+    .back-wrap{position:fixed;left:12px;top:12px;z-index:999}
+    .back-btn{
+      display:inline-flex;align-items:center;gap:8px;padding:8px 12px;background:var(--card);
+      border-radius:10px;box-shadow:var(--shadow);text-decoration:none;color:var(--accent);
+      font-weight:600;border:1px solid var(--muted-border)
+    }
+
+    .theme-wrap{position:fixed;right:12px;top:12px;z-index:999;display:flex;gap:8px;align-items:center}
+    .theme-btn{
+      display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:10px;
+      background:var(--card);border:1px solid var(--muted-border);box-shadow:var(--shadow);cursor:pointer;color:var(--text)
+    }
+    .theme-btn svg{width:18px;height:18px;display:block}
+
+    /* Dark-mode specific border/background tweaks to ensure full dark appearance */
+    .dark hr { border-top: 1px solid rgba(255,255,255,0.06); }
+    .dark .preview { border-color: rgba(255,255,255,0.08); background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent); }
+    .dark .back-btn, .dark .theme-btn, .dark .card { background: var(--card); border-color: var(--muted-border); }
+    .dark .row input[type="number"] { background: var(--card); color: var(--text); border: 1px solid var(--muted-border); }
+
+    @media (max-width:900px){
+      .grid{grid-template-columns:1fr; }
+      .preview{min-height:240px}
+      .back-wrap{left:8px;top:8px}
+      .theme-wrap{right:8px;top:8px}
+    }
+
+    hr{border:none;border-top:1px solid rgba(0,0,0,0.04);margin:12px 0}
+    .muted-border{border:1px solid var(--muted-border);border-radius:8px;padding:8px}
+  </style>
+</head>
+<body>
+  <div class="back-wrap">
+    
+  </div>
+
+  <div class="theme-wrap" role="toolbar" aria-label="Theme">
+    <button id="themeToggle" class="theme-btn" title="Toggle dark mode" aria-pressed="false" aria-label="Toggle dark mode">
+      <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>
+      </svg>
+    </button>
+  </div>
+
+  <div class="container">
+    <div class="card">
+      <header>
+        <h1>Image Resizer</h1>
+        <div class="small">Resize images quickly in your browser</div>
+      </header>
+
+      <div class="grid">
+        <div class="uploader">
+          <div class="card">
+            <label for="fileInput">Upload Image</label>
+            <input id="fileInput" type="file" accept="image/*" />
+            <div class="meta" id="fileMeta">No image selected</div>
+
+            <hr style="margin:12px 0;border:none;border-top:1px solid var(--muted-border)" />
+
+            <div class="controls">
+              <div>
+                <label>Target Dimensions</label>
+                <div class="row">
+                  <div>
+                    <div class="small">Width</div>
+                    <input id="widthInput" type="number" min="1" />
+                  </div>
+                  <div>
+                    <div class="small">Height</div>
+                    <input id="heightInput" type="number" min="1" />
+                  </div>
+                  <div style="display:flex;flex-direction:column;justify-content:center">
+                    <label style="font-size:12px;color:var(--muted)"><input id="keepAspect" type="checkbox" checked /> Keep aspect</label>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label>Format and Quality</label>
+                <div class="row">
+                  <select id="formatSelect" style="padding:8px;border-radius:8px;border:1px solid var(--muted-border)">
+                    <option value="image/png">PNG</option>
+                    <option value="image/jpeg">JPEG</option>
+                    <option value="image/webp">WebP</option>
+                  </select>
+                  <div style="display:flex;flex-direction:column">
+                    <div class="small">Quality <span id="qualityVal">0.92</span></div>
+                    <input id="quality" class="quality" type="range" min="0.1" max="1" step="0.01" value="0.92" />
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label>Resize Options</label>
+                <div class="actions">
+                  <button id="resizeBtn" class="primary" disabled>Resize</button>
+                  <button id="downloadBtn" class="secondary" disabled>Download</button>
+                  <button id="resetBtn" class="secondary">Reset</button>
+                </div>
+                <div class="footer-note">Tip: Use the quality slider for smaller JPEG/WebP files.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="card">
+            <label>Preview</label>
+            <div class="preview" id="previewBox">
+              <span class="small">No preview</span>
+              <img id="previewImg" alt="Preview" style="display:none" />
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-top:10px;align-items:center">
+              <div class="small" id="dimInfo">—</div>
+              <div class="small" id="sizeInfo">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <canvas id="hiddenCanvas" style="display:none"></canvas>
+    </div>
+  </div>
+
+  <script>
+    // Elements
+    const fileInput = document.getElementById('fileInput');
+    const previewImg = document.getElementById('previewImg');
+    const previewBox = document.getElementById('previewBox');
+    const fileMeta = document.getElementById('fileMeta');
+    const widthInput = document.getElementById('widthInput');
+    const heightInput = document.getElementById('heightInput');
+    const keepAspect = document.getElementById('keepAspect');
+    const formatSelect = document.getElementById('formatSelect');
+    const quality = document.getElementById('quality');
+    const qualityVal = document.getElementById('qualityVal');
+    const resizeBtn = document.getElementById('resizeBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const dimInfo = document.getElementById('dimInfo');
+    const sizeInfo = document.getElementById('sizeInfo');
+    const canvas = document.getElementById('hiddenCanvas');
+
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    const metaThemeColor = document.getElementById('metaThemeColor');
+
+    // State
+    let originalImage = new Image();
+    let originalBlob = null;
+    let originalWidth = 0;
+    let originalHeight = 0;
+    let lastResultBlob = null;
+
+    // Helpers
+    function createPlaceholder() {
+      if (!previewBox.querySelector('span')) {
+        const span = document.createElement('span');
+        span.className = 'small';
+        span.textContent = 'No preview';
+        previewBox.appendChild(span);
+      }
+    }
+
+    function resetAll(){
+      fileInput.value = '';
+      previewImg.style.display = 'none';
+      previewImg.src = '';
+      createPlaceholder();
+      fileMeta.textContent = 'No image selected';
+      dimInfo.textContent = '—';
+      sizeInfo.textContent = '—';
+      widthInput.value = '';
+      heightInput.value = '';
+      resizeBtn.disabled = true;
+      downloadBtn.disabled = true;
+      originalBlob = null;
+      lastResultBlob = null;
+    }
+
+    resetBtn.addEventListener('click', resetAll);
+
+    quality.addEventListener('input', function () {
+      qualityVal.textContent = quality.value;
+    });
+
+    fileInput.addEventListener('change', function (e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) { resetAll(); return; }
+      if (!file.type.startsWith('image/')) {
+        alert('Please select an image file.');
+        resetAll();
+        return;
+      }
+      originalBlob = file;
+      fileMeta.textContent = file.name + ' • ' + (file.size/1024).toFixed(1) + ' KB • ' + file.type;
+      const url = URL.createObjectURL(file);
+      originalImage = new Image();
+      originalImage.onload = function () {
+        originalWidth = originalImage.naturalWidth;
+        originalHeight = originalImage.naturalHeight;
+        previewImg.src = url;
+        previewImg.style.display = 'block';
+        const placeholder = previewBox.querySelector('span');
+        if (placeholder) placeholder.remove();
+        widthInput.value = originalWidth;
+        heightInput.value = originalHeight;
+        dimInfo.textContent = originalWidth + ' × ' + originalHeight + 'px';
+        sizeInfo.textContent = (file.size/1024).toFixed(1) + ' KB';
+        resizeBtn.disabled = false;
+        downloadBtn.disabled = true;
+        lastResultBlob = null;
+      };
+      originalImage.onerror = function () {
+        alert('Failed to load image.');
+        resetAll();
+      };
+      originalImage.src = url;
+    });
+
+    // Keep aspect ratio
+    widthInput.addEventListener('input', function () {
+      if (!originalWidth) return;
+      const w = parseInt(widthInput.value) || 0;
+      if (keepAspect.checked && w > 0) {
+        const h = Math.round((w / originalWidth) * originalHeight);
+        heightInput.value = h;
+      }
+    });
+    heightInput.addEventListener('input', function () {
+      if (!originalHeight) return;
+      const h = parseInt(heightInput.value) || 0;
+      if (keepAspect.checked && h > 0) {
+        const w = Math.round((h / originalHeight) * originalWidth);
+        widthInput.value = w;
+      }
+    });
+
+    // High-quality resize
+    function drawImageHighQuality(img, ctx, w, h) {
+      const srcW = img.naturalWidth || img.width;
+      const srcH = img.naturalHeight || img.height;
+      const scale = Math.max(srcW / w, srcH / h);
+      const steps = Math.max(1, Math.ceil(Math.log2(scale)));
+      if (steps <= 1) {
+        ctx.drawImage(img, 0, 0, w, h);
+        return;
+      }
+      let tmpW = srcW;
+      let tmpH = srcH;
+      let tmpCanvas = document.createElement('canvas');
+      let tmpCtx = tmpCanvas.getContext('2d');
+      tmpCanvas.width = tmpW;
+      tmpCanvas.height = tmpH;
+      tmpCtx.drawImage(img, 0, 0);
+      for (let i = 0; i < steps; i++) {
+        tmpW = Math.max(w, Math.floor(tmpW / 2));
+        tmpH = Math.max(h, Math.floor(tmpH / 2));
+        const nextCanvas = document.createElement('canvas');
+        nextCanvas.width = tmpW;
+        nextCanvas.height = tmpH;
+        const nextCtx = nextCanvas.getContext('2d');
+        nextCtx.drawImage(tmpCanvas, 0, 0, tmpCanvas.width, tmpCanvas.height, 0, 0, tmpW, tmpH);
+        tmpCanvas = nextCanvas;
+      }
+      ctx.drawImage(tmpCanvas, 0, 0, tmpW, tmpH, 0, 0, w, h);
+    }
+
+    function resizeImage() {
+      if (!originalImage || !originalImage.src) return Promise.resolve();
+      let targetW = parseInt(widthInput.value) || originalWidth;
+      let targetH = parseInt(heightInput.value) || originalHeight;
+      if (targetW <= 0 || targetH <= 0) {
+        alert('Please enter valid dimensions.');
+        return Promise.resolve();
+      }
+
+      canvas.width = targetW;
+      canvas.height = targetH;
+      const ctx = canvas.getContext('2d');
+
+      drawImageHighQuality(originalImage, ctx, targetW, targetH);
+
+      const mime = formatSelect.value || 'image/png';
+      const q = parseFloat(quality.value);
+
+      return new Promise(function (resolve) {
+        canvas.toBlob(function (blob) {
+          lastResultBlob = blob;
+          const url = URL.createObjectURL(blob);
+          previewImg.src = url;
+          previewImg.style.display = 'block';
+          dimInfo.textContent = targetW + ' × ' + targetH + 'px';
+          sizeInfo.textContent = (blob.size/1024).toFixed(1) + ' KB';
+          downloadBtn.disabled = false;
+          resolve(blob);
+        }, mime, q);
+      });
+    }
+
+    resizeBtn.addEventListener('click', function () {
+      resizeBtn.disabled = true;
+      resizeBtn.textContent = 'Resizing...';
+      resizeImage().catch(function (err) {
+        console.error(err);
+        alert('Resize failed.');
+      }).finally(function () {
+        resizeBtn.disabled = false;
+        resizeBtn.textContent = 'Resize';
+      });
+    });
+
+    downloadBtn.addEventListener('click', function () {
+      if (!lastResultBlob) return;
+      const a = document.createElement('a');
+      const ext = (formatSelect.value === 'image/png') ? 'png' : (formatSelect.value === 'image/jpeg') ? 'jpg' : 'webp';
+      a.href = URL.createObjectURL(lastResultBlob);
+      a.download = 'resized-image.' + ext;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    });
+
+    // Theme handling
+    const THEME_KEY = 'imageResizerTheme';
+    function applyTheme(theme) {
+      if (theme === 'dark') {
+        document.body.classList.add('dark');
+        themeToggle.setAttribute('aria-pressed', 'true');
+        themeIcon.innerHTML = '<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>';
+        metaThemeColor.setAttribute('content', '#0b1220');
+      } else {
+        document.body.classList.remove('dark');
+        themeToggle.setAttribute('aria-pressed', 'false');
+        themeIcon.innerHTML = '<circle cx="12" cy="12" r="4"></circle>'
+          + '<path d="M12 2v2"></path>'
+          + '<path d="M12 20v2"></path>'
+          + '<path d="M4.93 4.93l1.41 1.41"></path>'
+          + '<path d="M17.66 17.66l1.41 1.41"></path>'
+          + '<path d="M2 12h2"></path>'
+          + '<path d="M20 12h2"></path>'
+          + '<path d="M4.93 19.07l1.41-1.41"></path>'
+          + '<path d="M17.66 6.34l1.41-1.41"></path>';
+        metaThemeColor.setAttribute('content', '#f6f8fb');
+      }
+    }
+
+    function detectPreferredTheme() {
+      const saved = localStorage.getItem(THEME_KEY);
+      if (saved === 'dark' || saved === 'light') return saved;
+      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      return prefersDark ? 'dark' : 'light';
+    }
+
+    themeToggle.addEventListener('click', function () {
+      const current = document.body.classList.contains('dark') ? 'dark' : 'light';
+      const next = current === 'dark' ? 'light' : 'dark';
+      applyTheme(next);
+      localStorage.setItem(THEME_KEY, next);
+    });
+
+    (function initTheme(){
+      const theme = detectPreferredTheme();
+      applyTheme(theme);
+      if (!localStorage.getItem(THEME_KEY) && window.matchMedia) {
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
+          applyTheme(e.matches ? 'dark' : 'light');
+        });
+      }
+    })();
+
+    // Init UI
+    (function init(){
+      qualityVal.textContent = quality.value;
+      createPlaceholder();
+    })();
+  </script>
+</body>
+</html>
