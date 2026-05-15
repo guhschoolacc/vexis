@@ -1537,8 +1537,8 @@
   <div class="page" id="page-stats">
     <div class="inner">
       <div class="page-head">
-        <div class="page-title">Analytics</div>
-        <div class="page-subtitle">Live system metrics</div>
+        <div class="page-title">Your Profile</div>
+        <div class="page-subtitle">Account stats and activity</div>
       </div>
       <div id="statsBoxes" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:9px;margin-bottom:24px"></div>
       <div style="background:var(--surf);border:1px solid var(--bdr);border-radius:var(--r);padding:20px">
@@ -2020,6 +2020,14 @@
         const q = fsQuery(fsCol(fdb,'announcements'), fsOrder('timestamp','desc'), fsLimit(20));
         const snap = await fsGetAll(q);
         return snap.docs.map(d => ({id: d.id, ...d.data()}));
+      },
+      getUserStats: async (uid) => {
+        const [userSnap, msgSnap] = await Promise.all([
+          fsGet(fsDoc(fdb,'users',uid)),
+          fsGetAll(fsQuery(fsCol(fdb,'socialMessages'), fsWhere('userId','==',uid), fsLimit(500))),
+        ]);
+        const userData = userSnap.data() || {};
+        return { messages: msgSnap.size, coins: userData.coins ?? undefined };
       },
     };
 
@@ -2542,18 +2550,70 @@ function delItem(e, category, idx) {
 /* ══════════════════════════════════════════════
    STATS PAGE
 ══════════════════════════════════════════════ */
-function buildStats() {
+async function buildStats() {
+  const user = window._fbUser;
+  const isGuest = !user || user.uid === 'guest';
+
+  const name        = user?.displayName || 'Guest';
+  const email       = isGuest ? '—' : (user?.email || '—');
+  const role        = window._userRole || 'user';
+  const joinDate    = user?.metadata?.creationTime
+    ? new Date(user.metadata.creationTime).toLocaleDateString([], {month:'short', day:'numeric', year:'numeric'})
+    : '—';
+  const lastSeen    = user?.metadata?.lastSignInTime
+    ? new Date(user.metadata.lastSignInTime).toLocaleDateString([], {month:'short', day:'numeric', year:'numeric'})
+    : '—';
+  const photoURL    = user?.photoURL || localStorage.getItem('vexis-profile-photo') || null;
+  const savedTheme  = localStorage.getItem('vexis-theme') || 'dark';
+
+  // Profile card
+  const avHtml = photoURL
+    ? `<div style="width:56px;height:56px;border-radius:50%;background-image:url('${photoURL}');background-size:cover;background-position:center;flex-shrink:0"></div>`
+    : `<div style="width:56px;height:56px;border-radius:50%;background:hsl(${Math.abs([...name].reduce((h,c)=>((h<<5)-h)+c.charCodeAt(0),0))%360},42%,32%);display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:700;color:#fff;flex-shrink:0">${name[0]?.toUpperCase()||'?'}</div>`;
+
+  const roleBadgeColor = {owner:'#ffb84a', moderator:'#7aa0ff', banned:'#f85149', user:'var(--muted)'}[role] || 'var(--muted)';
+
+  document.getElementById('statsBoxes').innerHTML = `
+    <div style="grid-column:1/-1;background:var(--surf);border:1px solid var(--bdr);border-radius:12px;padding:18px 20px;display:flex;align-items:center;gap:16px;margin-bottom:4px">
+      ${avHtml}
+      <div style="flex:1;min-width:0">
+        <div style="font-size:1rem;font-weight:700;color:var(--white);line-height:1.2">${_esc(name)}</div>
+        <div style="font-size:.68rem;color:var(--dim);margin-top:2px">${_esc(email)}</div>
+        <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">
+          <span style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;background:rgba(255,255,255,.06);border:1px solid var(--bdr);border-radius:5px;padding:2px 8px;color:${roleBadgeColor}">${role}</span>
+          <span style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;background:rgba(255,255,255,.06);border:1px solid var(--bdr);border-radius:5px;padding:2px 8px;color:var(--muted)">${savedTheme} theme</span>
+        </div>
+      </div>
+    </div>
+  `;
+
   const rows = [
-    {n:'CPU',      v:'34%',    s:'nominal',   id:'scpu'},
-    {n:'RAM',      v:'8.1 GB', s:'of 16 GB'},
-    {n:'Network',  v:'1.2 Gb', s:'encrypted'},
-    {n:'Uptime',   v:'99%',    s:'stable'},
-    {n:'Sessions', v:'2.4K',   s:'+14%'},
-    {n:'Queries',  v:'18K',    s:'trending ↑'},
+    {n:'Joined',      v: joinDate,   s:'account created'},
+    {n:'Last Login',  v: lastSeen,   s:'most recent session'},
+    {n:'Account',     v: isGuest ? 'Guest' : 'Member', s: isGuest ? 'no data saved' : 'full access'},
+    {n:'Theme',       v: savedTheme.charAt(0).toUpperCase()+savedTheme.slice(1), s:'active theme'},
   ];
-  document.getElementById('statsBoxes').innerHTML = rows.map(d =>
-    `<div class="stat-box"><div class="stat-n">${d.n}</div><div class="stat-v"${d.id?` id="${d.id}"`:''}>${d.v}</div><div class="stat-s">${d.s}</div></div>`
+
+  document.getElementById('statsBoxes').innerHTML += rows.map(d =>
+    `<div class="stat-box"><div class="stat-n">${d.n}</div><div class="stat-v">${d.v}</div><div class="stat-s">${d.s}</div></div>`
   ).join('');
+
+  // Message count from Firestore
+  if (!isGuest && window._fb?.ready) {
+    try {
+      const snap = await window._fb.getUserStats(user.uid);
+      const msgBox = document.createElement('div');
+      msgBox.className = 'stat-box';
+      msgBox.innerHTML = `<div class="stat-n">Messages</div><div class="stat-v">${snap.messages}</div><div class="stat-s">sent in global chat</div>`;
+      document.getElementById('statsBoxes').appendChild(msgBox);
+      if (snap.coins !== undefined) {
+        const coinBox = document.createElement('div');
+        coinBox.className = 'stat-box';
+        coinBox.innerHTML = `<div class="stat-n">Coins</div><div class="stat-v">${snap.coins}</div><div class="stat-s">vexis currency</div>`;
+        document.getElementById('statsBoxes').appendChild(coinBox);
+      }
+    } catch(e) {}
+  }
 }
 
 /* ══════════════════════════════════════════════
@@ -2578,10 +2638,10 @@ function buildUserMenu(user) {
     {icon:'gear',   label:'Settings', cb:"openSettings();toggleUser()"},
   ];
   if ((role === 'moderator' || role === 'owner') && !isGuest) {
-    items.push({icon:'shield', label:'Mod Panel', cb:"openStaffPanel();toggleUser()", accent:'#7aa0ff'});
+    items.push({icon:'shield', label:'Mod Panel', cb:"openIframe('Mod Panel','staff/modpanel.html',_currentPage);toggleUser()", accent:'#7aa0ff'});
   }
   if (role === 'owner' && !isGuest) {
-    items.push({icon:'star', label:'Owner Panel', cb:"openStaffPanel('owner');toggleUser()", accent:'#ffb84a'});
+    items.push({icon:'star', label:'Owner Panel', cb:"openIframe('Owner Panel','staff/ownerpanel.html',_currentPage);toggleUser()", accent:'#ffb84a'});
   }
   items.push({icon:'signout', label: isGuest ? 'Exit Guest' : 'Sign out', cb:"doSignOut()", dim:true});
   document.getElementById('userMenu').innerHTML = items.map(m =>
@@ -3412,6 +3472,8 @@ function navRaw(page, omni) {
   if (page === 'stats') { buildStats(); drawChart(); }
   const cashFab = document.getElementById('cashFab');
   if (cashFab) cashFab.style.display = page === 'home' ? '' : 'none';
+  const bugBtn = document.getElementById('bugReportBtn');
+  if (bugBtn) bugBtn.style.display = page === 'home' ? '' : 'none';
 }
 
 function getActiveTabId() {
