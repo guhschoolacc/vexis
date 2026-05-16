@@ -263,6 +263,60 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 /* Toast */
 #toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(6px);background:var(--raise2);border:1px solid var(--bdr);color:var(--bright);padding:7px 15px;border-radius:8px;font-size:.78rem;pointer-events:none;opacity:0;transition:all .25s;z-index:2000;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.5);}
 #toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── PROFILE MODAL ── */
+.prof-overlay{position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:600;display:none;align-items:center;justify-content:center;padding:16px;}
+.prof-overlay.open{display:flex;}
+.prof-modal{background:var(--surf);border:1px solid var(--bdrhi);border-radius:14px;width:290px;max-width:100%;overflow:hidden;position:relative;animation:_pu .18s ease;}
+@keyframes _pu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.prof-banner{height:58px;background:linear-gradient(135deg,#0d1f35,#0a1520);}
+.prof-body{padding:0 16px 16px;position:relative;}
+.prof-av{width:52px;height:52px;border-radius:50%;border:3px solid var(--surf);overflow:hidden;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.1rem;color:#fff;margin-top:-26px;margin-bottom:4px;}
+.prof-av img{width:100%;height:100%;object-fit:cover;display:block;}
+.prof-name{font-size:.93rem;font-weight:700;color:var(--bright);}
+.prof-cstatus{font-size:.7rem;color:var(--dim);margin-top:2px;}
+.prof-bio{font-size:.76rem;color:var(--text);margin-top:8px;padding-top:8px;border-top:1px solid var(--bdr);line-height:1.5;}
+.prof-role{display:inline-flex;align-items:center;gap:4px;margin-top:6px;padding:2px 8px;border-radius:20px;font-size:.63rem;font-weight:700;}
+.prof-role.user{background:rgba(90,90,90,.18);color:#777;border:1px solid #2a2a2a}
+.prof-role.moderator{background:rgba(88,166,255,.1);color:var(--accent);border:1px solid rgba(88,166,255,.22)}
+.prof-role.owner,.prof-role.main_owner{background:rgba(227,179,65,.1);color:#e3b341;border:1px solid rgba(227,179,65,.22)}
+.prof-role.banned{background:rgba(248,81,73,.1);color:var(--danger);border:1px solid rgba(248,81,73,.22)}
+.prof-actions{display:flex;gap:6px;margin-top:12px;}
+.prof-btn{flex:1;padding:7px 8px;border-radius:8px;border:1px solid var(--bdrhi);background:var(--raise);color:var(--text);font-size:.74rem;font-weight:600;cursor:pointer;transition:all .14s;text-align:center;}
+.prof-btn:hover{background:var(--raise2);color:var(--bright);}
+.prof-btn.added{color:var(--success);border-color:rgba(86,211,100,.25);pointer-events:none;}
+.prof-btn.pending{color:var(--dim);cursor:default;pointer-events:none;}
+.prof-close{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.5);border:none;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#aaa;font-size:.75rem;z-index:1;}
+.prof-edit-row{display:flex;flex-direction:column;gap:6px;margin-top:10px;}
+.prof-edit-input{background:var(--raise);border:1px solid var(--bdr);border-radius:7px;padding:6px 9px;color:var(--bright);font-size:.78rem;font-family:inherit;outline:none;width:100%;}
+.prof-edit-input:focus{border-color:var(--accent);}
+.prof-edit-input::placeholder{color:var(--dim);}
+
+/* ── EDIT MODE ── */
+.edit-area{width:100%;background:transparent;border:none;border-bottom:1.5px solid var(--accent);color:inherit;font-size:.875rem;line-height:1.5;font-family:inherit;resize:none;outline:none;padding:2px 0;min-height:22px;}
+.msg-edited{font-size:.58rem;color:var(--dim);margin-left:4px;vertical-align:middle;}
+
+/* ── VIEW COUNT ── */
+.msg-views{font-size:.6rem;color:var(--dim);margin-top:3px;display:flex;align-items:center;gap:3px;}
+
+/* ── MENTIONS ── */
+.mention{color:var(--accent);font-weight:600;background:rgba(88,166,255,.1);border-radius:3px;padding:0 2px;}
+.mention-drop{background:var(--raise2);border:1px solid var(--bdrhi);border-radius:8px;overflow:hidden;display:none;max-height:140px;overflow-y:auto;margin-bottom:5px;}
+.mention-drop.open{display:block;}
+.mention-item{display:flex;align-items:center;gap:8px;padding:6px 10px;cursor:pointer;font-size:.8rem;}
+.mention-item:hover,.mention-item.sel{background:var(--raise);}
+.mention-av-sm{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.55rem;font-weight:700;color:#fff;flex-shrink:0;}
+.mention-name{color:var(--bright);font-weight:500;}
+.cmd-drop{background:var(--raise2);border:1px solid var(--bdrhi);border-radius:8px;overflow:hidden;display:none;margin-bottom:5px;}
+.cmd-drop.open{display:block;}
+.cmd-item{display:flex;align-items:center;gap:10px;padding:8px 12px;cursor:pointer;transition:background .1s;}
+.cmd-item:hover,.cmd-item.sel{background:var(--raise);}
+.cmd-icon{width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,rgba(88,166,255,.2),rgba(130,100,255,.2));border:1px solid rgba(88,166,255,.3);display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0;}
+.cmd-name{font-size:.82rem;font-weight:700;color:var(--accent);}
+.cmd-desc{font-size:.68rem;color:var(--dim);margin-top:1px;}
+
+/* chat-foot needs relative so mention drop positions */
+.chat-foot{position:relative;}
 </style>
 </head>
 <body>
@@ -311,6 +365,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
     </button>
   </div>
 
+  <!-- Slash command autocomplete -->
+  <div class="cmd-drop" id="cmdDrop"></div>
+  <!-- Mention autocomplete -->
+  <div class="mention-drop" id="mentionDrop"></div>
+
   <!-- Emoji panel -->
   <div class="panel" id="emojiPanel">
     <div class="ep-inner">
@@ -350,7 +409,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
       </svg>
     </button>
     <input type="file" id="fileIn" accept="image/*" style="display:none" onchange="handleFile(this)">
-    <textarea id="msgInput" placeholder="Message everyone…" rows="1" onkeydown="onKey(event)" oninput="resizeTA(this)"></textarea>
+    <textarea id="msgInput" placeholder="Message everyone…" rows="1" onkeydown="onKey(event)" oninput="onInput(this)"></textarea>
     <!-- Send button: arrow SVG -->
     <button class="send-btn" id="sendBtn" onclick="sendMsg()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -364,6 +423,28 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   <img id="lbImg" src="" alt="" onclick="event.stopPropagation()">
 </div>
 <div id="toast"></div>
+
+<!-- PROFILE MODAL -->
+<div class="prof-overlay" id="profOverlay" onclick="if(event.target===this)closeProfModal()">
+  <div class="prof-modal">
+    <div class="prof-banner"></div>
+    <button class="prof-close" onclick="closeProfModal()">✕</button>
+    <div class="prof-body">
+      <div class="prof-av" id="profAv"></div>
+      <div class="prof-name" id="profName"></div>
+      <div class="prof-cstatus" id="profCStatus"></div>
+      <div id="profRoleWrap"></div>
+      <div class="prof-bio" id="profBio" style="display:none"></div>
+      <div class="prof-edit-row" id="profEditRow" style="display:none">
+        <input class="prof-edit-input" id="profEditBio" placeholder="Bio (max 120 chars)" maxlength="120">
+        <input class="prof-edit-input" id="profEditStatus" placeholder="Custom status…" maxlength="60">
+        <button class="prof-btn" onclick="saveProfEdit()">Save</button>
+      </div>
+      <div class="prof-actions" id="profActions"></div>
+    </div>
+  </div>
+</div>
+
 
 <!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -391,7 +472,15 @@ const SVG={
   trash:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>`,
   flag:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>`,
   x:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`,
+  edit:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`,
 };
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+const _onlineUsers = []; // {uid, displayName, photoURL}
+const _friends = new Set();
+const _pendingOut = new Set();
+const _userCache = {};
+let _mentionSelIdx = -1;
 
 // Theme is fixed black – no sync with parent app
 
@@ -520,7 +609,7 @@ async function vexisChat(query, replyContext=null){
   try{
     const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages})});
     const data=await res.json();
-    const reply=data.content||data.choices?.[0]?.message?.content||'Sorry, I couldn\'t respond right now.';
+    const reply=data.message||data.content||data.choices?.[0]?.message?.content||'Sorry, I couldn\'t respond right now.';
 
     // Update session memory
     _vexisHistory.push({role:'user',content:query});
@@ -661,6 +750,7 @@ function addMsgEl(id,data){
     else if(data.isOfficial){av.style.background='rgba(255,180,40,.2)';av.style.color='#ffb840';av.textContent='✦';}
     else if(data.photoURL){av.style.backgroundImage=`url('${data.photoURL}')`;av.style.color='transparent';}
     else{av.textContent=(data.displayName||'?')[0].toUpperCase();av.style.background=strColor(data.userId||'');}
+    if(!data.isVexisAI&&!data.isOfficial){av.style.cursor='pointer';av.onclick=()=>openProfile(data.userId,data);}
     row.appendChild(av);
   }
 
@@ -673,6 +763,7 @@ function addMsgEl(id,data){
     const nm=document.createElement('span');nm.className='msg-name';nm.textContent=data.displayName||'Anonymous';
     if(data.isVexisAI) nm.style.color='var(--accent)';
     else if(data.isOfficial) nm.style.color='#ffb840';
+    else{nm.style.cursor='pointer';nm.onclick=()=>openProfile(data.userId,data);}
     meta.appendChild(nm);
     if(data.isVexisAI){const badge=document.createElement('span');badge.className='vexis-badge';badge.textContent='AI';meta.appendChild(badge);}
     else if(data.isOfficial){const badge=document.createElement('span');badge.textContent='OFFICIAL';badge.style.cssText='font-size:.55rem;font-weight:700;background:rgba(255,180,40,.15);border:1px solid rgba(255,180,40,.3);color:#ffb840;border-radius:4px;padding:1px 5px;margin-left:5px;letter-spacing:.06em;';meta.appendChild(badge);}
@@ -697,7 +788,7 @@ function addMsgEl(id,data){
     bubble.appendChild(rp);
   }
 
-  if(data.text){const t=document.createElement('div');t.className='msg-text';t.textContent=data.text;bubble.appendChild(t);}
+  if(data.text){const t=document.createElement('div');t.className='msg-text';t.innerHTML=renderMentionText(data.text)+(data.edited?'<span class="msg-edited">(edited)</span>':'');bubble.appendChild(t);}
   if(data.gifUrl){const i=document.createElement('img');i.className='msg-gif';i.src=data.gifUrl;i.loading='lazy';i.onclick=()=>openLightbox(data.gifUrl);bubble.appendChild(i);}
   if(data.imageBase64){const i=document.createElement('img');i.className='msg-img';i.src=data.imageBase64;i.loading='lazy';i.onclick=()=>openLightbox(data.imageBase64);bubble.appendChild(i);}
   col.appendChild(bubble);
@@ -705,6 +796,16 @@ function addMsgEl(id,data){
   // Reactions row
   const rr=document.createElement('div');rr.className='reactions-row';rr.id='rr-'+id;
   buildReactions(rr,id,data.reactions||{});col.appendChild(rr);
+
+  // View count (own messages only)
+  if(isOwn){
+    const vc=document.createElement('div');vc.className='msg-views';vc.id='vc-'+id;
+    const n=(data.viewedBy||[]).length;
+    if(n>0)vc.innerHTML=`<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> ${n}`;
+    col.appendChild(vc);
+  } else if(!data.isVexisAI&&!data.isOfficial) {
+    queueView(id);
+  }
 
   row.appendChild(col);
 
@@ -723,6 +824,9 @@ function addMsgEl(id,data){
   ddReact.onclick=(e)=>{e.stopPropagation();closeAllDropdowns();showReactFloater(id);};
   dd.append(ddReply,ddReact);
   if(isOwn&&!me?.isGuest){
+    const ddEdit=document.createElement('button');ddEdit.className='dd-item';ddEdit.innerHTML=SVG.edit+'<span>Edit</span>';
+    ddEdit.onclick=()=>{closeAllDropdowns();editMsg(id,data.text||'');};
+    dd.appendChild(ddEdit);
     const ddDel=document.createElement('button');ddDel.className='dd-item danger';ddDel.innerHTML=SVG.trash+'<span>Delete</span>';
     ddDel.onclick=()=>{closeAllDropdowns();delMsg(id);};
     dd.appendChild(ddDel);
@@ -768,11 +872,19 @@ function buildReactions(cont,msgId,reactions){
 
 function updateMsgEl(id,data){
   const rr=document.getElementById('rr-'+id); if(rr) buildReactions(rr,id,data.reactions||{});
+  const row=document.getElementById('m-'+id); if(!row) return;
+  // Update text (edits)
+  const textEl=row.querySelector('.msg-text');
+  if(textEl) textEl.innerHTML=renderMentionText(data.text||'')+(data.edited?'<span class="msg-edited">(edited)</span>':'');
+  const editArea=document.getElementById('edit-'+id); if(editArea) editArea.remove();
+  if(textEl) textEl.style.display='';
+  // Update view count
+  const vc=document.getElementById('vc-'+id);
+  if(vc){const n=(data.viewedBy||[]).length;vc.innerHTML=n>0?`<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> ${n}`:''}
 }
 
 async function delMsg(id){
-  if(!confirm('Delete this message?')) return;
-  try{await db.collection(COL).doc(id).delete();}catch(e){toast('Could not delete');}
+  try{await db.collection(COL).doc(id).delete();toast('Message deleted');}catch(e){toast('Could not delete');}
 }
 
 async function reportMsg(id,data){
@@ -835,7 +947,38 @@ function openLightbox(src){document.getElementById('lbImg').src=src;document.get
 function closeLightbox(){document.getElementById('lightbox').classList.remove('on');}
 
 // ── INPUT HELPERS ─────────────────────────────────────────────────────────────
-function onKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}}
+function onKey(e){
+  const cmdDrop=document.getElementById('cmdDrop');
+  if(cmdDrop.classList.contains('open')){
+    const items=cmdDrop.querySelectorAll('.cmd-item');
+    if(e.key==='ArrowDown'){e.preventDefault();_mentionSelIdx=Math.min(_mentionSelIdx+1,items.length-1);items.forEach((it,i)=>it.classList.toggle('sel',i===_mentionSelIdx));return;}
+    if(e.key==='ArrowUp'){e.preventDefault();_mentionSelIdx=Math.max(_mentionSelIdx-1,0);items.forEach((it,i)=>it.classList.toggle('sel',i===_mentionSelIdx));return;}
+    if((e.key==='Enter'||e.key==='Tab')&&_mentionSelIdx>=0){e.preventDefault();items[_mentionSelIdx]?.click();return;}
+    if(e.key==='Escape'){hideCmdDrop();return;}
+  }
+  const drop=document.getElementById('mentionDrop');
+  if(drop.classList.contains('open')){
+    const items=drop.querySelectorAll('.mention-item');
+    if(e.key==='ArrowDown'){e.preventDefault();_mentionSelIdx=Math.min(_mentionSelIdx+1,items.length-1);items.forEach((it,i)=>it.classList.toggle('sel',i===_mentionSelIdx));return;}
+    if(e.key==='ArrowUp'){e.preventDefault();_mentionSelIdx=Math.max(_mentionSelIdx-1,0);items.forEach((it,i)=>it.classList.toggle('sel',i===_mentionSelIdx));return;}
+    if((e.key==='Enter'||e.key==='Tab')&&_mentionSelIdx>=0){e.preventDefault();items[_mentionSelIdx]?.click();return;}
+    if(e.key==='Escape'){hideMentionDrop();return;}
+  }
+  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}
+}
+function onInput(el){
+  resizeTA(el);
+  const val=el.value;
+  if(val.startsWith('/')){
+    const query=val.slice(1).toLowerCase();
+    showCmdDrop(query);
+    hideMentionDrop();
+    return;
+  }
+  hideCmdDrop();
+  const q=getMentionQuery();
+  if(q!==null)showMentionDrop(q); else hideMentionDrop();
+}
 function resizeTA(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,110)+'px';}
 
 // ── ONLINE PRESENCE ───────────────────────────────────────────────────────────
@@ -845,13 +988,210 @@ function trackPresence(){
   const ping=()=>ref.set({online:true,lastSeen:FS.FieldValue.serverTimestamp(),displayName:me.displayName},{merge:true});
   ping(); setInterval(ping,30000);
   window.addEventListener('beforeunload',()=>ref.set({online:false},{merge:true}));
-  db.collection('presence').where('online','==',true).onSnapshot(s=>{document.getElementById('onlineCount').textContent=s.size+' online';});
+  db.collection('presence').where('online','==',true).onSnapshot(s=>{
+    document.getElementById('onlineCount').textContent=s.size+' online';
+    _onlineUsers.length=0;
+    s.docs.forEach(d=>{const dat=d.data();if(dat.displayName)_onlineUsers.push({uid:d.id,displayName:dat.displayName,photoURL:dat.photoURL||null});});
+  });
+}
+
+// ── PROFILE MODAL ─────────────────────────────────────────────────────────────
+let _profUID=null;
+async function getCachedUser(uid){
+  if(_userCache[uid])return _userCache[uid];
+  try{const s=await db.collection('users').doc(uid).get();_userCache[uid]=s.data()||{};return _userCache[uid];}
+  catch{return{};}
+}
+async function openProfile(uid,baseData){
+  if(!uid||uid==='vexis-ai')return;
+  _profUID=uid;
+  const av=document.getElementById('profAv'),nameEl=document.getElementById('profName');
+  const cstatEl=document.getElementById('profCStatus'),roleWrap=document.getElementById('profRoleWrap');
+  const bioEl=document.getElementById('profBio'),actEl=document.getElementById('profActions');
+  const editRow=document.getElementById('profEditRow');
+  const name=baseData?.displayName||'…';
+  av.style.background=strColor(uid);
+  av.innerHTML=baseData?.photoURL?`<img src="${baseData.photoURL}">`:(name[0]?.toUpperCase()||'?');
+  nameEl.textContent=name; cstatEl.textContent=''; roleWrap.innerHTML=''; bioEl.style.display='none';
+  actEl.innerHTML=''; editRow.style.display='none';
+  document.getElementById('profOverlay').classList.add('open');
+  const [u,pres]=await Promise.all([
+    getCachedUser(uid),
+    db.collection('presence').doc(uid).get().catch(()=>null)
+  ]);
+  const presData=pres?.data()||{};
+  if(u.photoURL) av.innerHTML=`<img src="${u.photoURL}">`;
+  nameEl.textContent=u.displayName||name;
+  const status=presData.status||'';
+  const online=presData.online===true;
+  cstatEl.textContent=status||(online?'🟢 Online':'');
+  const role=u.role||'user';
+  const RLBL={user:'User',moderator:'Moderator',owner:'Owner',main_owner:'Main Owner',banned:'Banned'};
+  roleWrap.innerHTML=`<div class="prof-role ${role}">${RLBL[role]||'User'}</div>`;
+  if(u.bio){bioEl.textContent=u.bio;bioEl.style.display='block';}
+  const isSelf=uid===me?.uid;
+  if(isSelf&&!me?.isGuest){
+    editRow.style.display='flex';
+    document.getElementById('profEditBio').value=u.bio||'';
+    document.getElementById('profEditStatus').value=presData.status||'';
+  } else if(me&&!me.isGuest){
+    const safeN=(u.displayName||'').replace(/'/g,"\\'");
+    if(_friends.has(uid)){
+      actEl.innerHTML=`<div class="prof-btn added">✓ Friends</div><button class="prof-btn" onclick="closeProfModal();openDmWith('${uid}','${safeN}')">Message</button>`;
+    } else if(_pendingOut.has(uid)){
+      actEl.innerHTML=`<div class="prof-btn pending">Request Sent</div>`;
+    } else {
+      actEl.innerHTML=`<button class="prof-btn" onclick="sendFriendReq('${uid}','${safeN}')">Add Friend</button><button class="prof-btn" onclick="closeProfModal();openDmWith('${uid}','${safeN}')">Message</button>`;
+    }
+  }
+}
+function closeProfModal(){document.getElementById('profOverlay').classList.remove('open');_profUID=null;}
+async function saveProfEdit(){
+  if(!me)return;
+  const bio=document.getElementById('profEditBio').value.trim().slice(0,120);
+  const status=document.getElementById('profEditStatus').value.trim().slice(0,60);
+  try{
+    await db.collection('users').doc(me.uid).update({bio});
+    await db.collection('presence').doc(me.uid).set({status},{merge:true});
+    delete _userCache[me.uid];
+    toast('Profile updated');closeProfModal();
+  }catch{toast('Failed to save');}
+}
+async function sendFriendReq(toUid,toName){
+  if(!me||me.isGuest){toast('Sign in to add friends');return;}
+  const reqId=`${toUid}_${me.uid}`;
+  try{
+    await db.collection('friendRequests').doc(reqId).set({
+      to:toUid,from:me.uid,fromName:me.displayName||'Someone',
+      fromPhoto:me.photoURL||null,status:'pending',
+      timestamp:FS.FieldValue.serverTimestamp(),
+    });
+    await db.collection('notifications').doc(toUid).set({friendRequests:FS.FieldValue.increment(1)},{merge:true});
+    _pendingOut.add(toUid);
+    toast('Friend request sent!');closeProfModal();
+  }catch{toast('Failed to send request');}
+}
+function openDmWith(uid,name){
+  if(window.top && window.top !== window && typeof window.top.openIframe === 'function'){
+    window.top.openIframe('DMs', `/social/dm.html?uid=${encodeURIComponent(uid)}&name=${encodeURIComponent(name)}`, 'social');
+  } else {
+    window.location.href=`/social/dm.html?uid=${encodeURIComponent(uid)}&name=${encodeURIComponent(name)}`;
+  }
+}
+async function loadFriendsCache(){
+  if(!me||me.isGuest)return;
+  try{
+    const s=await db.collection('friends').doc(me.uid).get();
+    (s.data()?.list||[]).forEach(uid=>_friends.add(uid));
+  }catch{}
+  try{
+    const s=await db.collection('friendRequests').where('from','==',me.uid).where('status','==','pending').get();
+    s.docs.forEach(d=>_pendingOut.add(d.data().to));
+  }catch{}
+}
+
+// ── MESSAGE EDIT ──────────────────────────────────────────────────────────────
+function editMsg(id,origText){
+  const row=document.getElementById('m-'+id); if(!row)return;
+  const textEl=row.querySelector('.msg-text'); if(!textEl)return;
+  textEl.style.display='none';
+  const area=document.createElement('textarea');
+  area.className='edit-area';area.value=origText;area.id='edit-'+id;
+  area.addEventListener('input',()=>{area.style.height='auto';area.style.height=area.scrollHeight+'px';});
+  area.addEventListener('keydown',e=>{
+    if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();saveEdit(id,origText);}
+    if(e.key==='Escape'){cancelEdit(id,textEl);}
+  });
+  textEl.parentNode.insertBefore(area,textEl.nextSibling);
+  area.style.height=area.scrollHeight+'px';area.focus();
+}
+async function saveEdit(id,origText){
+  const area=document.getElementById('edit-'+id); if(!area)return;
+  const newText=area.value.trim();
+  if(!newText||newText===origText){cancelEdit(id,document.querySelector(`#m-${id} .msg-text`));return;}
+  try{await db.collection(COL).doc(id).update({text:newText,edited:true});}
+  catch{toast('Failed to edit');}
+}
+function cancelEdit(id,textEl){
+  const area=document.getElementById('edit-'+id); if(area)area.remove();
+  if(textEl)textEl.style.display='';
+}
+
+// ── VIEW TRACKING ─────────────────────────────────────────────────────────────
+const _viewQueue=new Set();let _viewTimer=null;
+function queueView(id){
+  _viewQueue.add(id);
+  clearTimeout(_viewTimer);
+  _viewTimer=setTimeout(flushViews,1800);
+}
+async function flushViews(){
+  if(!me||me.isGuest||!_viewQueue.size)return;
+  const ids=[..._viewQueue];_viewQueue.clear();
+  const batch=db.batch();
+  ids.forEach(id=>batch.update(db.collection(COL).doc(id),{viewedBy:FS.FieldValue.arrayUnion(me.uid)}));
+  try{await batch.commit();}catch{}
+}
+
+// ── MENTIONS ──────────────────────────────────────────────────────────────────
+function renderMentionText(text){
+  if(!text)return'';
+  const esc=text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return esc.replace(/@([\w][\w ]{0,19})/g,'<span class="mention">@$1</span>');
+}
+function getMentionQuery(){
+  const val=msgInput.value,pos=msgInput.selectionStart;
+  const m=val.slice(0,pos).match(/@([\w ]*)$/);
+  return m?m[1]:null;
+}
+function showMentionDrop(query){
+  const drop=document.getElementById('mentionDrop');
+  const list=_onlineUsers.filter(u=>u.displayName?.toLowerCase().includes(query.toLowerCase())&&u.uid!==me?.uid).slice(0,8);
+  if(!list.length){drop.classList.remove('open');return;}
+  _mentionSelIdx=-1;
+  drop.innerHTML=list.map(u=>{
+    const bg=u.photoURL?`background-image:url('${u.photoURL}');background-size:cover;color:transparent;`:`background:${strColor(u.uid)};`;
+    const init=u.photoURL?'':(u.displayName||'?')[0].toUpperCase();
+    return `<div class="mention-item" onclick="insertMention('${u.displayName.replace(/'/g,"\\'")}')"><div class="mention-av-sm" style="${bg}">${init}</div><span class="mention-name">${u.displayName}</span></div>`;
+  }).join('');
+  drop.classList.add('open');
+}
+function hideMentionDrop(){document.getElementById('mentionDrop').classList.remove('open');_mentionSelIdx=-1;}
+
+const SLASH_COMMANDS=[
+  {name:'/vexis',desc:'Ask Vexis AI anything',icon:'✦',insert:'/vexis '},
+];
+function showCmdDrop(query){
+  const drop=document.getElementById('cmdDrop');
+  const matches=SLASH_COMMANDS.filter(c=>c.name.slice(1).startsWith(query));
+  if(!matches.length){drop.classList.remove('open');return;}
+  _mentionSelIdx=-1;
+  drop.innerHTML=matches.map(c=>`
+    <div class="cmd-item" onclick="insertCmd('${c.insert}')">
+      <div class="cmd-icon">${c.icon}</div>
+      <div><div class="cmd-name">${c.name}</div><div class="cmd-desc">${c.desc}</div></div>
+    </div>`).join('');
+  drop.classList.add('open');
+}
+function hideCmdDrop(){document.getElementById('cmdDrop').classList.remove('open');_mentionSelIdx=-1;}
+function insertCmd(insert){
+  msgInput.value=insert;
+  msgInput.selectionStart=msgInput.selectionEnd=insert.length;
+  msgInput.focus();
+  hideCmdDrop();
+}
+function insertMention(name){
+  const val=msgInput.value,pos=msgInput.selectionStart;
+  const before=val.slice(0,pos).replace(/@[\w ]*$/,`@${name} `);
+  msgInput.value=before+val.slice(pos);
+  msgInput.selectionStart=msgInput.selectionEnd=before.length;
+  msgInput.focus();hideMentionDrop();
 }
 
 // ── AUTH ──────────────────────────────────────────────────────────────────────
 auth.onAuthStateChanged(user=>{
   if(user){
     me=user;
+    loadFriendsCache();
   } else {
     me={uid:'guest_'+Math.random().toString(36).slice(2,9),displayName:localStorage.getItem('vexis-display-name')||'Guest',photoURL:localStorage.getItem('vexis-profile-photo')||null,isGuest:true};
     setInterval(()=>{const n=localStorage.getItem('vexis-display-name'),p=localStorage.getItem('vexis-profile-photo');if(n)me.displayName=n;if(p)me.photoURL=p;},3000);
