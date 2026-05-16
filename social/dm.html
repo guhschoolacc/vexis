@@ -305,6 +305,26 @@ audio{display:none}
 .load-row{display:flex;align-items:center;justify-content:center;gap:10px;padding:40px;color:var(--dim);font-size:.82rem;}
 .spin{width:16px;height:16px;border:2px solid var(--bdr);border-top-color:var(--accent);border-radius:50%;animation:_s .65s linear infinite;}
 @keyframes _s{to{transform:rotate(360deg)}}
+/* Read receipts */
+.seen-indicator{text-align:right;font-size:.6rem;color:var(--dim);padding:1px 18px 4px;margin-top:-2px;display:flex;align-items:center;justify-content:flex-end;gap:4px;}
+/* Profile modal */
+.prof-overlay{position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:600;display:none;align-items:center;justify-content:center;padding:16px;}
+.prof-overlay.open{display:flex;}
+.prof-modal{background:var(--surf);border:1px solid var(--bdrhi);border-radius:14px;width:280px;max-width:100%;overflow:hidden;position:relative;animation:_pu .18s ease;}
+@keyframes _pu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.prof-banner{height:56px;background:linear-gradient(135deg,#0d1f35,#0a1520);}
+.prof-body{padding:0 16px 16px;position:relative;}
+.prof-av{width:50px;height:50px;border-radius:50%;border:3px solid var(--surf);overflow:hidden;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.1rem;color:#fff;margin-top:-25px;margin-bottom:4px;}
+.prof-av img{width:100%;height:100%;object-fit:cover;display:block;}
+.prof-name{font-size:.92rem;font-weight:700;color:var(--bright);}
+.prof-cstatus{font-size:.7rem;color:var(--dim);margin-top:2px;}
+.prof-bio{font-size:.76rem;color:var(--text);margin-top:8px;padding-top:8px;border-top:1px solid var(--bdr);line-height:1.5;}
+.prof-role{display:inline-flex;align-items:center;gap:4px;margin-top:6px;padding:2px 8px;border-radius:20px;font-size:.63rem;font-weight:700;}
+.prof-role.user{background:rgba(90,90,90,.18);color:#777;border:1px solid #2a2a2a}
+.prof-role.moderator{background:rgba(88,166,255,.1);color:var(--accent);border:1px solid rgba(88,166,255,.22)}
+.prof-role.owner,.prof-role.main_owner{background:rgba(227,179,65,.1);color:#e3b341;border:1px solid rgba(227,179,65,.22)}
+.prof-role.banned{background:rgba(248,81,73,.1);color:var(--danger);border:1px solid rgba(248,81,73,.22)}
+.prof-close{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.5);border:none;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#aaa;font-size:.75rem;z-index:1;}
 </style>
 </head>
 <body>
@@ -458,6 +478,21 @@ audio{display:none}
   <img id="lbImg" src="" alt="" onclick="event.stopPropagation()">
 </div>
 <div id="toast"></div>
+
+<!-- PROFILE MODAL -->
+<div class="prof-overlay" id="profOverlay" onclick="if(event.target===this)closeProfModal()">
+  <div class="prof-modal">
+    <div class="prof-banner"></div>
+    <button class="prof-close" onclick="closeProfModal()">✕</button>
+    <div class="prof-body">
+      <div class="prof-av" id="profAv"></div>
+      <div class="prof-name" id="profName"></div>
+      <div class="prof-cstatus" id="profCStatus"></div>
+      <div id="profRoleWrap"></div>
+      <div class="prof-bio" id="profBio" style="display:none"></div>
+    </div>
+  </div>
+</div>
 
 <!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -676,6 +711,7 @@ function openConversation(conv){
     });
     if(atBottom)scrollToBottom();
     else if(snap.docChanges().some(c=>c.type==='added')){newCount++;updateNewPill();}
+    updateSeenIndicator(conv);
   });
 
   // Typing listener (DMs only)
@@ -696,6 +732,19 @@ function openConversation(conv){
 
   // Mark conv active
   document.querySelectorAll('.conv-item').forEach(el=>el.classList.toggle('active',el.dataset.id===conv.id));
+
+  // Read receipts (DMs only)
+  if(conv.type==='dm'&&me){
+    const convRef=db.collection('directMessages').doc(conv.id);
+    convRef.set({lastRead:{[me.uid]:FS.FieldValue.serverTimestamp()}},{merge:true}).catch(()=>{});
+    if(_unsubConvDoc)_unsubConvDoc();
+    _unsubConvDoc=convRef.onSnapshot(snap=>{
+      const lr=snap.data()?.lastRead||{};
+      _convLastRead={};
+      Object.entries(lr).forEach(([uid,ts])=>{_convLastRead[uid]=ts?.toMillis?.()??0;});
+      updateSeenIndicator(conv);
+    });
+  }
 }
 
 function renderHeader(conv){
@@ -749,17 +798,23 @@ function addMsgEl(id,data){
   }
 
   const row=document.createElement('div');row.id='m-'+id;row.className='msg-row'+(isOwn?' own':'');
+  if(data.timestamp) row.dataset.ts=data.timestamp.toMillis?.()??0;
 
   if(!isOwn){
     const av=document.createElement('div');av.className='msg-avatar';
     if(data.senderPhoto){av.style.backgroundImage=`url('${data.senderPhoto}')`;av.style.color='transparent';}
     else{av.textContent=(data.senderName||'?')[0].toUpperCase();av.style.background=strColor(data.senderId||'');}
+    av.style.cursor='pointer';av.onclick=()=>openDmProfile(data.senderId,data);
     row.appendChild(av);
   }
 
   const col=document.createElement('div');col.className='msg-col';
   const meta=document.createElement('div');meta.className='msg-meta';
-  if(!isOwn){const nm=document.createElement('span');nm.className='msg-name';nm.textContent=data.senderName||'Anonymous';meta.appendChild(nm);}
+  if(!isOwn){
+    const nm=document.createElement('span');nm.className='msg-name';nm.textContent=data.senderName||'Anonymous';
+    nm.style.cursor='pointer';nm.onclick=()=>openDmProfile(data.senderId,data);
+    meta.appendChild(nm);
+  }
   const tm=document.createElement('span');tm.className='msg-time';
   if(data.timestamp){const d=data.timestamp.toDate?data.timestamp.toDate():new Date(data.timestamp);tm.textContent=fmtTime(d);}
   meta.appendChild(tm);col.appendChild(meta);
@@ -826,11 +881,10 @@ function updateMsgEl(id,data){
 }
 
 async function deleteMsg(id){
-  if(!confirm('Delete this message?'))return;
   const col=activeConv.type==='group'
     ?db.collection('groupChats').doc(activeConv.id).collection('messages')
     :db.collection('directMessages').doc(activeConv.id).collection('messages');
-  try{await col.doc(id).delete();}catch(e){toast('Could not delete');}
+  try{await col.doc(id).delete();toast('Message deleted');}catch(e){toast('Could not delete');}
 }
 
 async function toggleReact(msgId,em){
@@ -1258,6 +1312,55 @@ async function upsertUserDoc(user){
   setInterval(()=>{db.collection('users').doc(user.uid).update({lastSeen:FS.FieldValue.serverTimestamp()}).catch(()=>{});},120000);
 }
 
+// ── READ RECEIPTS ─────────────────────────────────────────────────────────────
+let _convLastRead={},_unsubConvDoc=null;
+
+function updateSeenIndicator(conv){
+  document.querySelectorAll('.seen-indicator').forEach(el=>el.remove());
+  if(!conv||conv.type!=='dm'||!me)return;
+  const otherReadAt=_convLastRead[conv.otherId]||0;
+  if(!otherReadAt)return;
+  const ownRows=[...msgsEl.querySelectorAll('.msg-row.own')];
+  let target=null;
+  for(const row of ownRows){
+    const ts=parseInt(row.dataset.ts||'0');
+    if(ts&&ts<=otherReadAt)target=row;
+  }
+  if(target){
+    const el=document.createElement('div');el.className='seen-indicator';
+    el.innerHTML=`<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Seen`;
+    target.after(el);
+  }
+}
+
+// ── PROFILE MODAL ─────────────────────────────────────────────────────────────
+async function openDmProfile(uid,baseData){
+  if(!uid)return;
+  const av=document.getElementById('profAv'),nameEl=document.getElementById('profName');
+  const cstatEl=document.getElementById('profCStatus'),roleWrap=document.getElementById('profRoleWrap');
+  const bioEl=document.getElementById('profBio');
+  const name=baseData?.senderName||baseData?.displayName||'…';
+  av.style.background=strColor(uid);
+  av.innerHTML=baseData?.senderPhoto||baseData?.photoURL?`<img src="${baseData.senderPhoto||baseData.photoURL}">`:(name[0]?.toUpperCase()||'?');
+  nameEl.textContent=name;cstatEl.textContent='';roleWrap.innerHTML='';bioEl.style.display='none';
+  document.getElementById('profOverlay').classList.add('open');
+  try{
+    const [u,pres]=await Promise.all([
+      getUser(uid),
+      db.collection('presence').doc(uid).get().catch(()=>null)
+    ]);
+    const presData=pres?.data()||{};
+    if(u.photoURL)av.innerHTML=`<img src="${u.photoURL}">`;
+    nameEl.textContent=u.displayName||name;
+    cstatEl.textContent=presData.status||(presData.online?'🟢 Online':'');
+    const role=u.role||'user';
+    const RLBL={user:'User',moderator:'Moderator',owner:'Owner',main_owner:'Main Owner',banned:'Banned'};
+    roleWrap.innerHTML=`<div class="prof-role ${role}">${RLBL[role]||'User'}</div>`;
+    if(u.bio){bioEl.textContent=u.bio;bioEl.style.display='block';}
+  }catch{}
+}
+function closeProfModal(){document.getElementById('profOverlay').classList.remove('open');}
+
 // ── AUTH ──────────────────────────────────────────────────────────────────────
 auth.onAuthStateChanged(async user=>{
   if(user){
@@ -1265,6 +1368,14 @@ auth.onAuthStateChanged(async user=>{
     await upsertUserDoc(user);
     startConvListeners();
     startIncomingCallListener();
+    // Auto-open DM if navigated from a profile
+    const params=new URLSearchParams(location.search);
+    const targetUid=params.get('uid'),targetName=params.get('name');
+    if(targetUid&&targetUid!==me.uid){
+      const u=await getUser(targetUid);
+      openConversation({id:[me.uid,targetUid].sort().join('_'),type:'dm',otherId:targetUid,name:u.displayName||targetName||'User',photoURL:u.photoURL||null});
+      history.replaceState(null,'',location.pathname);
+    }
   } else {
     // Guest mode using localStorage identity
     const guestName=localStorage.getItem('vexis-display-name')||'Guest';
