@@ -4,6 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vexis</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#111111">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -284,7 +289,15 @@
 
   .item-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px,1fr)); gap: 10px; }
 
+  .item-card-badge {
+    position: absolute; top: 8px; right: 8px;
+    background: #f85149; color: #fff; border-radius: 10px;
+    font-size: .58rem; font-weight: 700; padding: 2px 6px;
+    min-width: 18px; text-align: center; line-height: 1.4;
+    box-shadow: 0 2px 6px rgba(248,81,73,.4);
+  }
   .item-card {
+    position: relative;
     background: var(--surf); border: 1px solid var(--bdr);
     border-radius: var(--r); padding: 20px 16px;
     cursor: pointer; transition: all .18s;
@@ -1801,8 +1814,19 @@
       if (dmCount !== null && dmCount !== undefined) window._notifCount = dmCount || 0;
       const total = (window._notifCount || 0) + (window._gcHasNew ? 1 : 0);
       const ndot = document.querySelector('.ndot');
-      if (!ndot) return;
-      ndot.classList.toggle('active', total > 0);
+      if (ndot) ndot.classList.toggle('active', total > 0);
+      // Update DM card badge
+      const dmCard = document.querySelector('.item-card[data-url="social/dm.html"]');
+      if (dmCard) {
+        let badge = dmCard.querySelector('.item-card-badge');
+        const n = window._notifCount || 0;
+        if (n > 0) {
+          if (!badge) { badge = document.createElement('span'); badge.className = 'item-card-badge'; dmCard.appendChild(badge); }
+          badge.textContent = n > 99 ? '99+' : n;
+        } else {
+          if (badge) badge.remove();
+        }
+      }
     };
 
     let _notifUnsub = null, _gcUnsub = null;
@@ -2293,7 +2317,7 @@ function buildGrid(category) {
     const delBtn = isCustom
       ? `<span class="item-card-del" onclick="delItem(event,'${category}',${idx - baseLen})"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="1" y1="1" x2="9" y2="9"/><line x1="9" y1="1" x2="1" y2="9"/></svg></span>`
       : '';
-    return `<div class="item-card" onclick="${clickAction}">${delBtn}
+    return `<div class="item-card" data-url="${item.url||''}" onclick="${clickAction}">${delBtn}
       <div class="item-card-ico">${ico(item.icon||'custom', 20)}</div>
       <div class="item-card-name">${item.name}</div>
       <div class="item-card-desc">${item.desc}</div>
@@ -3391,6 +3415,13 @@ document.addEventListener('keydown', e => {
     if(settingsOpen)toggleSettings(); if(_modalCat)closeModal();
   }
   if((e.metaKey||e.ctrlKey)&&e.key==='k') { e.preventDefault(); toggleSearch(); }
+  if((e.ctrlKey||e.metaKey)&&e.shiftKey&&e.key==='A') {
+    e.preventDefault();
+    const role=window._userRole;
+    if(role==='owner'||role==='main_owner') openStaffPanel('owner');
+    else if(role==='moderator') openStaffPanel('mod');
+    else toast('Staff access required');
+  }
 });
 
 /* ══════════════════════════════════════════════
@@ -4453,6 +4484,10 @@ buildHome();
 buildStats();
 buildNotifs();
 buildUserMenu(null);
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').catch(() => {});
+}
 </script>
 </body>
 </html>
