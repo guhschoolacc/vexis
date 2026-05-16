@@ -142,7 +142,8 @@
   .cr-btn svg { color: var(--dim); transition: color .12s; }
   .cr-btn:hover svg { color: var(--text); }
   .ndot { position: absolute; top: 6px; right: 6px; width: 5px; height: 5px; border-radius: 50%; background: var(--dim); border: 1.5px solid var(--surf); transition: background .2s; }
-  .ndot.active { background: #f85149; }
+  .ndot.active { background: #f85149; animation: ndotPop .38s cubic-bezier(.34,1.56,.64,1) both, ndotRing 2s ease-in-out 0.4s infinite; }
+  @keyframes ndotRing { 0%,100% { box-shadow: 0 0 0 0 rgba(248,81,73,.5); } 60% { box-shadow: 0 0 0 5px rgba(248,81,73,0); } }
 
   .user-chip {
     display: flex; align-items: center; gap: 6px;
@@ -157,8 +158,8 @@
 
   /* ═══════════════ PAGES ═══════════════ */
   #pages { flex: 1; overflow: hidden; position: relative; z-index: 1; }
-  .page { position: absolute; inset: 0; overflow-y: auto; opacity: 0; pointer-events: none; transition: opacity .16s; }
-  .page.active { opacity: 1; pointer-events: all; }
+  .page { position: absolute; inset: 0; overflow-y: auto; opacity: 0; pointer-events: none; transition: opacity .22s ease, transform .22s cubic-bezier(.4,0,.2,1); transform: translateY(10px); }
+  .page.active { opacity: 1; pointer-events: all; transform: translateY(0); }
 
   /* ═══════════════ IFRAME PAGE ═══════════════ */
   #page-iframe {
@@ -260,8 +261,9 @@
     display: flex; flex-direction: column;
     align-items: center; gap: 9px; cursor: pointer;
   }
-  .nav-circle-wrap:hover .nav-circle { background: var(--raise2); border-color: var(--bdrhi); transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,.35); }
+  .nav-circle-wrap:hover .nav-circle { background: var(--raise2); border-color: var(--bdrhi); transform: translateY(-8px) scale(1.1); box-shadow: 0 16px 32px rgba(0,0,0,.45), 0 0 0 1px rgba(255,255,255,.06); }
   .nav-circle-wrap:hover .nav-circle-label { color: var(--text); }
+  .nav-circle-wrap:active .nav-circle { transform: translateY(-2px) scale(.96); }
 
   .nav-circle {
     width: 56px; height: 56px; border-radius: 50%;
@@ -300,21 +302,24 @@
     position: relative;
     background: var(--surf); border: 1px solid var(--bdr);
     border-radius: var(--r); padding: 20px 16px;
-    cursor: pointer; transition: all .18s;
-    position: relative;
+    cursor: pointer;
+    transition: background .18s, border-color .18s, transform .26s cubic-bezier(.34,1.56,.64,1), box-shadow .26s;
+    animation: cardIn .38s cubic-bezier(.34,1.2,.64,1) both;
   }
   .item-card:hover {
     background: var(--raise); border-color: var(--bdrhi);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0,0,0,.25);
+    transform: translateY(-6px) scale(1.025);
+    box-shadow: 0 16px 40px rgba(0,0,0,.38), 0 0 0 1px rgba(255,255,255,.05);
   }
+  .item-card:active { transform: translateY(-2px) scale(.99); transition-duration: .08s; }
   .item-card-ico {
-    width: 36px; height: 36px; border-radius: 9px;
+    width: 38px; height: 38px; border-radius: 10px;
     background: var(--raise2); border: 1px solid var(--bdr);
     display: flex; align-items: center; justify-content: center;
-    margin-bottom: 14px; transition: border-color .18s;
+    margin-bottom: 14px;
+    transition: transform .26s cubic-bezier(.34,1.56,.64,1), border-color .18s, box-shadow .26s;
   }
-  .item-card:hover .item-card-ico { border-color: var(--bdrhi); }
+  .item-card:hover .item-card-ico { border-color: var(--accent); transform: scale(1.12) rotate(-4deg); box-shadow: 0 4px 12px rgba(0,0,0,.3); }
   .item-card-name { font-size: .76rem; font-weight: 600; color: var(--bright); margin-bottom: 4px; }
   .item-card-desc { font-size: .67rem; color: var(--dim); line-height: 1.55; }
 
@@ -333,24 +338,24 @@
   .add-card {
     background: transparent;
     border: 1.5px dashed var(--bdr);
-    border-radius: var(--r);
-    padding: 20px 16px;
+    border-radius: var(--r); padding: 20px 16px;
     cursor: pointer;
-    transition: all .18s;
+    transition: background .2s, border-color .2s, transform .26s cubic-bezier(.34,1.56,.64,1), box-shadow .2s;
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
     gap: 8px; min-height: 118px;
+    animation: cardIn .38s cubic-bezier(.34,1.2,.64,1) both;
   }
-  .add-card:hover { background: var(--surf); border-color: var(--bdrhi); border-style: solid; }
+  .add-card:hover { background: var(--surf); border-color: var(--bdrhi); border-style: solid; transform: translateY(-4px); box-shadow: 0 10px 28px rgba(0,0,0,.25); }
   .add-card-plus {
-    width: 28px; height: 28px; border-radius: 8px;
+    width: 30px; height: 30px; border-radius: 9px;
     background: var(--raise); border: 1px solid var(--bdrhi);
     display: flex; align-items: center; justify-content: center;
-    transition: all .18s;
+    transition: transform .26s cubic-bezier(.34,1.56,.64,1), background .18s;
   }
-  .add-card:hover .add-card-plus { background: var(--raise2); }
+  .add-card:hover .add-card-plus { background: var(--raise2); transform: rotate(90deg) scale(1.15); }
   .add-card-plus svg { color: var(--dim); }
-  .add-card-text { font-size: .67rem; color: var(--muted); font-weight: 500; }
+  .add-card-text { font-size: .67rem; color: var(--muted); font-weight: 500; transition: color .18s; }
   .add-card:hover .add-card-text { color: var(--text); }
 
   /* ═══════════════ ADD MODAL ═══════════════ */
@@ -531,15 +536,20 @@
   }
 
 
-  .theme-swatch-space   { background: linear-gradient(135deg, #000010 0%, #0a0020 40%, #000510 100%); }
-  .theme-swatch-aurora  { background: linear-gradient(135deg, #001a10 0%, #002a20 50%, #001530 100%); }
-  .theme-swatch-sunset  { background: linear-gradient(135deg, #1a0510 0%, #2a0a00 50%, #1a0800 100%); }
-  .theme-swatch-ocean   { background: linear-gradient(135deg, #000818 0%, #001830 50%, #000c20 100%); }
-  .theme-swatch-neon    { background: linear-gradient(135deg, #060010 0%, #100008 50%, #000810 100%); }
-  .theme-swatch-rain    { background: linear-gradient(135deg, #000814 0%, #001528 50%, #000a18 100%); }
-  .theme-swatch-fire    { background: linear-gradient(135deg, #150200 0%, #2a0800 50%, #150400 100%); }
-  .theme-swatch-matrix  { background: linear-gradient(135deg, #000800 0%, #001000 50%, #000500 100%); }
-  .theme-swatch-sakura  { background: linear-gradient(135deg, #100010 0%, #1a0515 50%, #0d0008 100%); }
+  .theme-swatch-space      { background: linear-gradient(135deg, #000010 0%, #0a0020 40%, #000510 100%); }
+  .theme-swatch-aurora     { background: linear-gradient(135deg, #001a10 0%, #002a20 50%, #001530 100%); }
+  .theme-swatch-sunset     { background: linear-gradient(135deg, #1a0510 0%, #2a0a00 50%, #1a0800 100%); }
+  .theme-swatch-ocean      { background: linear-gradient(135deg, #000818 0%, #001830 50%, #000c20 100%); }
+  .theme-swatch-neon       { background: linear-gradient(135deg, #060010 0%, #100008 50%, #000810 100%); }
+  .theme-swatch-rain       { background: linear-gradient(135deg, #000814 0%, #001528 50%, #000a18 100%); }
+  .theme-swatch-fire       { background: linear-gradient(135deg, #150200 0%, #2a0800 50%, #150400 100%); }
+  .theme-swatch-matrix     { background: linear-gradient(135deg, #000800 0%, #001000 50%, #000500 100%); }
+  .theme-swatch-sakura     { background: linear-gradient(135deg, #100010 0%, #1a0515 50%, #0d0008 100%); }
+  .theme-swatch-vaporwave  { background: linear-gradient(135deg, #0d0030 0%, #200040 40%, #0a0025 100%); }
+  .theme-swatch-midnight   { background: linear-gradient(135deg, #000820 0%, #001040 50%, #000c30 100%); }
+  .theme-swatch-petergriffin { background: linear-gradient(135deg, #0a0e1a 0%, #12182a 50%, #0a0e1a 100%); }
+  .theme-swatch-galaxy     { background: linear-gradient(135deg, #000510 0%, #050018 50%, #000510 100%); }
+  .theme-swatch-lofi       { background: linear-gradient(135deg, #120c00 0%, #1e1400 50%, #120c00 100%); }
 
   /* ═══════════════ SUBMIT MODAL ═══════════════ */
   #submitOverlay {
@@ -672,8 +682,15 @@
   }
   #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-  @keyframes up { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
-  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes up      { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes spin    { to { transform: rotate(360deg); } }
+  @keyframes cardIn  { from { opacity:0; transform:translateY(18px) scale(.96); } to { opacity:1; transform:translateY(0) scale(1); } }
+  @keyframes popIn   { 0% { opacity:0; transform:scale(.82); } 65% { transform:scale(1.04); } 100% { opacity:1; transform:scale(1); } }
+  @keyframes fadeUp  { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes shimmer { 0%,100% { opacity:.5; } 50% { opacity:1; } }
+  @keyframes float   { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-6px); } }
+  @keyframes glowPulse { 0%,100% { box-shadow:0 0 0 0 rgba(136,136,136,0); } 50% { box-shadow:0 0 18px 4px rgba(136,136,136,.18); } }
+  @keyframes ndotPop { 0% { transform:scale(0); } 70% { transform:scale(1.3); } 100% { transform:scale(1); } }
 
   /* ═══════════════ LOGIN SCREEN ═══════════════ */
   #loginScreen {
@@ -1468,6 +1485,19 @@
       <div class="theme-option theme-swatch-sakura" data-atheme="sakura" title="Sakura">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,170,200,.8)" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="1"/><path d="M12 5a3 3 0 0 1 3 3"/><path d="M19 12a3 3 0 0 1-3 3"/><path d="M12 19a3 3 0 0 1-3-3"/><path d="M5 12a3 3 0 0 1 3-3"/><path d="M9 5a3 3 0 0 0-3 3"/><path d="M5 12a3 3 0 0 0 3 3"/><path d="M9 19a3 3 0 0 0 3-3"/><path d="M19 12a3 3 0 0 0-3-3"/></svg>
       </div>
+      <div class="theme-option theme-swatch-vaporwave" data-atheme="vaporwave" title="Vaporwave">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,80,220,.8)" stroke-width="2" stroke-linecap="round"><rect x="2" y="14" width="20" height="8" rx="1"/><path d="M2 14L12 4l10 10"/><line x1="12" y1="4" x2="12" y2="2"/></svg>
+      </div>
+      <div class="theme-option theme-swatch-midnight" data-atheme="midnight" title="Midnight">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(120,160,255,.8)" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </div>
+      <div class="theme-option theme-swatch-petergriffin" data-atheme="petergriffin" title="Peter Griffin" style="background-image:url('images/peter.png');background-size:cover;background-position:center top;"></div>
+      <div class="theme-option theme-swatch-galaxy" data-atheme="galaxy" title="Galaxy">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(180,140,255,.8)" stroke-width="2" stroke-linecap="round"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 12l8.5-8.5"/><circle cx="12" cy="12" r="2"/></svg>
+      </div>
+      <div class="theme-option theme-swatch-lofi" data-atheme="lofi" title="Lo-Fi">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(220,180,100,.8)" stroke-width="2" stroke-linecap="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3z"/><path d="M3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
+      </div>
     </div>
     <div style="font-size:.6rem;color:var(--muted);margin-top:7px">Click to activate a live animated background.</div>
   </div>
@@ -2141,7 +2171,7 @@ const CUSTOM = {games:[], apps:[], tools:[], social:[]};
 ══════════════════════════════════════════════ */
 let _iframeReturnPage = 'home';
 
-function openIframe(name, url, returnPage) {
+function openIframe(name, url, returnPage, displayUrl) {
   _iframeReturnPage = returnPage || 'home';
   const iframePage = document.getElementById('page-iframe');
   const iframe     = document.getElementById('mainIframe');
@@ -2156,7 +2186,7 @@ function openIframe(name, url, returnPage) {
     setTimeout(() => { iframe.src = url; }, 30);
 
     iframe.onload = () => { spinner.classList.add('hidden'); };
-    document.getElementById('omni').value = url;
+    document.getElementById('omni').value = displayUrl || url;
   } else {
     iframe.style.display = 'none';
     noUrl.style.display  = 'flex';
@@ -2174,7 +2204,7 @@ function openIframe(name, url, returnPage) {
   const id = getActiveTabId();
   if (_tabState[id]) {
     _tabState[id].page = 'iframe';
-    _tabState[id].omni = url || 'vexis://no-url';
+    _tabState[id].omni = displayUrl || url || 'vexis://no-url';
     const hist = _tabState[id].history || [];
     if (hist[hist.length-1] !== 'iframe') {
       hist.push('iframe');
@@ -2571,7 +2601,8 @@ function buildGrid(category) {
     const delBtn = isCustom
       ? `<span class="item-card-del" onclick="delItem(event,'${category}',${idx - baseLen})"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="1" y1="1" x2="9" y2="9"/><line x1="9" y1="1" x2="1" y2="9"/></svg></span>`
       : '';
-    return `<div class="item-card" data-url="${item.url||''}" onclick="${clickAction}">${delBtn}
+    const delay = `animation-delay:${idx * 38}ms`;
+    return `<div class="item-card" data-url="${item.url||''}" onclick="${clickAction}" style="${delay}">${delBtn}
       <div class="item-card-ico">${ico(item.icon||'custom', 20)}</div>
       <div class="item-card-name">${item.name}</div>
       <div class="item-card-desc">${item.desc}</div>
@@ -2853,8 +2884,18 @@ const ANIM_CHROME_COLORS = {
     vars:{'--bg':'#0a0100','--surf':'#180400','--raise':'#230600','--raise2':'#2c0800','--bdr':'#3a0c00','--bdrhi':'#4c1000','--muted':'#4c1000','--dim':'#7a3010','--text':'#c07040','--bright':'#e09868','--white':'#ffcc99'} },
   matrix: { chrome:'rgba(0,8,0,.97)',    omni:'rgba(0,4,0,.98)',    bdr:'rgba(0,80,0,.4)',     text:'rgba(80,210,80,.88)',
     vars:{'--bg':'#000800','--surf':'#001000','--raise':'#001800','--raise2':'#001f00','--bdr':'#002800','--bdrhi':'#003300','--muted':'#003300','--dim':'#206020','--text':'#50c050','--bright':'#80e080','--white':'#b0ffb0'} },
-  sakura: { chrome:'rgba(12,0,14,.97)',  omni:'rgba(6,0,8,.98)',    bdr:'rgba(100,20,80,.4)',  text:'rgba(225,165,200,.88)',
+  sakura:      { chrome:'rgba(12,0,14,.97)',  omni:'rgba(6,0,8,.98)',    bdr:'rgba(100,20,80,.4)',  text:'rgba(225,165,200,.88)',
     vars:{'--bg':'#0c000e','--surf':'#180014','--raise':'#220018','--raise2':'#2a001e','--bdr':'#380028','--bdrhi':'#460032','--muted':'#460032','--dim':'#7a2060','--text':'#d080a8','--bright':'#e8a8c8','--white':'#ffcce0'} },
+  vaporwave:   { chrome:'rgba(8,0,28,.97)',   omni:'rgba(4,0,16,.98)',   bdr:'rgba(160,30,200,.4)', text:'rgba(255,100,240,.88)',
+    vars:{'--bg':'#060014','--surf':'#0d0028','--raise':'#160040','--raise2':'#1c004c','--bdr':'#280060','--bdrhi':'#320080','--muted':'#320080','--dim':'#7020a0','--text':'#c050e0','--bright':'#e080f8','--white':'#ffb0ff'} },
+  midnight:    { chrome:'rgba(0,4,20,.97)',   omni:'rgba(0,2,12,.98)',   bdr:'rgba(30,60,160,.4)',  text:'rgba(140,180,255,.88)',
+    vars:{'--bg':'#00040f','--surf':'#000820','--raise':'#000c30','--raise2':'#00103c','--bdr':'#001550','--bdrhi':'#001c68','--muted':'#001c68','--dim':'#103880','--text':'#5080c8','--bright':'#80a8e8','--white':'#b0ccff'} },
+  petergriffin:{ chrome:'rgba(6,8,14,.97)',  omni:'rgba(3,4,8,.98)',    bdr:'rgba(80,90,120,.4)',  text:'rgba(210,200,170,.88)',
+    vars:{'--bg':'#060810','--surf':'#0c1020','--raise':'#121828','--raise2':'#181f30','--bdr':'#202840','--bdrhi':'#2a3350','--muted':'#2a3350','--dim':'#506080','--text':'#a0a8c0','--bright':'#c8c8d8','--white':'#e8e0cc'} },
+  galaxy:      { chrome:'rgba(2,0,12,.97)',   omni:'rgba(1,0,7,.98)',    bdr:'rgba(80,40,160,.4)',  text:'rgba(200,170,255,.88)',
+    vars:{'--bg':'#020008','--surf':'#060018','--raise':'#0c0028','--raise2':'#100030','--bdr':'#1a0048','--bdrhi':'#220060','--muted':'#220060','--dim':'#502890','--text':'#9060c0','--bright':'#c090e8','--white':'#e0c0ff'} },
+  lofi:        { chrome:'rgba(10,7,0,.97)',   omni:'rgba(5,3,0,.98)',    bdr:'rgba(100,72,20,.4)',  text:'rgba(220,188,120,.88)',
+    vars:{'--bg':'#0a0700','--surf':'#160e00','--raise':'#1e1400','--raise2':'#261a00','--bdr':'#332000','--bdrhi':'#402800','--muted':'#402800','--dim':'#6a4a10','--text':'#b08840','--bright':'#d0a858','--white':'#f0cc80'} },
 };
 
 function applyChromePalette(colors) {
@@ -3350,6 +3391,256 @@ const ANIM_THEMES = {
       });
     }
   },
+
+  vaporwave: {
+    setup(ctx, W, H) {
+      this.stars = Array.from({length:120}, () => ({
+        x:Math.random()*W, y:Math.random()*H*.55,
+        r:Math.random()*.9+.2, alpha:Math.random()*.7+.3, twinkle:Math.random()*Math.PI*2,
+      }));
+      this.gridLines = {hz:18, vp:28};
+      this.scanY = 0;
+    },
+    draw(ctx, W, H, t) {
+      // Deep purple background
+      const bg = ctx.createLinearGradient(0,0,0,H);
+      bg.addColorStop(0,'#08001e'); bg.addColorStop(.45,'#18003a'); bg.addColorStop(1,'#0a0018');
+      ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
+
+      // Retro sun
+      const sunX=W*.5, sunY=H*.52, sunR=H*.18;
+      const sunG=ctx.createRadialGradient(sunX,sunY,0,sunX,sunY,sunR);
+      sunG.addColorStop(0,'rgba(255,80,200,.95)'); sunG.addColorStop(.5,'rgba(255,40,120,.7)'); sunG.addColorStop(1,'transparent');
+      ctx.save(); ctx.beginPath(); ctx.arc(sunX,sunY,sunR,0,Math.PI*2);
+      ctx.fillStyle=sunG; ctx.fill();
+      // Horizontal stripes on sun
+      const stripeCount=7;
+      for(let i=0;i<stripeCount;i++){
+        const sy=sunY-sunR*.5+i*(sunR/stripeCount)+((t*.5)%(sunR/stripeCount));
+        if(sy<sunY-sunR||sy>sunY+sunR*.5) continue;
+        const hw=Math.sqrt(Math.max(0,sunR*sunR-(sy-sunY)*(sy-sunY)));
+        ctx.fillStyle='rgba(8,0,20,.7)'; ctx.fillRect(sunX-hw,sy,hw*2,sunR/stripeCount*.55);
+      }
+      ctx.restore();
+
+      // Perspective grid floor
+      const horizon=H*.52;
+      const vp=W*.5;
+      ctx.save(); ctx.beginPath(); ctx.rect(0,horizon,W,H-horizon); ctx.clip();
+      // Horizontal lines
+      for(let i=0;i<this.gridLines.hz;i++){
+        const prog=i/this.gridLines.hz;
+        const speed=((t*.4)%((H-horizon)/this.gridLines.hz))/(H-horizon);
+        const y=horizon+(H-horizon)*Math.pow((prog+speed)%1,1.6);
+        const alpha=Math.pow(prog,1.2)*.7;
+        ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y);
+        ctx.strokeStyle=`rgba(255,60,210,${alpha})`; ctx.lineWidth=.8; ctx.stroke();
+      }
+      // Vertical lines
+      for(let i=-this.gridLines.vp;i<=this.gridLines.vp;i++){
+        const x=vp+i*(W/(this.gridLines.vp));
+        ctx.beginPath(); ctx.moveTo(vp,horizon); ctx.lineTo(x,H);
+        ctx.strokeStyle='rgba(180,40,255,.35)'; ctx.lineWidth=.7; ctx.stroke();
+      }
+      ctx.restore();
+
+      // Stars
+      this.stars.forEach(s=>{
+        const f=Math.sin(t*.018+s.twinkle)*.3+.7;
+        ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+        ctx.fillStyle=`rgba(255,200,255,${s.alpha*f})`; ctx.fill();
+      });
+
+      // Scan line
+      this.scanY=(this.scanY+1.2)%H;
+      ctx.fillStyle='rgba(255,80,255,.03)'; ctx.fillRect(0,this.scanY,W,2);
+    }
+  },
+
+  midnight: {
+    setup(ctx, W, H) {
+      this.orbs = Array.from({length:12}, () => ({
+        x:Math.random()*W, y:Math.random()*H,
+        r:Math.random()*80+40,
+        vx:(Math.random()-.5)*.18, vy:(Math.random()-.5)*.14,
+        hue:Math.random()*60+200,
+        alpha:Math.random()*.08+.04,
+        phase:Math.random()*Math.PI*2,
+      }));
+      this.stars = Array.from({length:160}, () => ({
+        x:Math.random()*W, y:Math.random()*H,
+        r:Math.random()*.8+.2, alpha:Math.random()*.6+.2,
+        twinkle:Math.random()*Math.PI*2,
+      }));
+    },
+    draw(ctx, W, H, t) {
+      ctx.fillStyle='#00040f'; ctx.fillRect(0,0,W,H);
+
+      // Stars
+      this.stars.forEach(s=>{
+        const f=Math.sin(t*.012+s.twinkle)*.3+.7;
+        ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+        ctx.fillStyle=`rgba(200,220,255,${s.alpha*f})`; ctx.fill();
+      });
+
+      // Floating orbs
+      this.orbs.forEach(o=>{
+        const pulse=Math.sin(t*.008+o.phase)*.02+1;
+        const rg=ctx.createRadialGradient(o.x,o.y,0,o.x,o.y,o.r*pulse);
+        rg.addColorStop(0,`hsla(${o.hue},85%,65%,${o.alpha*1.6})`);
+        rg.addColorStop(.5,`hsla(${o.hue},70%,50%,${o.alpha})`);
+        rg.addColorStop(1,'transparent');
+        ctx.fillStyle=rg; ctx.beginPath(); ctx.arc(o.x,o.y,o.r*pulse,0,Math.PI*2); ctx.fill();
+        o.x+=o.vx; o.y+=o.vy;
+        if(o.x<-o.r*2)o.x=W+o.r; if(o.x>W+o.r*2)o.x=-o.r;
+        if(o.y<-o.r*2)o.y=H+o.r; if(o.y>H+o.r*2)o.y=-o.r;
+      });
+
+      // Moon
+      const mx=W*.82, my=H*.15, mr=H*.055;
+      const mg=ctx.createRadialGradient(mx-mr*.2,my-mr*.2,0,mx,my,mr);
+      mg.addColorStop(0,'rgba(220,235,255,.95)'); mg.addColorStop(.7,'rgba(180,210,255,.6)'); mg.addColorStop(1,'transparent');
+      ctx.fillStyle=mg; ctx.beginPath(); ctx.arc(mx,my,mr,0,Math.PI*2); ctx.fill();
+      // Crater
+      ctx.fillStyle='rgba(140,170,220,.18)'; ctx.beginPath(); ctx.arc(mx+mr*.25,my-mr*.1,mr*.22,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='rgba(140,170,220,.12)'; ctx.beginPath(); ctx.arc(mx-mr*.2,my+mr*.2,mr*.14,0,Math.PI*2); ctx.fill();
+    }
+  },
+
+  petergriffin: {
+    setup(ctx, W, H) {
+      this._img = new Image();
+      this._img.src = 'images/peter.png';
+    },
+    draw(ctx, W, H, t) {
+      ctx.fillStyle = '#111'; ctx.fillRect(0, 0, W, H);
+      if (this._img.complete && this._img.naturalWidth > 0) {
+        const ar = this._img.naturalWidth / this._img.naturalHeight;
+        const ih = H * .9;
+        const iw = ih * ar;
+        ctx.drawImage(this._img, W * .5 - iw * .5, H * .5 - ih * .5, iw, ih);
+      }
+    }
+  },
+
+  galaxy: {
+    setup(ctx, W, H) {
+      const arms=4, starsPerArm=260;
+      this.stars=[];
+      for(let a=0;a<arms;a++){
+        for(let i=0;i<starsPerArm;i++){
+          const dist=Math.random()*Math.min(W,H)*.42+10;
+          const angle=(i/starsPerArm)*Math.PI*4+(a/arms)*Math.PI*2;
+          const spread=(Math.random()-.5)*0.5*(dist/90);
+          this.stars.push({
+            x:W*.5+Math.cos(angle+spread)*dist,
+            y:H*.5+Math.sin(angle+spread)*dist*.55,
+            r:Math.random()*1.4+.2,
+            alpha:Math.random()*.7+.25,
+            hue:160+a*45+Math.random()*40,
+            dist,
+          });
+        }
+      }
+      // Background scatter
+      this.scatter=Array.from({length:180},()=>({
+        x:Math.random()*W, y:Math.random()*H,
+        r:Math.random()*.5+.1, alpha:Math.random()*.3+.1,
+        twinkle:Math.random()*Math.PI*2,
+      }));
+    },
+    draw(ctx, W, H, t) {
+      ctx.fillStyle='#010008'; ctx.fillRect(0,0,W,H);
+
+      // Galactic core glow
+      const cg=ctx.createRadialGradient(W*.5,H*.5,0,W*.5,H*.5,Math.min(W,H)*.28);
+      cg.addColorStop(0,'rgba(255,240,200,.18)'); cg.addColorStop(.3,'rgba(180,140,255,.08)'); cg.addColorStop(1,'transparent');
+      ctx.fillStyle=cg; ctx.fillRect(0,0,W,H);
+
+      // Background stars
+      this.scatter.forEach(s=>{
+        const f=Math.sin(t*.01+s.twinkle)*.2+.8;
+        ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+        ctx.fillStyle=`rgba(200,210,255,${s.alpha*f})`; ctx.fill();
+      });
+
+      // Rotating spiral arms
+      const rot=t*.0012;
+      this.stars.forEach(s=>{
+        const ox=s.x-W*.5, oy=s.y-H*.5;
+        const rx=ox*Math.cos(rot)-oy*Math.sin(rot)+W*.5;
+        const ry=ox*Math.sin(rot)+oy*Math.cos(rot)+H*.5;
+        const edge=Math.max(0,1-s.dist/(Math.min(W,H)*.42));
+        ctx.beginPath(); ctx.arc(rx,ry,s.r,0,Math.PI*2);
+        ctx.fillStyle=`hsla(${s.hue},80%,72%,${s.alpha*(.3+edge*.7)})`; ctx.fill();
+        if(s.r>1){
+          const sg=ctx.createRadialGradient(rx,ry,0,rx,ry,s.r*3.5);
+          sg.addColorStop(0,`hsla(${s.hue},80%,80%,${s.alpha*.25})`); sg.addColorStop(1,'transparent');
+          ctx.fillStyle=sg; ctx.beginPath(); ctx.arc(rx,ry,s.r*3.5,0,Math.PI*2); ctx.fill();
+        }
+      });
+    }
+  },
+
+  lofi: {
+    setup(ctx, W, H) {
+      this.drops = Array.from({length:120}, () => ({
+        x:Math.random()*W, y:Math.random()*H,
+        len:Math.random()*16+6, speed:Math.random()*3+1.5,
+        alpha:Math.random()*.25+.08, width:Math.random()*.6+.3,
+      }));
+      this.particles = Array.from({length:30}, () => ({
+        x:Math.random()*W, y:Math.random()*H,
+        r:Math.random()*2+.5, vy:-(Math.random()*.4+.1),
+        alpha:Math.random()*.3+.1, sway:Math.random()*Math.PI*2, swaySpd:Math.random()*.012+.005,
+      }));
+    },
+    draw(ctx, W, H, t) {
+      // Warm amber night
+      const bg=ctx.createLinearGradient(0,0,0,H);
+      bg.addColorStop(0,'#0a0700'); bg.addColorStop(.55,'#130e00'); bg.addColorStop(1,'#0a0700');
+      ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
+
+      // Window light glow (like a lamp through rain)
+      const lg=ctx.createRadialGradient(W*.5,H*.35,0,W*.5,H*.35,W*.38);
+      lg.addColorStop(0,'rgba(255,200,80,.07)'); lg.addColorStop(.5,'rgba(255,160,40,.03)'); lg.addColorStop(1,'transparent');
+      ctx.fillStyle=lg; ctx.fillRect(0,0,W,H);
+
+      // Rain drops
+      this.drops.forEach(d=>{
+        ctx.save(); ctx.globalAlpha=d.alpha;
+        ctx.strokeStyle='#d4a84b'; ctx.lineWidth=d.width;
+        ctx.beginPath(); ctx.moveTo(d.x,d.y); ctx.lineTo(d.x-d.len*.15,d.y+d.len); ctx.stroke();
+        ctx.restore();
+        d.y+=d.speed;
+        if(d.y>H+d.len){ d.y=-(d.len); d.x=Math.random()*W; }
+      });
+
+      // Floating dust motes
+      this.particles.forEach(p=>{
+        const sway=Math.sin(t*p.swaySpd+p.sway)*1.2;
+        ctx.beginPath(); ctx.arc(p.x+sway,p.y,p.r,0,Math.PI*2);
+        const fade=Math.sin(t*.008+p.sway)*.4+.6;
+        ctx.fillStyle=`rgba(220,170,80,${p.alpha*fade})`; ctx.fill();
+        p.y+=p.vy; p.sway+=p.swaySpd;
+        if(p.y<-p.r){ p.y=H+p.r; p.x=Math.random()*W; }
+      });
+
+      // Film grain overlay
+      ctx.save(); ctx.globalAlpha=.018;
+      for(let i=0;i<200;i++){
+        const gx=(Math.random()*W)|0, gy=(Math.random()*H)|0;
+        const gs=Math.random()*1.5;
+        ctx.fillStyle=`rgba(255,200,100,${Math.random()*.5+.3})`; ctx.fillRect(gx,gy,gs,gs);
+      }
+      ctx.restore();
+
+      // Vignette
+      const vg=ctx.createRadialGradient(W*.5,H*.5,H*.25,W*.5,H*.5,H*.8);
+      vg.addColorStop(0,'transparent'); vg.addColorStop(1,'rgba(0,0,0,.55)');
+      ctx.fillStyle=vg; ctx.fillRect(0,0,W,H);
+    }
+  },
 };
 
 function startAnimTheme(name) {
@@ -3722,15 +4013,44 @@ function goForward() {
 
 function nav(page) { navigateTo(page); }
 
+// go.html lives on Interstellar's server (port 3001) so its SW registers
+// on the correct origin — the iframe embeds it inside Vexis seamlessly.
+function proxyUrl(realUrl) {
+  return 'http://localhost:' + (window._interstellarPort || 3001) + '/go.html?u=' + encodeURIComponent(realUrl);
+}
+fetch('/api/proxy-port').then(r => r.json()).then(d => { window._interstellarPort = d.port; }).catch(() => {});
+
 function omniNav(v) {
-  v = v.toLowerCase();
-  if      (v.includes('game'))               navigateTo('games');
-  else if (v.includes('app'))                navigateTo('apps');
-  else if (v.includes('tool'))               navigateTo('tools');
-  else if (v.includes('social'))             navigateTo('social');
-  else if (v.includes('stat')||v.includes('anal')) navigateTo('stats');
-  else if (v.startsWith('http')||v.startsWith('//')) openIframe(v, v, _currentPage);
-  else                                       navigateTo('home');
+  v = v.trim();
+  if (!v) return;
+  const vl = v.toLowerCase();
+
+  // External URL — route through Interstellar proxy
+  if (vl.startsWith('http://') || vl.startsWith('https://') || vl.startsWith('//')) {
+    const realUrl = vl.startsWith('//') ? 'https:' + v : v;
+    openIframe(realUrl, proxyUrl(realUrl), _currentPage, realUrl);
+    return;
+  }
+
+  // Bare domain (e.g. soundcloud.com) — auto-prepend https://
+  if (!v.includes(' ') && v.includes('.') && !vl.startsWith('vexis://')) {
+    const realUrl = 'https://' + v;
+    openIframe(realUrl, proxyUrl(realUrl), _currentPage, realUrl);
+    return;
+  }
+
+  // Internal keyword navigation
+  if      (vl.includes('game'))                      navigateTo('games');
+  else if (vl.includes('app'))                       navigateTo('apps');
+  else if (vl.includes('tool'))                      navigateTo('tools');
+  else if (vl.includes('social'))                    navigateTo('social');
+  else if (vl.includes('stat')||vl.includes('anal')) navigateTo('stats');
+  else if (vl === 'vexis://newtab' || vl === 'home') navigateTo('home');
+  // Search fallback
+  else {
+    const searchUrl = 'https://www.google.com/search?q=' + encodeURIComponent(v);
+    openIframe(searchUrl, proxyUrl(searchUrl), _currentPage, searchUrl);
+  }
 }
 
 function reload(btn) {
