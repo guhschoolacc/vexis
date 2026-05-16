@@ -172,7 +172,7 @@ auth.onAuthStateChanged(async user => {
   if (!user) { document.body.innerHTML = '<div style="text-align:center;padding:60px;color:#555;font-family:sans-serif">Not signed in.</div>'; return; }
   const snap = await db.collection('users').doc(user.uid).get();
   const role = snap.data()?.role || 'user';
-  if (role !== 'moderator' && role !== 'owner') {
+  if (role !== 'moderator' && role !== 'owner' && role !== 'main_owner') {
     document.body.innerHTML = '<div style="text-align:center;padding:60px;color:#555;font-family:sans-serif">Access denied.</div>';
     return;
   }
