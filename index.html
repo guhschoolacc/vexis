@@ -1098,7 +1098,10 @@
           <input class="login-input" id="lEmail" type="email" placeholder="you@example.com" onkeydown="if(event.key==='Enter')document.getElementById('lPass').focus()">
         </div>
         <div class="login-field">
-          <div class="login-label">Password</div>
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div class="login-label">Password</div>
+            <span id="forgotLink" style="font-size:.63rem;color:var(--accent);cursor:pointer;opacity:.8;transition:opacity .13s" onmouseenter="this.style.opacity='1'" onmouseleave="this.style.opacity='.8'" onclick="doForgotPassword()">Forgot password?</span>
+          </div>
           <input class="login-input" id="lPass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
         </div>
         <div class="login-field" id="lNameField" style="display:none">
@@ -1758,7 +1761,7 @@
   if (isRealConfig) {
     const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
     const { getAuth, onAuthStateChanged, signInWithEmailAndPassword,
-            createUserWithEmailAndPassword, signOut, updateProfile,
+            createUserWithEmailAndPassword, signOut, updateProfile, sendPasswordResetEmail,
             GoogleAuthProvider, signInWithPopup }
       = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js");
 
@@ -1784,6 +1787,7 @@
       updateProfile:  (user, data)  => updateProfile(user, data),
       signOut:        ()            => signOut(auth),
       googleSignIn:   ()            => signInWithPopup(auth, new GoogleAuthProvider()),
+      resetPassword:  (email)       => sendPasswordResetEmail(auth, email),
       uploadPhoto: async (file, uid) => {
         const storageRef = ref(storage, `profile-pictures/${uid}/avatar`);
         await uploadBytes(storageRef, file);
@@ -2736,7 +2740,7 @@ function buildUserMenu(user) {
           ? `background-image:url('${a.photoURL}');background-size:cover;color:transparent;`
           : `background:${strColorSimple(a.uid)};`;
         const init = (a.displayName||a.email||'?')[0].toUpperCase();
-        return `<div class="sa-row" onclick="switchToAccount('${a.uid}','${(a.provider||'password').replace(/'/g,'')}',' ${(a.email||'').replace(/'/g,'')}')">
+        return `<div class="sa-row" onclick="switchToAccount('${a.uid}','${(a.provider||'password').replace(/'/g,'')}','${(a.email||'').replace(/'/g,'')}')">
           <div class="sa-av" style="${avStyle}">${a.photoURL?'':init}</div>
           <div class="sa-info">
             <div class="sa-name">${a.displayName||a.email||'Unknown'}</div>
@@ -2783,26 +2787,27 @@ function removeStoredAccount(uid) {
   buildUserMenu(window._fbUser);
 }
 
+async function doForgotPassword() {
+  const email = document.getElementById('lEmail').value.trim();
+  if (!email) { setLoginErr('Enter your email above first.'); return; }
+  if (!window._fb || !window._fb.ready) { setLoginErr('Firebase not ready.'); return; }
+  try {
+    await window._fb.resetPassword(email);
+    setLoginErr('');
+    toast('Reset email sent — check your inbox');
+  } catch(e) {
+    const msgs = { 'auth/user-not-found': 'No account found with that email.', 'auth/invalid-email': 'Invalid email address.' };
+    setLoginErr(msgs[e.code] || 'Could not send reset email.');
+  }
+}
+
 async function switchToAccount(uid, provider, email) {
   await doSignOut();
-  if (provider === 'google.com') {
-    setLoginLoading(true);
-    try {
-      const cred = await window._fb.googleSignIn();
-      window.onFirebaseLogin(cred.user);
-    } catch(e) {
-      setLoginLoading(false);
-    }
-  } else {
-    const ls = document.getElementById('loginScreen');
-    ls.style.display = 'flex'; ls.style.opacity = '0';
-    setTimeout(() => { ls.classList.remove('hidden'); ls.style.opacity = ''; }, 10);
-    setLoginTab('sign');
-    const emailInput = document.getElementById('loginEmail');
-    if (emailInput) { emailInput.value = email.trim(); emailInput.focus(); }
-    const passInput = document.getElementById('loginPass');
-    if (passInput) setTimeout(() => passInput.focus(), 50);
-  }
+  setLoginTab('sign');
+  const emailInput = document.getElementById('lEmail');
+  const passInput  = document.getElementById('lPass');
+  if (emailInput) emailInput.value = (email || '').trim();
+  setTimeout(() => { if (passInput) passInput.focus(); }, 80);
 }
 
 /* ══════════════════════════════════════════════
