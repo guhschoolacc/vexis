@@ -1,1044 +1,1328 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Owner Panel · Vexis</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg: #0a0a0f;
-            --bg-alt: #0d0d14;
-            --surface: #111118;
-            --surface-raised: #16161f;
-            --surface-overlay: #1a1a26;
-            --border: #1e1e2d;
-            --border-hi: #28283a;
-            --text-muted: #54546d;
-            --text-dim: #6e6e85;
-            --text: #b0b0c8;
-            --text-bright: #d4d4e8;
-            --text-white: #eeeef6;
-            --accent: #f0a040;
-            --accent-soft: rgba(240, 160, 64, 0.12);
-            --accent-border: rgba(240, 160, 64, 0.3);
-            --danger: #f85149;
-            --danger-soft: rgba(248, 81, 73, 0.10);
-            --danger-border: rgba(248, 81, 73, 0.28);
-            --success: #3fb950;
-            --success-soft: rgba(63, 185, 80, 0.10);
-            --info: #7aa0ff;
-            --info-soft: rgba(122, 160, 255, 0.10);
-            --purple: #d070ff;
-            --purple-soft: rgba(208, 112, 255, 0.12);
-            --radius-sm: 8px;
-            --radius: 12px;
-            --radius-lg: 16px;
-            --transition: 160ms cubic-bezier(0.4, 0, 0.2, 1);
-            --font-base: 0.8rem;
-            --line-height: 1.5;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vexis · Command</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0c0c0e;--surf:#111115;--raise:#18181d;--raise2:#202028;
+  --bdr:#252530;--bdrhi:#32323f;--dim:#60607a;--muted:#383848;
+  --text:#b8b8d0;--bright:#e0e0f0;--white:#f0f0ff;
+  --accent:#ffb84a;--danger:#f85149;--success:#56d364;--info:#7aa0ff;
+  --accent-bg:rgba(255,184,74,.08);--accent-bdr:rgba(255,184,74,.22);
+  --danger-bg:rgba(248,81,73,.08);--danger-bdr:rgba(248,81,73,.22);
+  --success-bg:rgba(86,211,100,.08);--success-bdr:rgba(86,211,100,.22);
+}
+html,body{height:100%;overflow:hidden;font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--bdrhi);border-radius:4px}
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        html, body { height: 100%; overflow: hidden; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; font-size: var(--font-base); line-height: var(--line-height); }
+/* ── LAYOUT ── */
+.app{display:flex;flex-direction:column;height:100%;overflow:hidden}
 
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-thumb { background: var(--border-hi); border-radius: 10px; }
+/* ── TOP BAR ── */
+.topbar{
+  display:flex;align-items:center;gap:0;flex-shrink:0;
+  background:var(--surf);border-bottom:1px solid var(--bdr);
+  height:52px;
+}
+.topbar-brand{
+  display:flex;align-items:center;gap:10px;padding:0 20px;
+  border-right:1px solid var(--bdr);height:100%;flex-shrink:0;
+}
+.topbar-logo{
+  width:28px;height:28px;border-radius:8px;flex-shrink:0;
+  background:linear-gradient(135deg,rgba(255,184,74,.18),rgba(255,184,74,.06));
+  border:1px solid var(--accent-bdr);
+  display:flex;align-items:center;justify-content:center;color:var(--accent);
+}
+.topbar-title{font-size:.84rem;font-weight:700;color:var(--white);letter-spacing:-.01em}
+.topbar-role{
+  padding:2px 9px;border-radius:20px;font-size:.58rem;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;
+  background:var(--accent-bg);border:1px solid var(--accent-bdr);color:var(--accent);
+}
+.topbar-nav{display:flex;align-items:center;gap:2px;padding:0 12px;flex:1;height:100%;overflow-x:auto}
+.topbar-nav::-webkit-scrollbar{height:0}
+.nav-pill{
+  display:flex;align-items:center;gap:6px;padding:0 13px;height:34px;border-radius:8px;
+  font-size:.72rem;font-weight:600;color:var(--dim);cursor:pointer;white-space:nowrap;
+  background:transparent;border:1px solid transparent;transition:all .13s;user-select:none;
+  flex-shrink:0;
+}
+.nav-pill:hover{color:var(--text);background:var(--raise)}
+.nav-pill.active{color:var(--white);background:var(--raise2);border-color:var(--bdrhi)}
+.nav-pill svg{flex-shrink:0;opacity:.7}
+.nav-pill.active svg{opacity:1;color:var(--accent)}
+.nav-badge{
+  background:var(--danger-bg);border:1px solid var(--danger-bdr);color:var(--danger);
+  border-radius:10px;font-size:.56rem;font-weight:700;padding:1px 5px;min-width:18px;text-align:center;
+}
+.topbar-right{display:flex;align-items:center;gap:8px;padding:0 16px;border-left:1px solid var(--bdr);height:100%;flex-shrink:0}
+.topbar-user{font-size:.68rem;color:var(--dim);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
-        .app { display: flex; flex-direction: column; height: 100%; background: radial-gradient(ellipse at 20% 0%, rgba(240,160,64,0.03) 0%, transparent 55%), radial-gradient(ellipse at 80% 100%, rgba(122,160,255,0.03) 0%, transparent 55%); }
+/* ── RULES BANNER ── */
+.rules-banner{
+  background:rgba(255,184,74,.07);border-bottom:1px solid rgba(255,184,74,.18);
+  padding:8px 20px;display:none;align-items:flex-start;gap:10px;flex-shrink:0;
+}
+.rules-banner.show{display:flex}
+.rules-banner-ico{color:var(--accent);flex-shrink:0;margin-top:1px}
+.rules-banner-body{flex:1;font-size:.68rem;color:rgba(255,200,100,.85);line-height:1.6}
+.rules-banner-body strong{color:var(--accent)}
+.rules-banner-body code{font-family:'DM Mono',monospace;background:rgba(255,184,74,.12);padding:1px 5px;border-radius:3px;font-size:.66rem}
+.rules-banner-x{background:none;border:none;color:rgba(255,184,74,.4);cursor:pointer;font-size:.9rem;flex-shrink:0;transition:color .12s;padding:0 2px}
+.rules-banner-x:hover{color:var(--accent)}
 
-        .header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 14px 22px; display: flex; align-items: center; gap: 14px; flex-shrink: 0; backdrop-filter: blur(12px); }
-        .header-icon { width: 38px; height: 38px; border-radius: var(--radius); background: var(--accent-soft); border: 1px solid var(--accent-border); display: flex; align-items: center; justify-content: center; color: var(--accent); }
-        .header-title { font-size: 0.95rem; font-weight: 700; color: var(--text-white); }
-        .header-sub { font-size: 0.68rem; color: var(--text-dim); }
-        .badge { padding: 5px 13px; border-radius: 20px; font-size: 0.62rem; font-weight: 700; text-transform: uppercase; background: var(--accent-soft); border: 1px solid var(--accent-border); color: var(--accent); margin-left: auto; }
+/* ── CONTENT ── */
+.content{flex:1;overflow-y:auto;padding:22px 24px}
+.section{display:none}.section.active{display:block}
 
-        .main { display: flex; flex: 1; overflow: hidden; }
-        .sidebar { width: 200px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 10px 8px; gap: 1px; overflow-y: auto; }
-        .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: var(--radius-sm); cursor: pointer; font-size: 0.8rem; font-weight: 500; color: var(--text-dim); transition: all var(--transition); }
-        .nav-item:hover { color: var(--text-bright); background: var(--surface-raised); }
-        .nav-item.active { color: var(--text-white); background: var(--surface-overlay); position: relative; }
-        .nav-item.active::before { content: ''; position: absolute; left: 0; top: 6px; bottom: 6px; width: 3px; border-radius: 0 3px 3px 0; background: var(--accent); }
-        .nav-item svg { opacity: 0.55; }
-        .nav-item.active svg { opacity: 1; color: var(--accent); }
-        .nav-sep { height: 1px; background: var(--border); margin: 8px 6px; }
-        .nav-count { margin-left: auto; background: var(--danger-soft); color: var(--danger); border-radius: 10px; font-size: 0.6rem; font-weight: 700; padding: 2px 7px; }
+/* ── PAGE HEADER ── */
+.page-hd{margin-bottom:20px}
+.page-title{font-size:1rem;font-weight:700;color:var(--white);letter-spacing:-.01em}
+.page-sub{font-size:.66rem;color:var(--dim);margin-top:3px}
 
-        .content { flex: 1; overflow-y: auto; padding: 24px 28px; background: var(--bg-alt); }
-        .section { display: none; animation: fadeSlide 0.28s ease-out; }
-        .section.active { display: block; }
-        @keyframes fadeSlide { from { opacity: 0; transform: translateY(8px); } }
+/* ── STAT STRIP ── */
+.stat-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:22px}
+.stat-card{
+  background:var(--surf);border:1px solid var(--bdr);border-radius:11px;
+  padding:16px 18px;display:flex;flex-direction:column;gap:6px;
+  transition:border-color .14s;
+}
+.stat-card:hover{border-color:var(--bdrhi)}
+.stat-num{font-size:1.7rem;font-weight:700;color:var(--white);font-family:'DM Mono',monospace;line-height:1}
+.stat-lbl{font-size:.6rem;color:var(--dim);text-transform:uppercase;letter-spacing:.09em}
+.stat-card.accent .stat-num{color:var(--accent)}
+.stat-card.danger .stat-num{color:var(--danger)}
+.stat-card.success .stat-num{color:var(--success)}
+.stat-card.info .stat-num{color:var(--info)}
 
-        .sec-title { font-size: 1.1rem; font-weight: 700; color: var(--text-white); margin-bottom: 4px; }
-        .sec-sub { font-size: 0.72rem; color: var(--text-dim); margin-bottom: 22px; }
-        .sec-label { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin: 24px 0 10px; }
-        .sec-label:first-of-type { margin-top: 0; }
+/* ── TOP USERS ── */
+.top-list{background:var(--surf);border:1px solid var(--bdr);border-radius:11px;overflow:hidden}
+.top-list-hd{padding:12px 16px;border-bottom:1px solid var(--bdr);font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--muted)}
+.top-row{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--bdr);transition:background .12s}
+.top-row:last-child{border-bottom:none}
+.top-row:hover{background:var(--raise)}
+.top-rank{font-size:.62rem;color:var(--muted);font-family:'DM Mono',monospace;width:22px;flex-shrink:0;text-align:right}
+.top-name{flex:1;font-size:.74rem;color:var(--text)}
+.top-count{font-size:.68rem;color:var(--dim);font-family:'DM Mono',monospace}
 
-        .stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px,1fr)); gap: 10px; margin-bottom: 26px; }
-        .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; }
-        .stat-val { font-size: 1.7rem; font-weight: 800; color: var(--text-white); font-family: 'JetBrains Mono', monospace; }
-        .stat-lbl { font-size: 0.62rem; color: var(--text-muted); text-transform: uppercase; margin-top: 6px; }
+/* ── CARDS ── */
+.card-list{display:flex;flex-direction:column;gap:8px}
+.card{
+  background:var(--surf);border:1px solid var(--bdr);border-radius:11px;
+  padding:15px 17px;transition:border-color .14s;
+}
+.card:hover{border-color:var(--bdrhi)}
+.card.faded{opacity:.38;pointer-events:none}
+.card-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
+.card-body-text{font-size:.76rem;color:var(--text);line-height:1.55;background:var(--bg);border:1px solid var(--bdr);border-radius:8px;padding:9px 13px;margin-bottom:10px;word-break:break-word}
+.card-title{font-size:.8rem;font-weight:600;color:var(--white);margin-bottom:3px}
+.card-desc{font-size:.73rem;color:var(--text);line-height:1.5}
+.card-meta{font-size:.62rem;color:var(--dim);margin-top:4px}
+.card-who{flex:1;font-size:.72rem;color:var(--text);line-height:1.5}
+.card-who strong{color:var(--white)}
+.card-time{font-size:.62rem;color:var(--dim);flex-shrink:0;white-space:nowrap}
+.card-actions{display:flex;gap:7px;flex-wrap:wrap}
+.tag{padding:2px 8px;border-radius:5px;font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;flex-shrink:0;margin-top:1px}
+.tag.pending{background:var(--accent-bg);border:1px solid var(--accent-bdr);color:var(--accent)}
+.tag.open{background:var(--danger-bg);border:1px solid var(--danger-bdr);color:var(--danger)}
+.tag.resolved,.tag.done{background:var(--success-bg);border:1px solid var(--success-bdr);color:var(--success)}
 
-        .top-user { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 0.8rem; }
-        .top-rank { width: 24px; font-size: 0.65rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
-        .top-name { flex: 1; color: var(--text); font-weight: 500; }
-        .top-count { font-size: 0.7rem; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; background: var(--surface-raised); padding: 3px 8px; border-radius: 6px; }
+/* ── BUTTONS ── */
+.btn{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:0 14px;height:30px;border-radius:7px;
+  font-size:.7rem;font-weight:600;cursor:pointer;
+  border:1px solid var(--bdr);font-family:inherit;transition:all .13s;white-space:nowrap;
+}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn-sm{background:var(--raise2);color:var(--text)}.btn-sm:not(:disabled):hover{border-color:var(--bdrhi);color:var(--white)}
+.btn-danger{background:var(--danger-bg);color:var(--danger);border-color:var(--danger-bdr)}.btn-danger:not(:disabled):hover{background:rgba(248,81,73,.16)}
+.btn-accent{background:var(--accent);color:#000;font-weight:700;border-color:transparent}.btn-accent:not(:disabled):hover{filter:brightness(1.1)}
+.btn-ghost{background:transparent;color:var(--dim)}.btn-ghost:not(:disabled):hover{background:var(--raise);color:var(--text)}
+.btn-full{width:100%;height:34px;font-size:.73rem;justify-content:center}
+.btn-row{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
 
-        .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; margin-bottom: 10px; font-size: 0.82rem; }
-        .card.resolved, .card.done { opacity: 0.4; pointer-events: none; }
-        .card-top { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 12px; }
-        .tag { padding: 3px 10px; border-radius: 6px; font-size: 0.6rem; font-weight: 700; text-transform: uppercase; }
-        .tag.pending { background: rgba(240,160,64,0.1); color: #f0a040; }
-        .tag.open { background: var(--danger-soft); color: var(--danger); }
-        .tag.resolved, .tag.done { background: var(--success-soft); color: var(--success); }
-        .card-who { flex: 1; font-size: 0.78rem; }
-        .card-body { background: var(--bg-alt); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 12px; font-size: 0.82rem; line-height: 1.5; }
-        .card-title { font-size: 0.85rem; font-weight: 600; color: var(--text-white); margin-bottom: 4px; }
-        .card-desc { font-size: 0.8rem; color: var(--text); line-height: 1.5; }
+/* ── INPUTS ── */
+.inp{background:var(--bg);border:1px solid var(--bdr);border-radius:8px;padding:8px 12px;font-size:.76rem;color:var(--white);outline:none;width:100%;font-family:inherit;transition:border-color .15s}
+.inp:focus{border-color:var(--bdrhi)}.inp::placeholder{color:var(--muted)}
+.ta{background:var(--bg);border:1px solid var(--bdr);border-radius:8px;padding:9px 13px;font-size:.76rem;color:var(--white);outline:none;width:100%;font-family:inherit;resize:none;min-height:80px;line-height:1.5;transition:border-color .15s}
+.ta:focus{border-color:var(--bdrhi)}.ta::placeholder{color:var(--muted)}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.field-lbl{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--muted)}
+.search-row{display:flex;gap:8px;margin-bottom:16px}
 
-        .btn { padding: 0 16px; height: 34px; border-radius: var(--radius-sm); font-size: 0.72rem; font-weight: 600; border: none; cursor: pointer; transition: all var(--transition); display: inline-flex; align-items: center; justify-content: center; gap: 5px; }
-        .btn:disabled { opacity: 0.4; cursor: not-allowed; }
-        .btn-sm { background: var(--surface-overlay); color: var(--text); border: 1px solid var(--border); }
-        .btn-sm:hover:not(:disabled) { border-color: var(--border-hi); color: var(--text-white); }
-        .btn-danger { background: var(--danger-soft); color: var(--danger); border: 1px solid var(--danger-border); }
-        .btn-danger:hover:not(:disabled) { background: rgba(248,81,73,0.2); }
-        .btn-accent { background: var(--accent); color: #0a0a0f; font-weight: 700; }
-        .btn-accent:hover:not(:disabled) { filter: brightness(1.08); }
-        .btn-full { width: 100%; height: 38px; font-size: 0.78rem; margin-top: 6px; }
+/* ── USERS ── */
+.user-row{
+  background:var(--surf);border:1px solid var(--bdr);border-radius:10px;
+  padding:11px 15px;display:flex;align-items:center;gap:12px;
+  transition:border-color .14s;cursor:pointer;
+}
+.user-row:hover{border-color:var(--bdrhi);background:var(--raise)}
+.user-av{
+  width:34px;height:34px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.8rem;font-weight:700;color:#fff;
+  background-size:cover;background-position:center;border:1px solid var(--bdrhi);
+}
+.user-info{flex:1;min-width:0}
+.user-name{font-size:.76rem;font-weight:600;color:var(--white);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.user-email{font-size:.62rem;color:var(--dim);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.role-chip{padding:2px 9px;border-radius:20px;font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;flex-shrink:0}
+.role-chip.main_owner{background:rgba(255,80,220,.1);border:1px solid rgba(255,80,220,.3);color:#ff50dc}
+.role-chip.owner{background:var(--accent-bg);border:1px solid var(--accent-bdr);color:var(--accent)}
+.role-chip.moderator{background:rgba(122,160,255,.1);border:1px solid rgba(122,160,255,.28);color:#7aa0ff}
+.role-chip.banned{background:var(--danger-bg);border:1px solid var(--danger-bdr);color:var(--danger)}
+.role-chip.user{background:var(--raise);border:1px solid var(--bdr);color:var(--dim)}
+.user-actions{display:flex;gap:5px;flex-wrap:wrap;flex-shrink:0}
 
-        .inp, .ta { background: var(--bg-alt); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 14px; font-size: 0.82rem; color: var(--text-white); outline: none; width: 100%; font-family: inherit; line-height: 1.5; }
-        .inp:focus, .ta:focus { border-color: var(--accent-border); box-shadow: 0 0 0 3px var(--accent-soft); }
-        .ta { min-height: 80px; resize: vertical; }
+/* ── DRAWER ── */
+.drawer-overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.6);backdrop-filter:blur(5px);opacity:0;pointer-events:none;transition:opacity .2s}
+.drawer-overlay.open{opacity:1;pointer-events:all}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:320px;max-width:92vw;background:var(--surf);border-left:1px solid var(--bdrhi);z-index:501;transform:translateX(100%);transition:transform .22s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column}
+.drawer-overlay.open .drawer{transform:translateX(0)}
+.drawer-hd{padding:16px 18px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.drawer-hd-title{font-size:.84rem;font-weight:700;color:var(--white)}
+.drawer-close{background:none;border:none;cursor:pointer;color:var(--dim);width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;transition:all .12s}
+.drawer-close:hover{background:var(--raise2);color:var(--white)}
+.drawer-body{flex:1;overflow-y:auto;padding:18px}
+.drawer-av{width:60px;height:60px;border-radius:50%;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:700;color:#fff;background-size:cover;background-position:center;border:1px solid var(--bdrhi)}
+.drawer-name{text-align:center;font-size:.92rem;font-weight:700;color:var(--white);margin-bottom:3px}
+.drawer-email{text-align:center;font-size:.66rem;color:var(--dim);margin-bottom:12px;word-break:break-all}
+.drawer-chips{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.drawer-sep{height:1px;background:var(--bdr);margin:12px 0}
+.info-row{display:flex;justify-content:space-between;align-items:flex-start;padding:6px 0;border-bottom:1px solid var(--bdr)}
+.info-row:last-child{border-bottom:none}
+.info-lbl{font-size:.62rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600;flex-shrink:0;margin-right:10px}
+.info-val{font-size:.74rem;color:var(--text);text-align:right;word-break:break-all}
+.info-val.mono{font-family:'DM Mono',monospace;font-size:.68rem}
+.drawer-actions{padding:14px 18px;border-top:1px solid var(--bdr);display:flex;flex-direction:column;gap:6px;flex-shrink:0}
 
-        .user-row { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 16px; margin-bottom: 7px; display: flex; align-items: center; gap: 14px; cursor: pointer; transition: all var(--transition); }
-        .user-row:hover { border-color: var(--border-hi); transform: translateX(2px); }
-        .user-av { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #fff; background-size: cover; font-size: 0.9rem; }
-        .user-info { flex: 1; min-width: 0; }
-        .user-name { font-size: 0.82rem; font-weight: 600; color: var(--text-white); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .user-email { font-size: 0.65rem; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; margin-top: 2px; }
-        .user-role { padding: 3px 10px; border-radius: 6px; font-size: 0.6rem; font-weight: 700; text-transform: uppercase; flex-shrink: 0; }
-        .user-role.main_owner { background: var(--purple-soft); color: #d070ff; }
-        .user-role.owner { background: var(--accent-soft); color: #f0a040; }
-        .user-role.moderator { background: var(--info-soft); color: #7aa0ff; }
-        .user-role.banned { background: var(--danger-soft); color: var(--danger); }
-        .user-role.user { background: var(--surface-overlay); color: var(--text-dim); }
-        .user-actions { display: flex; gap: 5px; flex-wrap: wrap; }
+/* ── ANNOUNCE ── */
+.ann-compose{background:var(--surf);border:1px solid var(--bdr);border-radius:11px;padding:16px 18px;margin-bottom:18px}
+.ann-compose-title{font-size:.72rem;font-weight:600;color:var(--text);margin-bottom:10px}
+.ann-item{background:var(--surf);border:1px solid var(--bdr);border-radius:10px;padding:12px 15px;display:flex;gap:10px;align-items:flex-start;margin-bottom:6px}
+.ann-badge{padding:2px 8px;border-radius:5px;font-size:.58rem;font-weight:700;background:var(--accent-bg);border:1px solid var(--accent-bdr);color:var(--accent);flex-shrink:0;margin-top:2px}
+.ann-text{font-size:.76rem;color:var(--text);flex:1;line-height:1.5}
+.ann-time{font-size:.6rem;color:var(--dim);margin-top:3px}
 
-        .msg-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; display: flex; align-items: flex-start; gap: 14px; margin-bottom: 8px; font-size: 0.82rem; }
-        .msg-name { font-weight: 600; color: var(--text-white); margin-bottom: 3px; }
-        .msg-text { color: var(--text); line-height: 1.5; word-break: break-word; }
-        .msg-time { font-size: 0.62rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; white-space: nowrap; }
-        .msg-del { background: none; border: none; cursor: pointer; color: var(--text-dim); font-size: 1.1rem; padding: 4px 8px; border-radius: 6px; }
-        .msg-del:hover { background: var(--danger-soft); color: var(--danger); }
+/* ── PLATFORM ── */
+.plat-block{background:var(--surf);border:1px solid var(--bdr);border-radius:11px;padding:16px 18px;margin-bottom:14px}
+.plat-block-title{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);margin-bottom:10px}
+.flag-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--bdr)}
+.flag-row:last-child{border-bottom:none}
+.flag-lbl{font-size:.76rem;color:var(--text);font-weight:500}
+.flag-sub{font-size:.62rem;color:var(--dim);margin-top:2px}
+.toggle{width:36px;height:20px;border-radius:10px;background:var(--raise2);border:1px solid var(--bdr);cursor:pointer;position:relative;flex-shrink:0;transition:background .2s}
+.toggle.on{background:rgba(86,211,100,.2);border-color:rgba(86,211,100,.4)}
+.toggle::after{content:'';position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--dim);transition:all .2s}
+.toggle.on::after{transform:translateX(16px);background:var(--success)}
+.word-tag{display:inline-flex;align-items:center;gap:4px;background:var(--danger-bg);border:1px solid var(--danger-bdr);border-radius:5px;padding:2px 8px;font-size:.7rem;color:var(--danger)}
+.word-x{background:none;border:none;cursor:pointer;color:inherit;font-size:.85rem;padding:0 2px;opacity:.7;transition:opacity .12s}.word-x:hover{opacity:1}
+.tags-wrap{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;min-height:24px}
+.item-row{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--bdr);border-radius:8px;padding:8px 12px;margin-bottom:5px}
+.item-name{flex:1;font-size:.74rem;color:var(--text);font-weight:500}
+.item-url{font-size:.62rem;color:var(--dim);font-family:'DM Mono',monospace;flex:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.item-del{background:none;border:none;cursor:pointer;color:var(--dim);padding:3px 7px;border-radius:5px;transition:all .12s;font-size:.85rem}
+.item-del:hover{background:var(--danger-bg);color:var(--danger)}
+.add-form{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+.add-form .inp{font-size:.72rem;padding:7px 10px}
+.add-form .btn-accent{grid-column:1/-1;height:32px;font-size:.72rem}
 
-        .ann-item { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; display: flex; gap: 14px; align-items: flex-start; margin-bottom: 8px; }
-        .ann-badge { padding: 3px 10px; border-radius: 6px; font-size: 0.6rem; font-weight: 700; background: var(--accent-soft); border: 1px solid var(--accent-border); color: var(--accent); flex-shrink: 0; margin-top: 2px; }
-        .ann-text { font-size: 0.82rem; color: var(--text); flex: 1; line-height: 1.5; }
-        .ann-time { font-size: 0.62rem; color: var(--text-muted); margin-top: 4px; font-family: 'JetBrains Mono', monospace; }
+/* ── CHAT ── */
+.chat-msg{background:var(--surf);border:1px solid var(--bdr);border-radius:9px;padding:11px 14px;display:flex;align-items:flex-start;gap:12px;margin-bottom:6px;transition:border-color .13s}
+.chat-msg:hover{border-color:var(--bdrhi)}
+.chat-msg-name{font-size:.7rem;font-weight:600;color:var(--white);margin-bottom:3px}
+.chat-msg-text{font-size:.75rem;color:var(--text);line-height:1.45;word-break:break-word}
+.chat-msg-time{font-size:.6rem;color:var(--dim);flex-shrink:0;margin-top:2px}
+.chat-msg-del{background:none;border:none;cursor:pointer;color:var(--dim);padding:4px 8px;border-radius:5px;transition:all .12s;flex-shrink:0;font-size:.95rem}
+.chat-msg-del:hover{background:var(--danger-bg);color:var(--danger)}
 
-        .flag-row { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-        .flag-label { font-size: 0.82rem; color: var(--text); font-weight: 500; }
-        .flag-sub { font-size: 0.65rem; color: var(--text-dim); margin-top: 2px; }
-        .toggle { width: 42px; height: 24px; border-radius: 12px; background: var(--surface-overlay); border: 1px solid var(--border-hi); cursor: pointer; position: relative; flex-shrink: 0; }
-        .toggle.on { background: rgba(63,185,80,0.2); border-color: rgba(63,185,80,0.45); }
-        .toggle::after { content: ''; position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%; background: var(--text-dim); transition: 0.2s; }
-        .toggle.on::after { transform: translateX(18px); background: var(--success); }
+/* ── EMPTY / SPIN ── */
+.empty{text-align:center;padding:40px 20px;color:var(--dim)}
+.empty-ico{font-size:1.6rem;margin-bottom:8px;opacity:.3}
+.empty-txt{font-size:.74rem}
+.spin{width:18px;height:18px;border:2px solid var(--bdr);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite;margin:40px auto;display:block}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-        .automod-box { background: var(--bg-alt); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 20px; }
-        .tag-list { display: flex; flex-wrap: wrap; gap: 6px; min-height: 32px; margin-bottom: 12px; }
-        .word-tag { display: flex; align-items: center; gap: 5px; background: var(--danger-soft); border: 1px solid var(--danger-border); border-radius: 6px; padding: 4px 10px; font-size: 0.72rem; color: var(--danger); }
-        .word-tag-x { background: none; border: none; cursor: pointer; color: inherit; font-size: 1rem; padding: 0 3px; }
-        .word-tag-x:hover { opacity: 0.5; }
+/* ── TOAST ── */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(8px);background:var(--raise2);border:1px solid var(--bdrhi);border-radius:9px;padding:9px 18px;font-size:.76rem;color:var(--white);opacity:0;transition:all .2s;pointer-events:none;z-index:9999;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-        .add-grid { display: grid; gap: 8px; margin-top: 8px; }
-        .add-grid .html-ta { min-height: 80px; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; }
-        .item-row { display: flex; align-items: center; gap: 10px; background: var(--bg-alt); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 6px; }
-        .item-name { flex: 1; font-size: 0.78rem; color: var(--text); font-weight: 500; }
-        .item-html { font-size: 0.62rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
-        .item-del { background: none; border: none; cursor: pointer; color: var(--text-dim); font-size: 1rem; padding: 2px 6px; border-radius: 4px; }
-        .item-del:hover { background: var(--danger-soft); color: var(--danger); }
+/* ── SECTION LABEL ── */
+.sec-lbl{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);margin-bottom:8px;margin-top:18px}
+.sec-lbl:first-of-type{margin-top:0}
 
-        .toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(14px); background: var(--surface-overlay); border: 1px solid var(--border-hi); border-radius: var(--radius); padding: 10px 24px; color: var(--text-white); opacity: 0; transition: 0.2s; z-index: 9999; font-size: 0.8rem; font-weight: 500; }
-        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+/* ── MODAL ── */
+.modal-overlay{position:fixed;inset:0;z-index:800;background:rgba(0,0,0,.72);backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .18s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--surf);border:1px solid var(--bdrhi);border-radius:14px;padding:22px 24px;width:340px;max-width:92vw;transform:translateY(10px);transition:transform .18s}
+.modal-overlay.open .modal{transform:translateY(0)}
+.modal-title{font-size:.88rem;font-weight:700;color:var(--white);margin-bottom:7px}
+.modal-msg{font-size:.76rem;color:var(--text);line-height:1.6;margin-bottom:16px}
+.modal-inp-wrap{margin-bottom:14px}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end}
 
-        /* Modal */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(8px); z-index: 600; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
-        .modal-overlay.open { opacity: 1; pointer-events: all; }
-        .modal { background: var(--surface); border: 1px solid var(--border-hi); border-radius: var(--radius-lg); width: 90%; max-width: 520px; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.6); padding: 28px; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; }
-        .modal-title { font-size: 1.1rem; font-weight: 700; color: var(--text-white); }
-        .modal-close { background: none; border: none; color: var(--text-dim); font-size: 1.3rem; cursor: pointer; }
-        .modal-body { display: flex; flex-direction: column; align-items: center; margin-bottom: 18px; }
-        .modal-av { width: 76px; height: 76px; border-radius: 50%; background-size: cover; margin-bottom: 16px; font-size: 1.8rem; display: flex; align-items: center; justify-content: center; color: #fff; }
-        .modal-name { font-size: 1.1rem; font-weight: 700; color: var(--text-white); }
-        .modal-email { font-size: 0.72rem; color: var(--text-dim); margin-bottom: 16px; font-family: 'JetBrains Mono', monospace; }
-        .modal-badges { display: flex; gap: 8px; margin-bottom: 22px; }
-        .info-row { display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid var(--border); width: 100%; }
-        .info-label { font-size: 0.68rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; }
-        .info-val { font-size: 0.82rem; color: var(--text); font-weight: 500; }
-        .modal-actions { display: flex; flex-direction: column; gap: 8px; width: 100%; margin-top: 10px; }
+/* ── PLAT INPUT ROWS ── */
+.plat-input-row{display:flex;gap:8px;align-items:center}
+.plat-input-row .inp{flex:1;min-width:0}
+.plat-input-row .btn{flex-shrink:0;height:38px;padding:0 16px}
 
-        .empty { text-align: center; padding: 40px 20px; color: var(--text-dim); font-size: 0.8rem; }
+/* ── ICON BUTTON ── */
+.btn-icon{width:28px;height:28px;padding:0;display:inline-flex;align-items:center;justify-content:center;border-radius:7px;background:transparent;border:1px solid transparent;color:var(--dim);cursor:pointer;transition:all .13s;flex-shrink:0}
+.btn-icon:hover{background:var(--raise);border-color:var(--bdr);color:var(--text)}
+.btn-icon.loading svg{animation:spin .7s linear infinite}
 
-        @media (max-width: 900px) {
-            .sidebar { width: 56px; }
-            .nav-item span { display: none; }
-            .content { padding: 16px; }
-        }
-        @media (max-width: 600px) {
-            .header { padding: 10px 14px; }
-            .content { padding: 12px; }
-        }
-    </style>
+/* ── RESPONSIVE ── */
+@media(max-width:780px){
+  .stat-strip{grid-template-columns:repeat(2,1fr)}
+  .topbar-brand{padding:0 12px}
+  .content{padding:14px}
+  .add-form{grid-template-columns:1fr}
+  .add-form .btn-accent{grid-column:1}
+  .plat-input-row{flex-wrap:wrap}
+  .plat-input-row .btn{flex:1;min-width:72px;justify-content:center}
+}
+@media(max-width:520px){
+  .stat-strip{grid-template-columns:repeat(2,1fr);gap:7px}
+  .stat-num{font-size:1.3rem}
+  .user-actions{display:none}
+  .nav-pill>span:not(.nav-badge){display:none}
+  .nav-pill{padding:0 10px;gap:0}
+}
+@media(max-width:380px){
+  .content{padding:8px}
+  .stat-card{padding:12px 13px}
+}
+</style>
 </head>
 <body>
 <div class="app">
-    <div class="header">
-        <div class="header-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
-        <div><div class="header-title">Owner Panel</div><div class="header-sub">Full platform control</div></div>
-        <span class="badge" id="roleBadge">Owner</span>
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="topbar-brand">
+      <div class="topbar-logo">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      </div>
+      <span class="topbar-title">Command</span>
+      <span class="topbar-role" id="roleBadge">Owner</span>
     </div>
-    <div class="main">
-        <div class="sidebar">
-            <div class="nav-item active" id="nav-dashboard" onclick="go('dashboard')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Dashboard</span></div>
-            <div class="nav-item" id="nav-reports" onclick="go('reports')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span>Reports</span><span class="nav-count" id="nc-reports" style="display:none">0</span></div>
-            <div class="nav-item" id="nav-bugs" onclick="go('bugs')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span>Bugs</span><span class="nav-count" id="nc-bugs" style="display:none">0</span></div>
-            <div class="nav-sep"></div>
-            <div class="nav-item" id="nav-users" onclick="go('users')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Users</span></div>
-            <div class="nav-item" id="nav-chat" onclick="go('chat')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>Chat Mod</span></div>
-            <div class="nav-sep"></div>
-            <div class="nav-item" id="nav-announce" onclick="go('announce')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg><span>Announce</span></div>
-            <div class="nav-sep"></div>
-            <div class="nav-item" id="nav-platform" onclick="go('platform')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>Platform</span></div>
-        </div>
-        <div class="content">
-            <div class="section active" id="sec-dashboard">
-                <div class="sec-title">Dashboard</div><div class="sec-sub">Live overview of your platform</div>
-                <div class="stat-grid" id="dashStats">
-                    <div class="stat-card"><div class="stat-val" id="ds-users">—</div><div class="stat-lbl">Total Users</div></div>
-                    <div class="stat-card"><div class="stat-val" id="ds-reports">—</div><div class="stat-lbl">Open Reports</div></div>
-                    <div class="stat-card"><div class="stat-val" id="ds-bugs">—</div><div class="stat-lbl">Open Bugs</div></div>
-                    <div class="stat-card"><div class="stat-val" id="ds-msgs">—</div><div class="stat-lbl">Recent Msgs</div></div>
-                </div>
-                <div class="sec-label">Most Active Users</div>
-                <div id="topUsers"><div style="text-align:center;padding:28px"><div class="spin"></div></div></div>
-            </div>
-            <div class="section" id="sec-reports">
-                <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:4px;flex-wrap:wrap;gap:10px">
-                    <div><div class="sec-title">Reports</div><div class="sec-sub" style="margin-bottom:0">User-submitted message reports</div></div>
-                    <button class="btn btn-sm" onclick="clearResolvedReports()">Clear Resolved</button>
-                </div>
-                <div id="reportsList"><div style="text-align:center;padding:36px"><div class="spin"></div></div></div>
-            </div>
-            <div class="section" id="sec-bugs">
-                <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:4px;flex-wrap:wrap;gap:10px">
-                    <div><div class="sec-title">Bug Reports</div><div class="sec-sub" style="margin-bottom:0">Submitted by users via the bug report button</div></div>
-                    <button class="btn btn-sm" onclick="clearResolvedBugs()">Clear Resolved</button>
-                </div>
-                <div id="bugsList"><div style="text-align:center;padding:36px"><div class="spin"></div></div></div>
-            </div>
-            <div class="section" id="sec-users">
-                <div class="sec-title">Users</div><div class="sec-sub">Manage roles, coins, and display names</div>
-                <input class="inp" id="userSearch" placeholder="Search by name or email…" oninput="filterUsers(this.value)" style="margin-bottom:14px">
-                <div id="usersList"><div style="text-align:center;padding:36px"><div class="spin"></div></div></div>
-            </div>
-            <div class="section" id="sec-chat">
-                <div class="sec-title">Chat Mod</div><div class="sec-sub">Search and delete messages from global chat</div>
-                <div style="display:flex;gap:8px;margin-bottom:16px"><input class="inp" id="chatSearch" placeholder="Keyword or @username…" onkeydown="if(event.key==='Enter')searchChat()" style="flex:1"><button class="btn btn-accent" onclick="searchChat()">Search</button></div>
-                <div id="chatResults"><div class="empty"><div class="empty-text">Enter a keyword or username to search.</div></div></div>
-            </div>
-            <div class="section" id="sec-announce">
-                <div class="sec-title">Announcements</div><div class="sec-sub">Broadcast an official message to global chat</div>
-                <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:20px">
-                    <div class="field"><label class="field-label">Message</label><textarea class="ta" id="annText" placeholder="Write your announcement…"></textarea></div>
-                    <div style="display:flex;align-items:center;gap:10px"><label style="font-size:.7rem;color:var(--text-dim);display:flex;align-items:center;gap:7px"><input type="checkbox" id="annPinned"> Pin to top of chat</label><button class="btn btn-accent" style="margin-left:auto" onclick="sendAnn()">Send Announcement</button></div>
-                </div>
-                <div class="sec-label">Recent Announcements</div>
-                <div id="annHistory"><div class="empty"><div class="empty-text">No announcements yet.</div></div></div>
-            </div>
-            <div class="section" id="sec-platform">
-                <div class="sec-title">Platform</div><div class="sec-sub">MOTD, banner, feature flags, auto-mod, and items</div>
-                <div class="sec-label">Message of the Day</div>
-                <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap"><input class="inp" id="motdVal" placeholder="Shown on the home screen…" style="flex:1"><button class="btn btn-accent" onclick="saveMOTD()">Save</button><button class="btn btn-sm" onclick="clearMOTD()">Clear</button></div>
-                <div class="sec-label">Maintenance Banner</div>
-                <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap"><input class="inp" id="bannerVal" placeholder="Banner message…" style="flex:1"><button class="btn btn-accent" onclick="saveBanner(true)">Show</button><button class="btn btn-sm" onclick="saveBanner(false)">Hide</button></div>
-                <div class="sec-label">Feature Flags</div><div id="flagsList" style="margin-bottom:20px"></div>
-                <div class="sec-label">Auto-Mod Keywords</div>
-                <div class="automod-box">
-                    <div class="tag-list" id="automodTags"></div>
-                    <div style="display:flex;gap:7px"><input class="inp" id="automodInp" placeholder="Add a blocked word…" onkeydown="if(event.key==='Enter')addWord()"><button class="btn btn-accent" onclick="addWord()">Add</button></div>
-                </div>
-                <div class="sec-label">Platform Items</div><div id="itemSections"></div>
-            </div>
-        </div>
+
+    <nav class="topbar-nav">
+      <div class="nav-pill active" id="pill-dash" onclick="go('dash')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        <span>Overview</span>
+      </div>
+      <div class="nav-pill" id="pill-users" onclick="go('users')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span>Users</span>
+      </div>
+      <div class="nav-pill" id="pill-reports" onclick="go('reports')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span>Reports</span>
+        <span class="nav-badge" id="nb-reports" style="display:none">0</span>
+      </div>
+      <div class="nav-pill" id="pill-bugs" onclick="go('bugs')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span>Bugs</span>
+        <span class="nav-badge" id="nb-bugs" style="display:none">0</span>
+      </div>
+      <div class="nav-pill" id="pill-chat" onclick="go('chat')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span>Chat</span>
+      </div>
+      <div class="nav-pill" id="pill-announce" onclick="go('announce')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        <span>Announce</span>
+      </div>
+      <div class="nav-pill" id="pill-audit" onclick="go('audit')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        <span>Audit</span>
+      </div>
+      <div class="nav-pill" id="pill-platform" onclick="go('platform')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span>Platform</span>
+      </div>
+    </nav>
+
+    <div class="topbar-right">
+      <span class="topbar-user" id="topbarUser">—</span>
+      <button class="btn-icon" id="refreshBtn" onclick="refreshAll()" title="Refresh current view">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+      </button>
     </div>
-</div>
+  </div>
+
+  <!-- FIRESTORE RULES BANNER (shown when owner has permission errors) -->
+  <div class="rules-banner" id="rulesBanner">
+    <div class="rules-banner-ico">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    </div>
+    <div class="rules-banner-body">
+      <strong>Firestore permission error detected.</strong> Your security rules only allow <code>main_owner</code> for admin reads.
+      Go to <strong>Firebase Console → Firestore → Rules</strong> and change <code>role == 'main_owner'</code>
+      to <code>role in ['owner', 'main_owner']</code> for the collections you want owners to manage.
+    </div>
+    <button class="rules-banner-x" onclick="document.getElementById('rulesBanner').classList.remove('show')">✕</button>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- OVERVIEW -->
+    <div class="section active" id="sec-dash">
+      <div class="page-hd">
+        <div class="page-title">Overview</div>
+        <div class="page-sub">Live platform snapshot</div>
+      </div>
+      <div class="stat-strip">
+        <div class="stat-card info"><div class="stat-num" id="ds-users">—</div><div class="stat-lbl">Total Users</div></div>
+        <div class="stat-card danger"><div class="stat-num" id="ds-reports">—</div><div class="stat-lbl">Open Reports</div></div>
+        <div class="stat-card accent"><div class="stat-num" id="ds-bugs">—</div><div class="stat-lbl">Open Bugs</div></div>
+        <div class="stat-card success"><div class="stat-num" id="ds-msgs">—</div><div class="stat-lbl">Recent Messages</div></div>
+      </div>
+      <div class="sec-lbl">Most Active Users</div>
+      <div id="topUsers"><div class="spin"></div></div>
+    </div>
+
+    <!-- USERS -->
+    <div class="section" id="sec-users">
+      <div class="page-hd" style="display:flex;align-items:flex-end;justify-content:space-between">
+        <div><div class="page-title">Users</div><div class="page-sub">Manage roles, names, and access</div></div>
+        <span id="userCount" style="font-size:.62rem;color:var(--dim);font-family:'DM Mono',monospace"></span>
+      </div>
+      <div class="search-row">
+        <input class="inp" id="userSearch" placeholder="Search by name or email…" oninput="filterUsers(this.value)">
+      </div>
+      <div id="usersList"><div class="spin"></div></div>
+    </div>
+
+    <!-- REPORTS -->
+    <div class="section" id="sec-reports">
+      <div class="page-hd" style="display:flex;align-items:flex-end;justify-content:space-between">
+        <div><div class="page-title">Reports</div><div class="page-sub">User-submitted message reports</div></div>
+        <button class="btn btn-sm" onclick="clearResolved()">Clear Resolved</button>
+      </div>
+      <div class="card-list" id="reportsList"><div class="spin"></div></div>
+    </div>
+
+    <!-- BUGS -->
+    <div class="section" id="sec-bugs">
+      <div class="page-hd">
+        <div class="page-title">Bug Reports</div>
+        <div class="page-sub">Submitted via the in-app report form</div>
+      </div>
+      <div class="card-list" id="bugsList"><div class="spin"></div></div>
+    </div>
+
+    <!-- CHAT MOD -->
+    <div class="section" id="sec-chat">
+      <div class="page-hd">
+        <div class="page-title">Chat Moderation</div>
+        <div class="page-sub">Search and remove messages from global chat</div>
+      </div>
+      <div class="search-row">
+        <input class="inp" id="chatQ" placeholder="Keyword or @username…" onkeydown="if(event.key==='Enter')searchChat()" style="flex:1">
+        <button class="btn btn-accent" style="height:38px;padding:0 20px;flex-shrink:0" onclick="searchChat()">Search</button>
+      </div>
+      <div id="chatResults"><div class="empty"><div class="empty-txt">Enter a keyword or @username to search messages.</div></div></div>
+    </div>
+
+    <!-- ANNOUNCE -->
+    <div class="section" id="sec-announce">
+      <div class="page-hd">
+        <div class="page-title">Announcements</div>
+        <div class="page-sub">Broadcast an official message to global chat</div>
+      </div>
+      <div class="ann-compose">
+        <div class="ann-compose-title">New Announcement</div>
+        <div class="field">
+          <label class="field-lbl">Message</label>
+          <textarea class="ta" id="annText" placeholder="Write your announcement…"></textarea>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <label style="font-size:.68rem;color:var(--dim);display:flex;align-items:center;gap:6px;cursor:pointer">
+            <input type="checkbox" id="annPin"> Pin to top of chat
+          </label>
+          <button class="btn btn-accent" style="margin-left:auto;height:34px;padding:0 22px" onclick="sendAnn()">Send</button>
+        </div>
+      </div>
+      <div class="sec-lbl">Recent Announcements</div>
+      <div id="annHistory"><div class="empty"><div class="empty-txt">No announcements yet.</div></div></div>
+    </div>
+
+    <!-- AUDIT LOG -->
+    <div class="section" id="sec-audit">
+      <div class="page-hd" style="display:flex;align-items:flex-end;justify-content:space-between">
+        <div><div class="page-title">Audit Log</div><div class="page-sub">Every owner and moderator action, newest first</div></div>
+        <button class="btn btn-sm" onclick="loadAudit(true)">Refresh</button>
+      </div>
+      <div id="auditList"><div class="spin"></div></div>
+    </div>
+
+    <!-- PLATFORM -->
+    <div class="section" id="sec-platform">
+      <div class="page-hd">
+        <div class="page-title">Platform</div>
+        <div class="page-sub">MOTD, banner, feature flags, auto-mod, and custom items</div>
+      </div>
+
+      <div class="plat-block">
+        <div class="plat-block-title">Message of the Day</div>
+        <div class="plat-input-row">
+          <input class="inp" id="motdVal" placeholder="Shown on the home screen for all users…">
+          <button class="btn btn-accent" onclick="saveMOTD()">Save</button>
+          <button class="btn btn-sm" onclick="clearMOTD()">Clear</button>
+        </div>
+      </div>
+
+      <div class="plat-block">
+        <div class="plat-block-title">Maintenance Banner</div>
+        <div class="plat-input-row">
+          <input class="inp" id="bannerVal" placeholder="Banner message text…">
+          <button class="btn btn-accent" onclick="saveBanner(true)">Show</button>
+          <button class="btn btn-sm" onclick="saveBanner(false)">Hide</button>
+        </div>
+      </div>
+
+      <div class="plat-block">
+        <div class="plat-block-title">Feature Flags</div>
+        <div id="flagsList"></div>
+      </div>
+
+      <div class="plat-block">
+        <div class="plat-block-title">Auto-Mod Keywords</div>
+        <div class="tags-wrap" id="automodTags"></div>
+        <div style="display:flex;gap:7px">
+          <input class="inp" id="automodInp" placeholder="Add a blocked word…" style="flex:1" onkeydown="if(event.key==='Enter')addWord()">
+          <button class="btn btn-accent" style="height:36px;padding:0 14px;flex-shrink:0" onclick="addWord()">Add</button>
+        </div>
+      </div>
+
+      <div class="plat-block">
+        <div class="plat-block-title">Platform Items</div>
+        <div id="itemSections"></div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /app -->
 
 <div class="toast" id="toast"></div>
 
-<div class="modal-overlay" id="userModalOverlay" onclick="if(event.target===this)closeUserModal()">
-    <div class="modal">
-        <div class="modal-header">
-            <span class="modal-title">User Profile</span>
-            <button class="modal-close" onclick="closeUserModal()">✕</button>
-        </div>
-        <div class="modal-body" id="modalBody"></div>
-        <div class="modal-actions" id="modalActions"></div>
+<!-- CUSTOM CONFIRM/PROMPT MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)_modalDismiss()">
+  <div class="modal">
+    <div class="modal-title" id="modalTitle">Are you sure?</div>
+    <div class="modal-msg" id="modalMsg"></div>
+    <div class="modal-inp-wrap" id="modalInpWrap" style="display:none">
+      <input class="inp" id="modalInp" onkeydown="if(event.key==='Enter')_modalOk();if(event.key==='Escape')_modalDismiss()">
     </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="_modalDismiss()">Cancel</button>
+      <button class="btn btn-accent" id="modalOkBtn" onclick="_modalOk()">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- USER DRAWER -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="if(event.target===this)closeDrawer()">
+  <div class="drawer">
+    <div class="drawer-hd">
+      <span class="drawer-hd-title">User Profile</span>
+      <button class="drawer-close" onclick="closeDrawer()">
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="1" y1="1" x2="9" y2="9"/><line x1="9" y1="1" x2="1" y2="9"/></svg>
+      </button>
+    </div>
+    <div class="drawer-body" id="drawerBody"></div>
+    <div class="drawer-actions" id="drawerActions"></div>
+  </div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 <script>
-    firebase.initializeApp({
-        apiKey: "AIzaSyCR8I5eOiZbHzVZJDEQHYpyxXbcClk_rxA",
-        authDomain: "goon-7ddc3.firebaseapp.com",
-        projectId: "goon-7ddc3",
-        storageBucket: "goon-7ddc3.firebasestorage.app",
-        messagingSenderId: "117099331820",
-        appId: "1:117099331820:web:3af984b15a843d3d7b65c9"
+firebase.initializeApp({
+  apiKey:"AIzaSyCR8I5eOiZbHzVZJDEQHYpyxXbcClk_rxA",
+  authDomain:"goon-7ddc3.firebaseapp.com",
+  projectId:"goon-7ddc3",
+  storageBucket:"goon-7ddc3.firebasestorage.app",
+  messagingSenderId:"117099331820",
+  appId:"1:117099331820:web:3af984b15a843d3d7b65c9"
+});
+
+const db   = firebase.firestore();
+const auth = firebase.auth();
+const FS   = firebase.firestore;
+
+let me = null;
+let myRole = null;
+let _allUsers = [];
+let _siteConfig = {};
+let _autoWords = [];
+let _section = 'dash';
+const _cache = {};
+const TTL = 60000;
+const stale = k => !_cache[k] || Date.now() - _cache[k] > TTL;
+const fresh = k => { _cache[k] = Date.now(); };
+const bust  = k => { delete _cache[k]; };
+
+/* ── PERMISSION ERROR DETECTION ── */
+function isPermErr(e) {
+  const m = (e.message || '').toLowerCase();
+  return m.includes('permission') || m.includes('insufficient') || m.includes('missing');
+}
+function handleErr(e, fallback) {
+  if (isPermErr(e)) {
+    document.getElementById('rulesBanner').classList.add('show');
+    toast('Permission denied — see the banner above');
+  } else {
+    toast('Error: ' + e.message);
+  }
+  if (fallback) fallback();
+}
+
+/* ── AUTH ── */
+auth.onAuthStateChanged(async user => {
+  if (!user) {
+    document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#0c0c0e;font-family:sans-serif;color:#555;flex-direction:column;gap:8px"><div style="font-size:2rem;opacity:.2">⚡</div><div>Not signed in.</div></div>';
+    return;
+  }
+  try {
+    const snap = await db.collection('users').doc(user.uid).get();
+    myRole = snap.data()?.role;
+  } catch(e) {
+    document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#0c0c0e;font-family:sans-serif;color:#f85149;flex-direction:column;gap:8px"><div style="font-size:2rem;opacity:.4">⚠</div><div>Could not verify your role.</div><div style="font-size:.75rem;color:#555;margin-top:4px">Check your Firestore security rules.</div></div>';
+    return;
+  }
+  if (myRole !== 'owner' && myRole !== 'main_owner') {
+    document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#0c0c0e;font-family:sans-serif;color:#555;flex-direction:column;gap:8px"><div style="font-size:2rem;opacity:.2">🔒</div><div>Owner access required.</div></div>';
+    return;
+  }
+  me = user;
+  window._myRole = myRole;
+  document.getElementById('topbarUser').textContent = user.email || user.displayName || 'Owner';
+  if (myRole === 'main_owner') {
+    const b = document.getElementById('roleBadge');
+    b.textContent = 'Main Owner';
+    b.style.background = 'rgba(255,80,220,.1)';
+    b.style.borderColor = 'rgba(255,80,220,.3)';
+    b.style.color = '#ff50dc';
+  }
+  go('dash');
+});
+
+/* ── NAV ── */
+function go(sec) {
+  _section = sec;
+  document.querySelectorAll('.nav-pill').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('pill-' + sec)?.classList.add('active');
+  document.getElementById('sec-' + sec)?.classList.add('active');
+  ({
+    dash:     loadDash,
+    users:    loadUsers,
+    reports:  loadReports,
+    bugs:     loadBugs,
+    chat:     () => {},
+    announce: loadAnnouncements,
+    audit:    loadAudit,
+    platform: loadPlatform,
+  }[sec] || (() => {}))();
+}
+
+/* ── OVERVIEW ── */
+async function loadDash() {
+  if (!stale('dash')) return;
+  try {
+    const [uS, rS, bS, mS] = await Promise.all([
+      db.collection('users').get(),
+      db.collection('reports').where('status','==','pending').get(),
+      db.collection('bugReports').where('status','==','open').get(),
+      db.collection('socialMessages').orderBy('timestamp','desc').limit(100).get(),
+    ]);
+    document.getElementById('ds-users').textContent   = uS.size;
+    document.getElementById('ds-reports').textContent = rS.size;
+    document.getElementById('ds-bugs').textContent    = bS.size;
+    document.getElementById('ds-msgs').textContent    = mS.size;
+    const nbR=document.getElementById('nb-reports'); nbR.textContent=rS.size; nbR.style.display=rS.size?'':'none';
+    const nbB=document.getElementById('nb-bugs');    nbB.textContent=bS.size; nbB.style.display=bS.size?'':'none';
+    const counts = {};
+    mS.docs.forEach(d => {
+      const dat = d.data(); if (!dat.userId) return;
+      if (!counts[dat.userId]) counts[dat.userId] = { name: dat.displayName || '?', n: 0 };
+      counts[dat.userId].n++;
     });
-    const db = firebase.firestore();
-    const auth = firebase.auth();
-    const FS = firebase.firestore;
-    let me = null;
-    let _section = 'dashboard';
-    let _allUsers = [];
-    let _siteConfig = {};
-    let _autoWords = [];
-    const _cache = {};
-    const TTL = 60000;
-    const stale = k => !_cache[k] || Date.now() - _cache[k] > TTL;
-    const fresh = k => { _cache[k] = Date.now(); };
-    const bust = k => { delete _cache[k]; };
-
-    auth.onAuthStateChanged(async user => {
-        if (!user) { document.body.innerHTML = '<div style="text-align:center;padding:80px;color:#6e6e85">Not signed in.</div>'; return; }
-        const snap = await db.collection('users').doc(user.uid).get();
-        const myRole = snap.data()?.role;
-        if (myRole !== 'owner' && myRole !== 'main_owner') {
-            document.body.innerHTML = '<div style="text-align:center;padding:80px;color:#6e6e85">Owner access required.</div>';
-            return;
-        }
-        window._myRole = myRole;
-        me = user;
-        if (myRole === 'main_owner') {
-            const b = document.getElementById('roleBadge');
-            b.textContent = 'Main Owner';
-            b.style.background = 'rgba(208,112,255,.12)';
-            b.style.color = '#d070ff';
-        }
-        go('dashboard');
+    const top = Object.values(counts).sort((a,b) => b.n - a.n).slice(0, 8);
+    const el = document.getElementById('topUsers');
+    if (!top.length) {
+      el.innerHTML = '<div class="empty"><div class="empty-txt">No messages yet.</div></div>';
+    } else {
+      el.innerHTML = '<div class="top-list"><div class="top-list-hd">Most Active (last 100 messages)</div>' +
+        top.map((u,i) => `<div class="top-row"><span class="top-rank">${i+1}</span><span class="top-name">${esc(u.name)}</span><span class="top-count">${u.n} msg${u.n===1?'':'s'}</span></div>`).join('') +
+        '</div>';
+    }
+    fresh('dash');
+  } catch(e) {
+    handleErr(e, () => {
+      document.getElementById('topUsers').innerHTML = '<div class="empty"><div class="empty-txt">Could not load data.</div></div>';
     });
+  }
+}
 
-    function go(sec) {
-        _section = sec;
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-        document.getElementById('nav-' + sec)?.classList.add('active');
-        document.getElementById('sec-' + sec)?.classList.add('active');
-        const loaders = {
-            dashboard: loadDashboard,
-            reports: loadReports,
-            bugs: loadBugs,
-            users: loadUsers,
-            chat: () => {},
-            announce: loadAnnouncements,
-            platform: loadPlatform
-        };
-        loaders[sec]?.();
+/* ── REPORTS ── */
+async function loadReports() {
+  if (!stale('reports')) return;
+  const el = document.getElementById('reportsList');
+  el.innerHTML = '<div class="spin"></div>';
+  try {
+    const snap = await db.collection('reports').orderBy('timestamp','desc').limit(80).get();
+    if (!snap.empty) {
+      el.innerHTML = '';
+      snap.docs.forEach(r => renderReport(el, r.id, r.data()));
+      fresh('reports');
+    } else {
+      el.innerHTML = '<div class="empty"><div class="empty-ico">✓</div><div class="empty-txt">No reports.</div></div>';
+      fresh('reports');
     }
+  } catch(e) { handleErr(e, () => { el.innerHTML = '<div class="empty"><div class="empty-txt">Could not load reports.</div></div>'; }); }
+}
 
-    async function loadDashboard() {
-        if (!stale('dashboard')) return;
-        try {
-            const [uSnap, rSnap, bSnap, mSnap] = await Promise.all([
-                db.collection('users').get(),
-                db.collection('reports').where('status','==','pending').get(),
-                db.collection('bugReports').where('status','==','open').get(),
-                db.collection('socialMessages').orderBy('timestamp','desc').limit(100).get()
-            ]);
-            document.getElementById('ds-users').textContent = uSnap.size;
-            document.getElementById('ds-reports').textContent = rSnap.size;
-            document.getElementById('ds-bugs').textContent = bSnap.size;
-            document.getElementById('ds-msgs').textContent = mSnap.size;
-            if (rSnap.size) { const nc = document.getElementById('nc-reports'); nc.textContent = rSnap.size; nc.style.display = ''; }
-            if (bSnap.size) { const nc = document.getElementById('nc-bugs'); nc.textContent = bSnap.size; nc.style.display = ''; }
-            const counts = {};
-            mSnap.docs.forEach(d => {
-                const dat = d.data();
-                if (dat.userId) {
-                    counts[dat.userId] = counts[dat.userId] || { name: dat.displayName || '?', n: 0 };
-                    counts[dat.userId].n++;
-                }
-            });
-            const top = Object.values(counts).sort((a,b) => b.n - a.n).slice(0,8);
-            const el = document.getElementById('topUsers');
-            if (top.length) {
-                el.innerHTML = '<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px">' +
-                    top.map((u,i) => `<div class="top-user"><span class="top-rank">${i+1}</span><span class="top-name">${esc(u.name)}</span><span class="top-count">${u.n} msg${u.n===1?'':'s'}</span></div>`).join('') +
-                    '</div>';
-            } else {
-                el.innerHTML = '<div class="empty"><div class="empty-text">No messages yet.</div></div>';
-            }
-            fresh('dashboard');
-        } catch(e) {
-            document.getElementById('topUsers').innerHTML = `<div class="empty"><div class="empty-text">Error: ${esc(e.message)}</div></div>`;
+function renderReport(el, id, r) {
+  const ts   = r.timestamp?.toDate ? r.timestamp.toDate() : new Date(r.timestamp||0);
+  const time = ts.toLocaleString([],{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  const res  = r.status === 'resolved';
+  const div  = document.createElement('div');
+  div.className = 'card' + (res ? ' faded' : ''); div.id = 'rc-' + id;
+  div.innerHTML = `
+    <div class="card-top">
+      <span class="tag ${r.status||'pending'}">${r.status||'pending'}</span>
+      <div class="card-who">By <strong>${esc(r.reportedByName||'?')}</strong> — targeting <strong>${esc(r.reportedDisplayName||'?')}</strong></div>
+      <span class="card-time">${time}</span>
+    </div>
+    <div class="card-body-text">${esc(r.messageText||'[no content]')}</div>
+    <div class="card-actions">
+      <button class="btn btn-sm" ${res?'disabled':''} onclick="resolveReport('${id}',this)">${res?'Resolved':'Dismiss'}</button>
+      <button class="btn btn-danger" ${res?'disabled':''} onclick="deleteReportMsg('${id}','${r.messageId||''}',this)">Delete Message</button>
+    </div>`;
+  el.appendChild(div);
+}
+
+async function resolveReport(id, btn) {
+  btn.disabled = true; btn.textContent = 'Saving…';
+  try {
+    await db.collection('reports').doc(id).update({ status: 'resolved', resolvedBy: me.uid });
+    const c = document.getElementById('rc-'+id);
+    if (c) { c.classList.add('faded'); c.querySelectorAll('.btn').forEach(b=>b.disabled=true); c.querySelector('.tag').className='tag resolved'; c.querySelector('.tag').textContent='resolved'; }
+    audit('resolve_report', { reportId: id });
+    bust('reports'); bust('dash'); toast('Dismissed');
+  } catch(e) { handleErr(e, () => { btn.disabled=false; btn.textContent='Dismiss'; }); }
+}
+
+async function deleteReportMsg(rId, mId, btn) {
+  if (!mId) { toast('No message ID'); return; }
+  if (!await customConfirm('Delete this message permanently?', true)) return;
+  btn.disabled = true; btn.textContent = 'Deleting…';
+  try {
+    try { await db.collection('socialMessages').doc(mId).delete(); } catch(e2) {}
+    await db.collection('reports').doc(rId).update({ status: 'resolved', resolvedBy: me.uid });
+    const c = document.getElementById('rc-'+rId);
+    if (c) { c.classList.add('faded'); c.querySelectorAll('.btn').forEach(b=>b.disabled=true); c.querySelector('.tag').className='tag resolved'; c.querySelector('.tag').textContent='resolved'; }
+    audit('delete_message', { reportId: rId, messageId: mId });
+    bust('reports'); bust('dash'); toast('Message deleted');
+  } catch(e) { handleErr(e, () => { btn.disabled=false; btn.textContent='Delete Message'; }); }
+}
+
+async function clearResolved() {
+  if (!await customConfirm('Permanently delete all resolved reports? This cannot be undone.', true)) return;
+  try {
+    const snap = await db.collection('reports').where('status','==','resolved').get();
+    if (!snap.empty) {
+      const batch = db.batch();
+      snap.docs.forEach(d => batch.delete(d.ref));
+      await batch.commit();
+    }
+    bust('reports');
+    toast(`Cleared ${snap.size} resolved report${snap.size===1?'':'s'}`);
+    document.getElementById('reportsList').innerHTML = '<div class="spin"></div>';
+    loadReports();
+  } catch(e) { handleErr(e); }
+}
+
+/* ── BUGS ── */
+async function loadBugs() {
+  if (!stale('bugs')) return;
+  const el = document.getElementById('bugsList');
+  el.innerHTML = '<div class="spin"></div>';
+  try {
+    const snap = await db.collection('bugReports').orderBy('timestamp','desc').limit(80).get();
+    if (!snap.empty) {
+      el.innerHTML = '';
+      snap.docs.forEach(d => {
+        const b = { id: d.id, ...d.data() };
+        const ts = b.timestamp?.toDate ? b.timestamp.toDate() : new Date(b.timestamp||0);
+        const time = ts.toLocaleString([],{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+        const done = b.status === 'resolved';
+        const div  = document.createElement('div');
+        div.className = 'card' + (done ? ' faded' : ''); div.id = 'bc-' + b.id;
+        div.innerHTML = `
+          <div class="card-top">
+            <span class="tag ${b.status||'open'}">${b.status||'open'}</span>
+            <div class="card-who">By <strong>${esc(b.userName||'?')}</strong></div>
+            <span class="card-time">${time}</span>
+          </div>
+          <div class="card-title">${esc(b.title||'Untitled')}</div>
+          <div class="card-desc" style="margin-top:4px">${esc(b.desc||'')}</div>
+          <div class="card-actions" style="margin-top:10px">
+            <button class="btn btn-sm" ${done?'disabled':''} onclick="resolveBug('${b.id}',this)">${done?'Resolved':'Mark Resolved'}</button>
+          </div>`;
+        el.appendChild(div);
+      });
+      fresh('bugs');
+    } else {
+      el.innerHTML = '<div class="empty"><div class="empty-ico">✓</div><div class="empty-txt">No bug reports.</div></div>';
+      fresh('bugs');
+    }
+  } catch(e) { handleErr(e, () => { el.innerHTML = '<div class="empty"><div class="empty-txt">Could not load bugs.</div></div>'; }); }
+}
+
+async function resolveBug(id, btn) {
+  btn.disabled = true; btn.textContent = 'Saving…';
+  try {
+    await db.collection('bugReports').doc(id).update({ status: 'resolved', resolvedBy: me.uid });
+    const c = document.getElementById('bc-'+id);
+    if (c) { c.classList.add('faded'); c.querySelectorAll('.btn').forEach(b=>b.disabled=true); c.querySelector('.tag').className='tag done'; c.querySelector('.tag').textContent='resolved'; }
+    audit('resolve_bug', { bugId: id });
+    bust('bugs'); bust('dash'); toast('Marked resolved');
+  } catch(e) { handleErr(e, () => { btn.disabled=false; btn.textContent='Mark Resolved'; }); }
+}
+
+/* ── USERS ── */
+async function loadUsers() {
+  if (!stale('users') && _allUsers.length) { renderUsers(_allUsers); return; }
+  document.getElementById('usersList').innerHTML = '<div class="spin"></div>';
+  try {
+    const snap = await db.collection('users').get();
+    _allUsers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    fresh('users');
+    renderUsers(_allUsers);
+  } catch(e) {
+    handleErr(e, () => {
+      document.getElementById('usersList').innerHTML = '<div class="empty"><div class="empty-txt">Could not load users.</div></div>';
+    });
+  }
+}
+
+function filterUsers(q) {
+  const lq = q.toLowerCase();
+  renderUsers(q ? _allUsers.filter(u =>
+    (u.displayName||'').toLowerCase().includes(lq) ||
+    (u.email||'').toLowerCase().includes(lq)
+  ) : _allUsers);
+}
+
+function renderUsers(users) {
+  const el = document.getElementById('usersList');
+  const cnt = document.getElementById('userCount');
+  if (cnt) cnt.textContent = users.length === _allUsers.length ? `${_allUsers.length} total` : `${users.length} / ${_allUsers.length}`;
+  if (!users.length) { el.innerHTML = '<div class="empty"><div class="empty-txt">No users found.</div></div>'; return; }
+  el.innerHTML = '';
+  const isMO = myRole === 'main_owner';
+  users.forEach(u => {
+    const role   = u.role || 'user';
+    const isMe   = u.id === me?.uid;
+    const isOwnerish = role === 'owner' || role === 'main_owner';
+    const canAct = !isMe && (!isOwnerish || isMO);
+    const avStyle = u.photoURL
+      ? `background-image:url('${u.photoURL}');color:transparent`
+      : `background:${strCol(u.id||'')}`;
+    const init = u.photoURL ? '' : (u.displayName||'?')[0].toUpperCase();
+    const row = document.createElement('div');
+    row.className = 'user-row';
+    row.onclick = () => openDrawer(u);
+    row.innerHTML = `
+      <div class="user-av" style="${avStyle}">${init}</div>
+      <div class="user-info">
+        <div class="user-name">${esc(u.displayName||'Unknown')}${isMe?' <span style="color:var(--dim);font-weight:400">(you)</span>':''}</div>
+        <div class="user-email">${esc(u.email||u.id)}</div>
+      </div>
+      <span class="role-chip ${role}">${role}</span>
+      ${canAct ? `<div class="user-actions" onclick="event.stopPropagation()">
+        ${role==='banned'
+          ? `<button class="btn btn-sm" onclick="setRole('${u.id}','user',this)">Unban</button>`
+          : role==='moderator'
+            ? `<button class="btn btn-sm" onclick="setRole('${u.id}','user',this)">Remove Mod</button>`
+            : role==='owner' && isMO
+              ? `<button class="btn btn-sm" onclick="setRole('${u.id}','user',this)">Remove Owner</button>`
+              : `<button class="btn btn-sm" onclick="setRole('${u.id}','moderator',this)">Make Mod</button>`
         }
+        ${isMO && role!=='owner' && role!=='main_owner' && role!=='banned'
+          ? `<button class="btn btn-sm" onclick="setRole('${u.id}','owner',this)">Make Owner</button>` : ''}
+        ${role!=='banned' ? `<button class="btn btn-danger" onclick="setRole('${u.id}','banned',this)">Ban</button>` : ''}
+      </div>` : ''}`;
+    el.appendChild(row);
+  });
+}
+
+async function setRole(uid, role, btn) {
+  if (role === 'banned') {
+    const reason = await customPrompt('Ban Reason', 'Why is this user being banned? (shown in their profile)', '');
+    if (reason === null) return;
+    btn.disabled = true; btn.textContent = '…';
+    try {
+      await db.collection('users').doc(uid).update({ role, banReason: reason || 'No reason given', bannedAt: FS.FieldValue.serverTimestamp(), bannedBy: me.uid });
+      const u = _allUsers.find(x => x.id === uid); if (u) { u.role = 'banned'; u.banReason = reason; }
+      audit('ban', { targetUid: uid, targetName: u?.displayName, reason: reason || 'No reason given' });
+      bust('users'); renderUsers(_allUsers); toast('User banned');
+    } catch(e) { handleErr(e, () => { btn.disabled=false; btn.textContent='Retry'; }); }
+    return;
+  }
+  btn.disabled = true; btn.textContent = '…';
+  try {
+    const patch = role === 'user' ? { role, banReason: FS.FieldValue.delete(), bannedAt: FS.FieldValue.delete(), bannedBy: FS.FieldValue.delete() } : { role };
+    await db.collection('users').doc(uid).update(patch);
+    const u = _allUsers.find(x => x.id === uid); if (u) u.role = role;
+    audit('role_change', { targetUid: uid, targetName: u?.displayName, newRole: role });
+    bust('users'); renderUsers(_allUsers);
+    toast({ moderator:'Promoted to moderator', owner:'Promoted to owner', user:'Role removed' }[role] || 'Role updated');
+  } catch(e) { handleErr(e, () => { btn.disabled=false; btn.textContent='Retry'; }); }
+}
+
+/* ── USER DRAWER ── */
+function openDrawer(u) {
+  const role   = u.role || 'user';
+  const isMe   = u.id === me?.uid;
+  const isMO   = myRole === 'main_owner';
+  const isOwnerish = role === 'owner' || role === 'main_owner';
+  const canAct = !isMe && (!isOwnerish || isMO);
+  const avStyle = u.photoURL
+    ? `background-image:url('${u.photoURL}');color:transparent`
+    : `background:${strCol(u.id||'')}`;
+  const init = u.photoURL ? '' : (u.displayName||'?')[0].toUpperCase();
+  const chipColors = {
+    main_owner:'background:rgba(255,80,220,.1);border:1px solid rgba(255,80,220,.3);color:#ff50dc',
+    owner:     'background:rgba(255,184,74,.1);border:1px solid rgba(255,184,74,.28);color:#ffb84a',
+    moderator: 'background:rgba(122,160,255,.1);border:1px solid rgba(122,160,255,.28);color:#7aa0ff',
+    banned:    'background:rgba(248,81,73,.08);border:1px solid rgba(248,81,73,.22);color:#f85149',
+    user:      'background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);color:#60607a',
+  }[role] || '';
+  const joined = u.createdAt
+    ? new Date(u.createdAt?.toDate ? u.createdAt.toDate() : u.createdAt).toLocaleDateString([],{year:'numeric',month:'short',day:'numeric'})
+    : '—';
+  document.getElementById('drawerBody').innerHTML = `
+    <div class="drawer-av" style="${avStyle}">${init}</div>
+    <div class="drawer-name">${esc(u.displayName||'Unknown')}</div>
+    <div class="drawer-email">${esc(u.email||u.id)}</div>
+    <div class="drawer-chips">
+      <span style="padding:3px 10px;border-radius:20px;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;${chipColors}">${role}</span>
+      ${isMe?'<span style="padding:3px 10px;border-radius:20px;font-size:.6rem;font-weight:700;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);color:#60607a">YOU</span>':''}
+    </div>
+    <div>
+      ${[['UID',`<span class="info-val mono">${esc(u.id)}</span>`],['Email',esc(u.email||'—')],['Role',`<span style="${chipColors};padding:2px 7px;border-radius:4px;font-size:.65rem;font-weight:700;">${role}</span>`],['Joined',joined],
+        ...(role==='banned'&&u.banReason?[['Ban Reason',`<span style="color:var(--danger)">${esc(u.banReason)}</span>`]]:[])]
+        .map(([l,v])=>`<div class="info-row"><span class="info-lbl">${l}</span><span class="info-val">${v}</span></div>`).join('')}
+    </div>`;
+  const actions = document.getElementById('drawerActions');
+  if (canAct) {
+    actions.style.display = '';
+    const isBanned = role === 'banned', isMod = role === 'moderator', isOw = role === 'owner';
+    actions.innerHTML = `
+      ${isMod ? `<button class="btn btn-sm btn-full" onclick="drawerRole('${u.id}','user',this)">Remove Moderator</button>`
+        : isBanned ? `<button class="btn btn-sm btn-full" onclick="drawerRole('${u.id}','user',this)">Unban User</button>`
+        : isOw && isMO ? `<button class="btn btn-sm btn-full" onclick="drawerRole('${u.id}','user',this)">Remove Owner</button>`
+        : `<button class="btn btn-sm btn-full" onclick="drawerRole('${u.id}','moderator',this)">Promote to Moderator</button>`}
+      ${isMO && !isOw && !isBanned ? `<button class="btn btn-sm btn-full" onclick="drawerRole('${u.id}','owner',this)">Promote to Owner</button>` : ''}
+      ${!isBanned ? `<button class="btn btn-danger btn-full" onclick="drawerRole('${u.id}','banned',this)">Ban User</button>` : ''}
+      <button class="btn btn-sm btn-full" onclick="drawerRename('${u.id}','${esc(u.displayName||'').replace(/'/g,"\\'")}',this)">Rename</button>
+      <button class="btn btn-sm btn-full" onclick="drawerWipe('${u.id}',this)">Wipe All Messages</button>
+      ${u.email ? `<button class="btn btn-ghost btn-full" onclick="drawerReset('${esc(u.email)}',this)">Send Password Reset Email</button>` : ''}`;
+  } else {
+    actions.style.display = 'none';
+  }
+  document.getElementById('drawerOverlay').classList.add('open');
+}
+
+function closeDrawer() { document.getElementById('drawerOverlay').classList.remove('open'); }
+
+async function drawerRole(uid, role, btn) {
+  if (role === 'banned') {
+    const reason = await customPrompt('Ban Reason', 'Why is this user being banned?', '');
+    if (reason === null) return;
+    btn.disabled = true; btn.textContent = 'Banning…';
+    try {
+      await db.collection('users').doc(uid).update({ role, banReason: reason || 'No reason given', bannedAt: FS.FieldValue.serverTimestamp(), bannedBy: me.uid });
+      const u = _allUsers.find(x => x.id === uid); if (u) { u.role = 'banned'; u.banReason = reason; }
+      audit('ban', { targetUid: uid, targetName: u?.displayName, reason: reason || 'No reason given' });
+      bust('users'); renderUsers(_allUsers); closeDrawer(); toast('User banned');
+    } catch(e) { handleErr(e, () => { btn.disabled=false; btn.textContent='Ban User'; }); }
+    return;
+  }
+  btn.disabled = true; btn.textContent = 'Updating…';
+  try {
+    const patch = role === 'user' ? { role, banReason: FS.FieldValue.delete(), bannedAt: FS.FieldValue.delete(), bannedBy: FS.FieldValue.delete() } : { role };
+    await db.collection('users').doc(uid).update(patch);
+    const u = _allUsers.find(x => x.id === uid); if (u) u.role = role;
+    audit('role_change', { targetUid: uid, targetName: u?.displayName, newRole: role });
+    bust('users'); renderUsers(_allUsers); closeDrawer();
+    toast({ moderator:'Promoted to moderator', owner:'Promoted to owner', user:'Role removed' }[role] || 'Role updated');
+  } catch(e) { handleErr(e, () => { btn.disabled=false; btn.textContent='Retry'; }); }
+}
+
+async function drawerRename(uid, cur, btn) {
+  const name = await customPrompt('Rename User', 'Enter a new display name:', cur);
+  if (!name || name === cur) return;
+  btn.disabled = true; btn.textContent = 'Saving…';
+  try {
+    await db.collection('users').doc(uid).update({ displayName: name.trim() });
+    const u = _allUsers.find(x => x.id === uid);
+    audit('rename', { targetUid: uid, oldName: u?.displayName, newName: name.trim() });
+    if (u) u.displayName = name.trim();
+    renderUsers(_allUsers); closeDrawer(); toast('Name updated');
+  } catch(e) { handleErr(e, () => { btn.disabled=false; btn.textContent='Rename'; }); }
+}
+
+async function drawerWipe(uid, btn) {
+  if (!await customConfirm('Delete ALL messages from this user? This cannot be undone.', true)) return;
+  btn.disabled = true; btn.textContent = 'Wiping…';
+  try {
+    const snap = await db.collection('socialMessages').where('userId','==',uid).get();
+    const batch = db.batch();
+    snap.docs.forEach(d => batch.delete(d.ref));
+    await batch.commit();
+    audit('wipe_messages', { targetUid: uid, count: snap.size });
+    closeDrawer(); toast(`Deleted ${snap.size} message${snap.size===1?'':'s'}`);
+  } catch(e) { handleErr(e, () => { btn.disabled=false; btn.textContent='Wipe All Messages'; }); }
+}
+
+async function drawerReset(email, btn) {
+  if (!await customConfirm(`Send a password reset email to ${email}?`)) return;
+  btn.disabled = true; btn.textContent = 'Sending…';
+  try {
+    await firebase.auth().sendPasswordResetEmail(email);
+    audit('password_reset', { targetEmail: email });
+    toast('Password reset email sent');
+  } catch(e) { toast('Error: ' + e.message); }
+  finally { btn.disabled=false; btn.textContent='Send Password Reset Email'; }
+}
+
+/* ── CHAT ── */
+async function searchChat() {
+  const q   = document.getElementById('chatQ').value.trim();
+  const el  = document.getElementById('chatResults');
+  if (!q) return;
+  el.innerHTML = '<div class="spin"></div>';
+  try {
+    const snap = await db.collection('socialMessages').orderBy('timestamp','desc').limit(300).get();
+    const lq   = q.toLowerCase().replace(/^@/,'');
+    const res  = snap.docs.map(d=>({id:d.id,...d.data()}))
+      .filter(d=>(d.text||'').toLowerCase().includes(lq)||(d.displayName||'').toLowerCase().includes(lq)).slice(0,50);
+    if (!res.length) { el.innerHTML = '<div class="empty"><div class="empty-txt">No messages matched.</div></div>'; return; }
+    el.innerHTML = `<div style="font-size:.62rem;color:var(--dim);margin-bottom:10px;font-family:'DM Mono',monospace">${res.length} result${res.length===1?'':'s'}</div>`;
+    res.forEach(m => {
+      const ts   = m.timestamp?.toDate ? m.timestamp.toDate() : new Date(m.timestamp||0);
+      const time = ts.toLocaleString([],{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+      const div  = document.createElement('div');
+      div.className = 'chat-msg'; div.id = 'cm-' + m.id;
+      div.innerHTML = `
+        <div style="flex:1;min-width:0">
+          <div class="chat-msg-name">${esc(m.displayName||'?')}</div>
+          <div class="chat-msg-text">${esc(m.text||'[no text]')}</div>
+        </div>
+        <span class="chat-msg-time">${time}</span>
+        <button class="chat-msg-del" title="Delete" onclick="delChatMsg('${m.id}',this)">🗑</button>`;
+      el.appendChild(div);
+    });
+  } catch(e) { handleErr(e, () => { el.innerHTML = '<div class="empty"><div class="empty-txt">Search failed.</div></div>'; }); }
+}
+
+async function delChatMsg(id, btn) {
+  if (!await customConfirm('Delete this message?', true)) return;
+  btn.disabled = true;
+  try {
+    await db.collection('socialMessages').doc(id).delete();
+    document.getElementById('cm-'+id)?.remove();
+    toast('Deleted');
+  } catch(e) { handleErr(e, () => { btn.disabled=false; }); }
+}
+
+/* ── ANNOUNCE ── */
+async function loadAnnouncements() {
+  if (!stale('announce')) return;
+  const el = document.getElementById('annHistory');
+  try {
+    const snap = await db.collection('announcements').orderBy('timestamp','desc').limit(20).get();
+    fresh('announce');
+    if (!snap.empty) {
+      el.innerHTML = '';
+      snap.docs.forEach(d => {
+        const a  = d.data();
+        const ts = a.timestamp?.toDate ? a.timestamp.toDate() : new Date(a.timestamp||0);
+        const time = ts.toLocaleString([],{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+        const div  = document.createElement('div');
+        div.className = 'ann-item';
+        div.innerHTML = `<span class="ann-badge">OFFICIAL</span><div><div class="ann-text">${esc(a.text||'')}</div><div class="ann-time">${time}${a.pinned?' · 📌':''}</div></div>`;
+        el.appendChild(div);
+      });
     }
+  } catch(e) { handleErr(e); }
+}
 
-    async function loadReports() {
-        if (!stale('reports')) return;
-        const el = document.getElementById('reportsList');
-        el.innerHTML = '<div style="text-align:center;padding:36px"><div class="spin"></div></div>';
-        try {
-            const snap = await db.collection('reports').orderBy('timestamp','desc').limit(80).get();
-            const docs = snap.docs.map(d => ({id: d.id, ...d.data()}));
-            if (!docs.length) {
-                el.innerHTML = '<div class="empty"><div class="empty-ico">✓</div><div class="empty-text">No reports yet.</div></div>';
-                fresh('reports');
-                return;
-            }
-            el.innerHTML = '';
-            docs.forEach(r => {
-                const ts = r.timestamp?.toDate ? r.timestamp.toDate() : new Date(r.timestamp || 0);
-                const time = ts.toLocaleString([], { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
-                const res = r.status === 'resolved';
-                const card = document.createElement('div');
-                card.className = 'card' + (res ? ' resolved' : '');
-                card.id = 'rc-' + r.id;
-                card.innerHTML = `
-                    <div class="card-top">
-                        <span class="tag ${r.status||'pending'}">${r.status||'pending'}</span>
-                        <div class="card-who">By <strong>${esc(r.reportedByName||'?')}</strong> — targeting <strong>${esc(r.reportedDisplayName||'?')}</strong></div>
-                        <span class="card-time">${time}</span>
-                    </div>
-                    <div class="card-body">${esc(r.messageText||'[no content]')}</div>
-                    <div class="card-actions">
-                        <button class="btn btn-sm" ${res?'disabled':''} onclick="resolveReport('${r.id}',this)">${res?'Resolved':'Dismiss'}</button>
-                        <button class="btn btn-danger" ${res?'disabled':''} onclick="deleteMsg('${r.id}','${r.messageId||''}',this)">Delete Message</button>
-                    </div>`;
-                el.appendChild(card);
-            });
-            fresh('reports');
-        } catch(e) {
-            el.innerHTML = `<div class="empty"><div class="empty-text">Error: ${esc(e.message)}</div></div>`;
-        }
-    }
+async function sendAnn() {
+  const text   = document.getElementById('annText').value.trim();
+  const pinned = document.getElementById('annPin').checked;
+  if (!text) { toast('Write a message first'); return; }
+  const btn = document.querySelector('#sec-announce .btn-accent');
+  btn.disabled = true; btn.textContent = 'Sending…';
+  try {
+    await Promise.all([
+      db.collection('announcements').add({ text, pinned, sentBy: me.uid, sentByName: me.displayName||'Owner', timestamp: FS.FieldValue.serverTimestamp() }),
+      db.collection('socialMessages').add({ text, userId: me.uid, displayName: me.displayName||'Vexis', photoURL: null, timestamp: FS.FieldValue.serverTimestamp(), reactions:{}, replyTo:null, gifUrl:null, imageBase64:null, isOfficial:true, pinned }),
+    ]);
+    document.getElementById('annText').value = '';
+    document.getElementById('annPin').checked = false;
+    audit('announcement', { text: text.slice(0, 120), pinned });
+    bust('announce'); loadAnnouncements(); toast('Announcement sent!');
+  } catch(e) { handleErr(e); }
+  finally { btn.disabled=false; btn.textContent='Send'; }
+}
 
-    async function clearResolvedReports() {
-        if (!confirm('Permanently delete all resolved reports?')) return;
-        try {
-            const snap = await db.collection('reports').where('status','==','resolved').get();
-            const batch = db.batch();
-            snap.docs.forEach(d => batch.delete(d.ref));
-            await batch.commit();
-            bust('reports');
-            toast(`Cleared ${snap.size} resolved report${snap.size===1?'':'s'}`);
-            loadReports();
-        } catch(e) { toast('Error: ' + e.message); }
-    }
+/* ── AUDIT LOG ── */
+const ACTION_LABELS = {
+  role_change:'Role change', ban:'User banned', rename:'User renamed',
+  wipe_messages:'Messages wiped', password_reset:'Password reset sent',
+  resolve_report:'Report resolved', delete_message:'Message deleted',
+  resolve_bug:'Bug resolved', announcement:'Announcement sent',
+  motd:'MOTD updated', banner:'Banner updated', flag:'Feature flag toggled',
+};
 
-    async function resolveReport(id, btn) {
-        btn.disabled = true;
-        btn.textContent = 'Resolving…';
-        try {
-            await db.collection('reports').doc(id).update({ status:'resolved', resolvedBy: me.uid });
-            const c = document.getElementById('rc-' + id);
-            if (c) {
-                c.classList.add('resolved');
-                c.querySelectorAll('.btn').forEach(b => b.disabled = true);
-                const tag = c.querySelector('.tag');
-                if (tag) { tag.className = 'tag resolved'; tag.textContent = 'resolved'; }
-            }
-            bust('reports');
-            toast('Dismissed');
-        } catch(e) {
-            toast('Error: ' + e.message);
-            btn.disabled = false;
-            btn.textContent = 'Dismiss';
-        }
-    }
+async function loadAudit(force) {
+  if (!stale('audit') && !force) return;
+  const el = document.getElementById('auditList');
+  el.innerHTML = '<div class="spin"></div>';
+  try {
+    const snap = await db.collection('auditLog').orderBy('timestamp','desc').limit(100).get();
+    fresh('audit');
+    if (snap.empty) { el.innerHTML = '<div class="empty"><div class="empty-txt">No audit entries yet.</div></div>'; return; }
+    el.innerHTML = '';
+    snap.docs.forEach(d => {
+      const a = d.data();
+      const ts = a.timestamp?.toDate ? a.timestamp.toDate() : new Date(a.timestamp || 0);
+      const time = ts.toLocaleString([],{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+      const label = ACTION_LABELS[a.action] || a.action;
+      const detail = Object.entries(a.detail || {})
+        .filter(([k]) => !['targetUid'].includes(k))
+        .map(([k,v]) => `<span style="color:var(--dim)">${k}:</span> ${esc(String(v))}`)
+        .join(' · ');
+      const row = document.createElement('div');
+      row.className = 'card'; row.style.marginBottom = '6px';
+      row.innerHTML = `
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <span style="font-size:.7rem;font-weight:700;color:var(--white)">${esc(label)}</span>
+          <span style="font-size:.68rem;color:var(--dim);flex:1">${detail}</span>
+          <span style="font-size:.62rem;color:var(--muted);flex-shrink:0">${time}</span>
+        </div>
+        <div style="font-size:.62rem;color:var(--muted);margin-top:4px">by <strong style="color:var(--dim)">${esc(a.byName||'?')}</strong> · ${esc(a.byRole||'owner')}</div>`;
+      el.appendChild(row);
+    });
+  } catch(e) { handleErr(e, () => { el.innerHTML = '<div class="empty"><div class="empty-txt">Could not load audit log.</div></div>'; }); }
+}
 
-    async function deleteMsg(rId, mId, btn) {
-        if (!mId) return toast('No message ID');
-        if (!confirm('Delete this message?')) return;
-        btn.disabled = true;
-        btn.textContent = 'Deleting…';
-        try {
-            try { await db.collection('socialMessages').doc(mId).delete(); } catch(e) {}
-            await db.collection('reports').doc(rId).update({ status:'resolved', resolvedBy: me.uid });
-            const c = document.getElementById('rc-' + rId);
-            if (c) {
-                c.classList.add('resolved');
-                c.querySelectorAll('.btn').forEach(b => b.disabled = true);
-                const tag = c.querySelector('.tag');
-                if (tag) { tag.className = 'tag resolved'; tag.textContent = 'resolved'; }
-            }
-            bust('reports');
-            toast('Message deleted');
-        } catch(e) {
-            toast('Error: ' + e.message);
-            btn.disabled = false;
-            btn.textContent = 'Delete Message';
-        }
-    }
+/* ── PLATFORM ── */
+async function loadPlatform() {
+  if (!stale('platform') && Object.keys(_siteConfig).length) { renderPlatform(); return; }
+  try {
+    const snap  = await db.collection('siteSettings').doc('main').get();
+    _siteConfig = snap.exists ? snap.data() : {};
+    _autoWords  = _siteConfig.automodWords || [];
+    fresh('platform');
+    renderPlatform();
+  } catch(e) { handleErr(e); }
+}
 
-    async function loadBugs() {
-        if (!stale('bugs')) return;
-        const el = document.getElementById('bugsList');
-        el.innerHTML = '<div style="text-align:center;padding:36px"><div class="spin"></div></div>';
-        try {
-            const snap = await db.collection('bugReports').orderBy('timestamp','desc').limit(80).get();
-            const docs = snap.docs.map(d => ({id: d.id, ...d.data()}));
-            if (!docs.length) {
-                el.innerHTML = '<div class="empty"><div class="empty-ico">✓</div><div class="empty-text">No bug reports yet.</div></div>';
-                fresh('bugs');
-                return;
-            }
-            el.innerHTML = '';
-            docs.forEach(b => {
-                const ts = b.timestamp?.toDate ? b.timestamp.toDate() : new Date(b.timestamp || 0);
-                const time = ts.toLocaleString([], { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
-                const done = b.status === 'resolved';
-                const card = document.createElement('div');
-                card.className = 'card' + (done ? ' done' : '');
-                card.id = 'bc-' + b.id;
-                card.innerHTML = `
-                    <div class="card-top">
-                        <span class="tag ${b.status||'open'}">${b.status||'open'}</span>
-                        <div class="card-who">By <strong>${esc(b.userName||'?')}</strong></div>
-                        <span class="card-time">${time}</span>
-                    </div>
-                    <div class="card-title">${esc(b.title||'Untitled')}</div>
-                    <div class="card-desc">${esc(b.desc||'')}</div>
-                    <div class="card-actions" style="margin-top:10px">
-                        <button class="btn btn-sm" ${done?'disabled':''} onclick="resolveBug('${b.id}',this)">${done?'Resolved':'Mark Resolved'}</button>
-                    </div>`;
-                el.appendChild(card);
-            });
-            fresh('bugs');
-        } catch(e) {
-            el.innerHTML = `<div class="empty"><div class="empty-text">Error: ${esc(e.message)}</div></div>`;
-        }
-    }
+function renderPlatform() {
+  document.getElementById('motdVal').value   = _siteConfig.motd || '';
+  document.getElementById('bannerVal').value = _siteConfig.bannerText || '';
+  renderFlags(_siteConfig.flags || {});
+  renderAutomod();
+  renderItems(_siteConfig.items || { games:[], apps:[], tools:[] });
+}
 
-    async function clearResolvedBugs() {
-        if (!confirm('Permanently delete all resolved bug reports?')) return;
-        try {
-            const snap = await db.collection('bugReports').where('status','==','resolved').get();
-            const batch = db.batch();
-            snap.docs.forEach(d => batch.delete(d.ref));
-            await batch.commit();
-            bust('bugs');
-            toast(`Cleared ${snap.size} resolved bug${snap.size===1?'':'s'}`);
-            loadBugs();
-        } catch(e) { toast('Error: ' + e.message); }
-    }
+async function savePlat(patch) {
+  Object.assign(_siteConfig, patch);
+  await db.collection('siteSettings').doc('main').set(_siteConfig, { merge: true });
+  bust('platform');
+}
 
-    async function resolveBug(id, btn) {
-        btn.disabled = true;
-        btn.textContent = 'Resolving…';
-        try {
-            await db.collection('bugReports').doc(id).update({ status:'resolved', resolvedBy: me.uid });
-            const c = document.getElementById('bc-' + id);
-            if (c) {
-                c.classList.add('done');
-                c.querySelectorAll('.btn').forEach(b => b.disabled = true);
-                const tag = c.querySelector('.tag');
-                if (tag) { tag.className = 'tag done'; tag.textContent = 'resolved'; }
-            }
-            bust('bugs');
-            toast('Marked resolved');
-        } catch(e) {
-            toast('Error: ' + e.message);
-            btn.disabled = false;
-            btn.textContent = 'Mark Resolved';
-        }
-    }
+async function saveMOTD()  { const v=document.getElementById('motdVal').value.trim(); try{await savePlat({motd:v});audit('motd',{value:v});toast(v?'MOTD saved':'MOTD cleared');}catch(e){handleErr(e);} }
+async function clearMOTD() { document.getElementById('motdVal').value=''; await saveMOTD(); }
+async function saveBanner(show) {
+  const t = document.getElementById('bannerVal').value.trim();
+  try { await savePlat({ bannerText: t, bannerOn: show }); audit('banner', { text: t, on: show }); toast(show ? 'Banner shown' : 'Banner hidden'); }
+  catch(e) { handleErr(e); }
+}
 
-    async function loadUsers() {
-        if (!stale('users') && _allUsers.length) { renderUsers(_allUsers); return; }
-        const el = document.getElementById('usersList');
-        el.innerHTML = '<div style="text-align:center;padding:36px"><div class="spin"></div></div>';
-        try {
-            const snap = await db.collection('users').get();
-            _allUsers = snap.docs.map(d => ({id: d.id, ...d.data()}));
-            fresh('users');
-            renderUsers(_allUsers);
-        } catch(e) {
-            el.innerHTML = `<div class="empty"><div class="empty-text">Error: ${esc(e.message)}</div></div>`;
-        }
-    }
+const FLAG_DEFS = [
+  { key:'globalChat',  label:'Global Chat',      sub:'Allow messages in global chat' },
+  { key:'guestLogin',  label:'Guest Login',       sub:'Allow access without an account' },
+  { key:'imageGen',    label:'Image Generation',  sub:'AI image generation in Vexis AI' },
+  { key:'localAI',     label:'Local AI',          sub:'Run AI models in the browser' },
+];
 
-    function filterUsers(q) {
-        const f = q ? _allUsers.filter(u => (u.displayName||'').toLowerCase().includes(q.toLowerCase()) || (u.email||'').toLowerCase().includes(q.toLowerCase())) : _allUsers;
-        renderUsers(f);
-    }
+function renderFlags(flags) {
+  const el = document.getElementById('flagsList'); el.innerHTML = '';
+  FLAG_DEFS.forEach(def => {
+    const on  = flags[def.key] !== false;
+    const row = document.createElement('div'); row.className = 'flag-row';
+    row.innerHTML = `<div><div class="flag-lbl">${def.label}</div><div class="flag-sub">${def.sub}</div></div>
+      <button class="toggle ${on?'on':''}" onclick="toggleFlag('${def.key}',this)"></button>`;
+    el.appendChild(row);
+  });
+}
 
-    function renderUsers(users) {
-        const el = document.getElementById('usersList');
-        if (!users.length) { el.innerHTML = '<div class="empty"><div class="empty-text">No users found.</div></div>'; return; }
-        el.innerHTML = '';
-        const iAmMainOwner = window._myRole === 'main_owner';
-        users.forEach(u => {
-            const role = u.role || 'user';
-            const isMe = u.id === me?.uid;
-            const isOwner = role === 'owner' || role === 'main_owner';
-            const canAct = !isMe && (!isOwner || iAmMainOwner);
-            const row = document.createElement('div');
-            row.className = 'user-row';
-            row.style.cursor = 'pointer';
-            const hash = Math.abs([...(u.id||'')].reduce((h,c) => ((h<<5)-h)+c.charCodeAt(0), 0)) % 360;
-            const avStyle = u.photoURL ? `background-image:url('${u.photoURL}')` : `background:hsl(${hash},42%,32%)`;
-            const init = u.photoURL ? '' : (u.displayName||'?')[0].toUpperCase();
-            const actionsHtml = canAct ? `
-                <div class="user-actions" onclick="event.stopPropagation()">
-                    ${role==='moderator' ? `<button class="btn btn-sm" onclick="setRole('${u.id}','user',this)">Remove Mod</button>`
-                    : role==='banned' ? `<button class="btn btn-sm" onclick="setRole('${u.id}','user',this)">Unban</button>`
-                    : role==='owner' && iAmMainOwner ? `<button class="btn btn-sm" onclick="setRole('${u.id}','user',this)">Remove Owner</button>`
-                    : `<button class="btn btn-sm" onclick="setRole('${u.id}','moderator',this)">Make Mod</button>`}
-                    ${iAmMainOwner && role!=='owner' && role!=='main_owner' && role!=='banned' ? `<button class="btn btn-sm" onclick="setRole('${u.id}','owner',this)">Make Owner</button>` : ''}
-                    ${role!=='banned' ? `<button class="btn btn-danger" onclick="setRole('${u.id}','banned',this)">Ban</button>` : ''}
-                </div>` : '';
-            row.innerHTML = `
-                <div class="user-av" style="${avStyle}">${init}</div>
-                <div class="user-info">
-                    <div class="user-name">${esc(u.displayName||'Unknown')}${isMe ? ' <span style="color:var(--text-dim);font-weight:400">(you)</span>' : ''}</div>
-                    <div class="user-email">${esc(u.email||u.id)}</div>
-                </div>
-                <span class="user-role ${role}">${role}</span>
-                ${actionsHtml}`;
-            row.addEventListener('click', () => openUserModal(u));
-            el.appendChild(row);
-        });
-    }
+async function toggleFlag(key, btn) {
+  const on    = btn.classList.toggle('on');
+  const flags = _siteConfig.flags || {}; flags[key] = on; _siteConfig.flags = flags;
+  try { await savePlat({ flags }); audit('flag', { key, on }); toast(`${key}: ${on?'on':'off'}`); }
+  catch(e) { handleErr(e); btn.classList.toggle('on'); }
+}
 
-    function openUserModal(u) {
-        const role = u.role || 'user';
-        const isMe = u.id === me?.uid;
-        const isOwner = role === 'owner' || role === 'main_owner';
-        const iAmMainOwner = window._myRole === 'main_owner';
-        const canAct = !isMe && (!isOwner || iAmMainOwner);
-        const hash = Math.abs([...(u.id||'')].reduce((h,c) => ((h<<5)-h)+c.charCodeAt(0), 0)) % 360;
-        const avStyle = u.photoURL ? `background-image:url('${u.photoURL}')` : `background:hsl(${hash},42%,32%)`;
-        const init = u.photoURL ? '' : (u.displayName||'?')[0].toUpperCase();
-        const joinDate = u.createdAt?.toDate ? u.createdAt.toDate().toLocaleDateString() : '—';
-        const roleStyle = {
-            main_owner: 'background:rgba(208,112,255,.12);color:#d070ff',
-            owner: 'background:rgba(240,160,64,.12);color:#f0a040',
-            moderator: 'background:rgba(122,160,255,.12);color:#7aa0ff',
-            banned: 'background:rgba(248,81,73,.12);color:#f85149',
-            user: 'background:rgba(255,255,255,.05);color:#7a7a7a'
-        }[role] || '';
+function renderAutomod() {
+  const el = document.getElementById('automodTags'); el.innerHTML = '';
+  if (!_autoWords.length) { el.innerHTML = '<span style="font-size:.68rem;color:var(--muted)">No blocked words.</span>'; return; }
+  _autoWords.forEach(w => {
+    const t = document.createElement('span'); t.className = 'word-tag';
+    t.innerHTML = `${esc(w)}<button class="word-x" onclick="removeWord('${esc(w).replace(/'/g,"\\'")}')">×</button>`;
+    el.appendChild(t);
+  });
+}
 
-        document.getElementById('modalBody').innerHTML = `
-            <div class="modal-av" style="${avStyle}">${init}</div>
-            <div class="modal-name">${esc(u.displayName||'Unknown')}</div>
-            <div class="modal-email">${esc(u.email||u.id)}</div>
-            <div class="modal-badges">
-                <span style="padding:4px 12px;border-radius:20px;font-size:0.62rem;font-weight:700;${roleStyle}">${role}</span>
-                ${isMe ? '<span style="padding:4px 12px;border-radius:20px;font-size:0.62rem;background:rgba(255,255,255,.06);color:#7a7a7a">YOU</span>' : ''}
-            </div>
-            <div class="info-row"><span class="info-label">UID</span><span class="info-val" style="font-family:monospace">${esc(u.id)}</span></div>
-            <div class="info-row"><span class="info-label">Display Name</span><span class="info-val">${esc(u.displayName||'—')}</span></div>
-            <div class="info-row"><span class="info-label">Email</span><span class="info-val">${esc(u.email||'—')}</span></div>
-            <div class="info-row"><span class="info-label">Joined</span><span class="info-val">${joinDate}</span></div>
-            <div class="info-row"><span class="info-label">Messages</span><span class="info-val" id="modalMsgCount">loading…</span></div>
-        `;
+async function addWord() {
+  const inp = document.getElementById('automodInp');
+  const w   = inp.value.trim().toLowerCase();
+  if (!w || _autoWords.includes(w)) { inp.value = ''; return; }
+  _autoWords.push(w); inp.value = '';
+  try { await savePlat({ automodWords: _autoWords }); renderAutomod(); }
+  catch(e) { handleErr(e); _autoWords.pop(); }
+}
 
-        const actionsDiv = document.getElementById('modalActions');
-        if (canAct) {
-            const isBanned = role === 'banned';
-            const isMod = role === 'moderator';
-            const isOwnerRole = role === 'owner';
-            actionsDiv.innerHTML = `
-                ${isMod ? `<button class="btn btn-sm btn-full" onclick="modalSetRole('${u.id}','user',this)">Remove Moderator</button>`
-                : isBanned ? `<button class="btn btn-sm btn-full" onclick="modalSetRole('${u.id}','user',this)">Unban User</button>`
-                : isOwnerRole && iAmMainOwner ? `<button class="btn btn-sm btn-full" onclick="modalSetRole('${u.id}','user',this)">Remove Owner</button>`
-                : `<button class="btn btn-sm btn-full" onclick="modalSetRole('${u.id}','moderator',this)">Promote to Moderator</button>`}
-                ${iAmMainOwner && !isOwnerRole && !isBanned ? `<button class="btn btn-sm btn-full" onclick="modalSetRole('${u.id}','owner',this)">Promote to Owner</button>` : ''}
-                ${!isBanned ? `<button class="btn btn-danger btn-full" onclick="modalSetRole('${u.id}','banned',this)">Ban User</button>` : ''}
-                <button class="btn btn-sm btn-full" onclick="modalRename('${u.id}','${esc(u.displayName||'').replace(/'/g,"\\'")}',this)">Rename</button>
-                <button class="btn btn-sm btn-full" onclick="modalWipeMessages('${u.id}',this)">Wipe Messages</button>
-                ${u.email ? `<button class="btn btn-sm btn-full" onclick="modalSendPasswordReset('${esc(u.email)}',this)">Send Password Reset</button>` : ''}
-            `;
-        } else {
-            actionsDiv.innerHTML = '';
-        }
-        document.getElementById('userModalOverlay').classList.add('open');
+async function removeWord(w) {
+  _autoWords = _autoWords.filter(x => x !== w);
+  try { await savePlat({ automodWords: _autoWords }); renderAutomod(); }
+  catch(e) { handleErr(e); }
+}
 
-        db.collection('socialMessages').where('userId','==',u.id).get().then(snap => {
-            document.getElementById('modalMsgCount').textContent = snap.size;
-        }).catch(() => {
-            document.getElementById('modalMsgCount').textContent = 'error';
-        });
-    }
+function renderItems(items) {
+  const el = document.getElementById('itemSections'); el.innerHTML = '';
+  ['games','apps','tools'].forEach(cat => {
+    const list = items[cat] || [];
+    const singular = cat.slice(0,-1);
+    const sec = document.createElement('div'); sec.style.marginBottom = '18px';
+    sec.innerHTML = `
+      <div class="sec-lbl" style="margin-top:0">${cat.charAt(0).toUpperCase()+cat.slice(1)}</div>
+      <div id="pi-${cat}">
+        ${list.map((item,i) => `
+          <div class="item-row">
+            <span class="item-name">${esc(item.name)}</span>
+            <span class="item-url">${esc(item.html ? '[custom HTML]' : (item.url||''))}</span>
+            <button class="item-del" onclick="removeItem('${cat}',${i})">✕</button>
+          </div>`).join('') || `<div style="font-size:.68rem;color:var(--muted);padding:4px 0">No ${cat} yet.</div>`}
+      </div>
+      <div class="add-form">
+        <input class="inp" id="pn-${cat}" placeholder="${singular.charAt(0).toUpperCase()+singular.slice(1)} name">
+        <input class="inp" id="pu-${cat}" placeholder="URL (https://…)">
+        <button class="btn btn-accent" onclick="addItem('${cat}')">Add ${singular}</button>
+      </div>`;
+    el.appendChild(sec);
+  });
+}
 
-    function closeUserModal() { document.getElementById('userModalOverlay').classList.remove('open'); }
+async function addItem(cat) {
+  const name = document.getElementById('pn-'+cat).value.trim();
+  const url  = document.getElementById('pu-'+cat).value.trim();
+  if (!name) { toast('Name required'); return; }
+  if (!url)  { toast('URL required'); return; }
+  const items = _siteConfig.items || { games:[], apps:[], tools:[] };
+  items[cat] = [...(items[cat]||[]), { name, url }]; _siteConfig.items = items;
+  document.getElementById('pn-'+cat).value = '';
+  document.getElementById('pu-'+cat).value = '';
+  try { await savePlat({ items }); toast('Added'); renderItems(items); }
+  catch(e) { handleErr(e); }
+}
 
-    async function modalSetRole(uid, role, btn) {
-        btn.disabled = true;
-        btn.textContent = 'Updating…';
-        try {
-            await db.collection('users').doc(uid).update({ role });
-            const u = _allUsers.find(x => x.id === uid);
-            if (u) u.role = role;
-            bust('users');
-            renderUsers(_allUsers);
-            closeUserModal();
-            toast({ banned:'User banned', moderator:'Promoted to moderator', owner:'Promoted to owner', user:'Role removed' }[role] || 'Role updated');
-        } catch(e) {
-            toast('Error: ' + e.message);
-            btn.disabled = false;
-            btn.textContent = 'Retry';
-        }
-    }
+async function removeItem(cat, idx) {
+  const items = _siteConfig.items || { games:[], apps:[], tools:[] };
+  items[cat] = (items[cat]||[]).filter((_,i)=>i!==idx); _siteConfig.items = items;
+  try { await savePlat({ items }); renderItems(items); }
+  catch(e) { handleErr(e); }
+}
 
-    async function modalRename(uid, cur, btn) {
-        const name = prompt('New display name:', cur);
-        if (!name || name.trim() === cur) return;
-        btn.disabled = true;
-        btn.textContent = 'Saving…';
-        try {
-            await db.collection('users').doc(uid).update({ displayName: name.trim() });
-            const u = _allUsers.find(x => x.id === uid);
-            if (u) u.displayName = name.trim();
-            renderUsers(_allUsers);
-            closeUserModal();
-            toast('Name updated');
-        } catch(e) {
-            toast('Error: ' + e.message);
-            btn.disabled = false;
-            btn.textContent = 'Rename';
-        }
-    }
+/* ── AUDIT LOG ── */
+async function audit(action, detail = {}) {
+  try {
+    await db.collection('auditLog').add({
+      action, detail,
+      by: me.uid, byName: me.displayName || me.email || 'Owner', byRole: myRole,
+      timestamp: FS.FieldValue.serverTimestamp(),
+    });
+  } catch(e) {} // never throw — audit must not break the main action
+}
 
-    async function modalWipeMessages(uid, btn) {
-        if (!confirm('Delete ALL messages from this user?')) return;
-        btn.disabled = true;
-        btn.textContent = 'Wiping…';
-        try {
-            const snap = await db.collection('socialMessages').where('userId','==',uid).get();
-            const batch = db.batch();
-            snap.docs.forEach(d => batch.delete(d.ref));
-            await batch.commit();
-            closeUserModal();
-            toast(`Deleted ${snap.size} message${snap.size===1?'':'s'}`);
-        } catch(e) {
-            toast('Error: ' + e.message);
-            btn.disabled = false;
-            btn.textContent = 'Wipe Messages';
-        }
-    }
+/* ── CUSTOM MODAL ── */
+let _mResolve = null;
+function _modalShow(title, msg, okLabel, okClass, showInp, defaultVal) {
+  return new Promise(r => {
+    _mResolve = r;
+    document.getElementById('modalTitle').textContent = title;
+    document.getElementById('modalMsg').textContent = msg;
+    const okBtn = document.getElementById('modalOkBtn');
+    okBtn.textContent = okLabel; okBtn.className = 'btn ' + okClass;
+    const inpWrap = document.getElementById('modalInpWrap');
+    inpWrap.style.display = showInp ? '' : 'none';
+    if (showInp) { const i = document.getElementById('modalInp'); i.value = defaultVal||''; setTimeout(() => { i.focus(); i.select(); }, 60); }
+    document.getElementById('modalOverlay').classList.add('open');
+  });
+}
+function _modalOk() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  if (!_mResolve) return;
+  const inpWrap = document.getElementById('modalInpWrap');
+  _mResolve(inpWrap.style.display === 'none' ? true : document.getElementById('modalInp').value.trim());
+  _mResolve = null;
+}
+function _modalDismiss() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  if (_mResolve) { _mResolve(null); _mResolve = null; }
+}
+const customConfirm = (msg, danger=false) => _modalShow(danger ? 'Confirm' : 'Are you sure?', msg, danger ? 'Delete' : 'Confirm', danger ? 'btn btn-danger' : 'btn btn-accent', false);
+const customPrompt  = (title, msg, def) => _modalShow(title, msg, 'Save', 'btn btn-accent', true, def);
 
-    async function modalSendPasswordReset(email, btn) {
-        if (!confirm(`Send password reset email to ${email}?`)) return;
-        btn.disabled = true;
-        btn.textContent = 'Sending…';
-        try {
-            await firebase.auth().sendPasswordResetEmail(email);
-            toast('Password reset email sent');
-        } catch(e) {
-            toast('Error: ' + e.message);
-        } finally {
-            btn.disabled = false;
-            btn.textContent = 'Send Password Reset';
-        }
-    }
+/* ── REFRESH ── */
+function refreshAll() {
+  Object.keys(_cache).forEach(k => delete _cache[k]);
+  _allUsers = []; _siteConfig = {}; _autoWords = [];
+  const btn = document.getElementById('refreshBtn');
+  btn.classList.add('loading');
+  go(_section);
+  setTimeout(() => btn.classList.remove('loading'), 900);
+}
 
-    async function setRole(uid, role, btn) {
-        btn.disabled = true;
-        btn.textContent = '…';
-        try {
-            await db.collection('users').doc(uid).update({ role });
-            const u = _allUsers.find(x => x.id === uid);
-            if (u) u.role = role;
-            bust('users');
-            renderUsers(_allUsers);
-            toast({ banned:'User banned', moderator:'Promoted to mod', owner:'Promoted to owner', user:'Role removed' }[role] || 'Role updated');
-        } catch(e) {
-            toast('Error: ' + e.message);
-            btn.disabled = false;
-            btn.textContent = 'Retry';
-        }
-    }
-
-    async function searchChat() {
-        const q = document.getElementById('chatSearch').value.trim();
-        const el = document.getElementById('chatResults');
-        if (!q) return;
-        el.innerHTML = '<div style="text-align:center;padding:28px"><div class="spin"></div></div>';
-        try {
-            const snap = await db.collection('socialMessages').orderBy('timestamp','desc').limit(300).get();
-            const lq = q.toLowerCase().replace(/^@/, '');
-            const res = snap.docs.map(d => ({id: d.id, ...d.data()}))
-                .filter(d => (d.text||'').toLowerCase().includes(lq) || (d.displayName||'').toLowerCase().includes(lq))
-                .slice(0,50);
-            if (!res.length) {
-                el.innerHTML = '<div class="empty"><div class="empty-text">No messages matched.</div></div>';
-                return;
-            }
-            el.innerHTML = '';
-            res.forEach(m => {
-                const ts = m.timestamp?.toDate ? m.timestamp.toDate() : new Date(m.timestamp||0);
-                const time = ts.toLocaleString([], { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
-                const card = document.createElement('div');
-                card.className = 'msg-card';
-                card.id = 'mc-' + m.id;
-                card.innerHTML = `
-                    <div style="flex:1;min-width:0">
-                        <div class="msg-name">${esc(m.displayName||'?')}</div>
-                        <div class="msg-text">${esc(m.text||'')}</div>
-                    </div>
-                    <span class="msg-time">${time}</span>
-                    <button class="msg-del" onclick="delChatMsg('${m.id}',this)">🗑</button>`;
-                el.appendChild(card);
-            });
-        } catch(e) {
-            el.innerHTML = `<div class="empty"><div class="empty-text">Error: ${esc(e.message)}</div></div>`;
-        }
-    }
-
-    async function delChatMsg(id, btn) {
-        if (!confirm('Delete this message?')) return;
-        btn.disabled = true;
-        try {
-            await db.collection('socialMessages').doc(id).delete();
-            document.getElementById('mc-' + id)?.remove();
-            toast('Deleted');
-        } catch(e) {
-            toast('Error: ' + e.message);
-            btn.disabled = false;
-        }
-    }
-
-    async function loadAnnouncements() {
-        if (!stale('announce')) return;
-        const el = document.getElementById('annHistory');
-        try {
-            const snap = await db.collection('announcements').orderBy('timestamp','desc').limit(20).get();
-            fresh('announce');
-            if (!snap.empty) {
-                el.innerHTML = '';
-                snap.docs.forEach(d => {
-                    const a = d.data();
-                    const ts = a.timestamp?.toDate ? a.timestamp.toDate() : new Date(a.timestamp||0);
-                    const time = ts.toLocaleString([], { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
-                    const item = document.createElement('div');
-                    item.className = 'ann-item';
-                    item.innerHTML = `
-                        <span class="ann-badge">OFFICIAL</span>
-                        <div>
-                            <div class="ann-text">${esc(a.text||'')}</div>
-                            <div class="ann-time">${time}${a.pinned ? ' · 📌' : ''}</div>
-                        </div>`;
-                    el.appendChild(item);
-                });
-            }
-        } catch(e) {}
-    }
-
-    async function sendAnn() {
-        const text = document.getElementById('annText').value.trim();
-        const pinned = document.getElementById('annPinned').checked;
-        if (!text) { toast('Write a message first'); return; }
-        const btn = document.querySelector('#sec-announce .btn-accent');
-        btn.disabled = true;
-        btn.textContent = 'Sending…';
-        try {
-            await Promise.all([
-                db.collection('announcements').add({
-                    text, pinned, sentBy: me.uid, sentByName: me.displayName || 'Owner',
-                    timestamp: FS.FieldValue.serverTimestamp()
-                }),
-                db.collection('socialMessages').add({
-                    text, userId: me.uid, displayName: me.displayName || 'Vexis',
-                    photoURL: null, timestamp: FS.FieldValue.serverTimestamp(),
-                    reactions: {}, replyTo: null, gifUrl: null, imageBase64: null,
-                    isOfficial: true, pinned
-                })
-            ]);
-            document.getElementById('annText').value = '';
-            document.getElementById('annPinned').checked = false;
-            bust('announce');
-            loadAnnouncements();
-            toast('Announcement sent!');
-        } catch(e) {
-            toast('Error: ' + e.message);
-        } finally {
-            btn.disabled = false;
-            btn.textContent = 'Send Announcement';
-        }
-    }
-
-    async function loadPlatform() {
-        if (!stale('platform') && Object.keys(_siteConfig).length) { renderPlatform(); return; }
-        try {
-            const snap = await db.collection('siteSettings').doc('main').get();
-            _siteConfig = snap.exists ? snap.data() : {};
-            _autoWords = _siteConfig.automodWords || [];
-            fresh('platform');
-            renderPlatform();
-        } catch(e) { toast('Error loading config: ' + e.message); }
-    }
-
-    function renderPlatform() {
-        document.getElementById('motdVal').value = _siteConfig.motd || '';
-        document.getElementById('bannerVal').value = _siteConfig.bannerText || '';
-        renderFlags(_siteConfig.flags || {});
-        renderAutomod();
-        renderItems(_siteConfig.items || { games:[], apps:[], tools:[] });
-    }
-
-    async function savePlatform(patch) {
-        Object.assign(_siteConfig, patch);
-        await db.collection('siteSettings').doc('main').set(_siteConfig, { merge: true });
-        bust('platform');
-    }
-
-    async function saveMOTD() {
-        const v = document.getElementById('motdVal').value.trim();
-        await savePlatform({ motd: v });
-        toast(v ? 'MOTD saved' : 'MOTD cleared');
-    }
-    async function clearMOTD() {
-        document.getElementById('motdVal').value = '';
-        await saveMOTD();
-    }
-    async function saveBanner(show) {
-        const t = document.getElementById('bannerVal').value.trim();
-        await savePlatform({ bannerText: t, bannerOn: show });
-        toast(show ? 'Banner shown' : 'Banner hidden');
-    }
-
-    const FLAG_DEFS = [
-        { key:'globalChat', label:'Global Chat', sub:'Allow users to send messages in global chat' },
-        { key:'guestLogin', label:'Guest Login', sub:'Allow guest access without an account' },
-        { key:'imageGen',   label:'Image Generation', sub:'AI image generation in Vexis AI' },
-        { key:'localAI',    label:'Local AI', sub:'Download and run AI models in-browser' }
-    ];
-
-    function renderFlags(flags) {
-        const el = document.getElementById('flagsList');
-        el.innerHTML = '';
-        FLAG_DEFS.forEach(def => {
-            const on = flags[def.key] !== false;
-            const row = document.createElement('div');
-            row.className = 'flag-row';
-            row.innerHTML = `
-                <div>
-                    <div class="flag-label">${def.label}</div>
-                    <div class="flag-sub">${def.sub}</div>
-                </div>
-                <button class="toggle ${on ? 'on' : ''}" id="fl-${def.key}" onclick="toggleFlag('${def.key}',this)"></button>`;
-            el.appendChild(row);
-        });
-    }
-
-    async function toggleFlag(key, btn) {
-        const on = btn.classList.toggle('on');
-        const flags = _siteConfig.flags || {};
-        flags[key] = on;
-        _siteConfig.flags = flags;
-        await savePlatform({ flags });
-        toast(`${key}: ${on ? 'on' : 'off'}`);
-    }
-
-    function renderAutomod() {
-        const el = document.getElementById('automodTags');
-        el.innerHTML = '';
-        if (!_autoWords.length) {
-            el.innerHTML = '<span style="font-size:0.7rem;color:var(--text-muted)">No blocked words.</span>';
-            return;
-        }
-        _autoWords.forEach(w => {
-            const t = document.createElement('span');
-            t.className = 'word-tag';
-            t.innerHTML = `${esc(w)}<button class="word-tag-x" onclick="removeWord('${esc(w).replace(/'/g,"\\'")}')">×</button>`;
-            el.appendChild(t);
-        });
-    }
-
-    async function addWord() {
-        const inp = document.getElementById('automodInp');
-        const w = inp.value.trim().toLowerCase();
-        if (!w || _autoWords.includes(w)) { inp.value = ''; return; }
-        _autoWords.push(w);
-        inp.value = '';
-        await savePlatform({ automodWords: _autoWords });
-        renderAutomod();
-    }
-
-    async function removeWord(w) {
-        _autoWords = _autoWords.filter(x => x !== w);
-        await savePlatform({ automodWords: _autoWords });
-        renderAutomod();
-    }
-
-    function renderItems(items) {
-        const el = document.getElementById('itemSections');
-        el.innerHTML = '';
-        ['games','apps','tools'].forEach(cat => {
-            const list = items[cat] || [];
-            const singular = cat.slice(0, -1);
-            const sec = document.createElement('div');
-            sec.style.marginBottom = '24px';
-            sec.innerHTML = `
-                <div class="sec-label">${cat.charAt(0).toUpperCase()+cat.slice(1)}</div>
-                <div id="pi-${cat}">
-                    ${list.map((item,i) => `
-                        <div class="item-row">
-                            <span class="item-name">${esc(item.name)}</span>
-                            <span class="item-html" title="${esc(item.html||'')}">${esc((item.html||'').substring(0,40))}…</span>
-                            <button class="item-del" onclick="removeItem('${cat}',${i})">✕</button>
-                        </div>`).join('') || '<div style="color:var(--text-muted);font-size:0.7rem;padding:4px 0">No items yet.</div>'}
-                </div>
-                <div class="add-grid">
-                    <input class="inp" id="pn-${cat}" placeholder="${singular.charAt(0).toUpperCase()+singular.slice(1)} name">
-                    <textarea class="html-ta" id="ph-${cat}" placeholder="Paste HTML code for this ${singular}…"></textarea>
-                    <button class="btn btn-accent" onclick="addItem('${cat}')">Add ${singular}</button>
-                </div>`;
-            el.appendChild(sec);
-        });
-    }
-
-    async function addItem(cat) {
-        const name = document.getElementById('pn-' + cat).value.trim();
-        const html = document.getElementById('ph-' + cat).value.trim();
-        if (!name) return toast('Name required');
-        if (!html) return toast('HTML code required');
-        const items = _siteConfig.items || { games:[], apps:[], tools:[] };
-        items[cat] = [...items[cat], { name, html }];
-        _siteConfig.items = items;
-        document.getElementById('pn-' + cat).value = '';
-        document.getElementById('ph-' + cat).value = '';
-        await savePlatform({ items });
-        toast('Added');
-        renderItems(items);
-    }
-
-    async function removeItem(cat, idx) {
-        const items = _siteConfig.items || { games:[], apps:[], tools:[] };
-        items[cat] = items[cat].filter((_, i) => i !== idx);
-        _siteConfig.items = items;
-        await savePlatform({ items });
-        renderItems(items);
-    }
-
-    function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-    let _tt;
-    function toast(msg) {
-        const el = document.getElementById('toast');
-        el.textContent = msg;
-        el.classList.add('show');
-        clearTimeout(_tt);
-        _tt = setTimeout(() => el.classList.remove('show'), 2400);
-    }
+/* ── UTILS ── */
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function strCol(s) { let h=0; for(const c of s) h=((h<<5)-h)+c.charCodeAt(0); return `hsl(${Math.abs(h)%360},42%,30%)`; }
+let _tt;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(_tt); _tt = setTimeout(() => el.classList.remove('show'), 2400);
+}
 </script>
 </body>
 </html>
