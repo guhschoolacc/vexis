@@ -1974,12 +1974,22 @@
         window._fbUser = user;
         // Read role from Firestore before building the UI
         try {
-          const snap = await fsGet(fsDoc(fdb, 'users', user.uid));
+          const userRef = fsDoc(fdb, 'users', user.uid);
+          const snap = await fsGet(userRef);
           window._userRole = snap.data()?.role || 'user';
           if (window._userRole === 'banned') {
             window.location.href = 'banned.html';
             return;
           }
+          // Create or update the user doc — never overwrites existing role
+          const userDocData = {
+            displayName: user.displayName || snap.data()?.displayName || user.email?.split('@')[0] || 'User',
+            email: user.email || null,
+            photoURL: user.photoURL || snap.data()?.photoURL || null,
+            lastSeen: fsST(),
+          };
+          if (!snap.exists()) userDocData.role = 'user';
+          await fsSet(userRef, userDocData, { merge: true });
         } catch(e) { window._userRole = 'user'; }
         window.onFirebaseLogin(user);
         loadSiteConfig();
