@@ -992,10 +992,10 @@ async function drawerRole(uid, role, btn) {
 
 async function drawerRename(uid, cur, btn) {
   const name = await customPrompt('Rename User', 'Enter a new display name:', cur);
-  if (!name || name === cur) return;
+  if (!name || !name.trim()) return;
   btn.disabled = true; btn.textContent = 'Saving…';
   try {
-    await db.collection('users').doc(uid).update({ displayName: name.trim() });
+    await db.collection('users').doc(uid).set({ displayName: name.trim() }, { merge: true });
     const u = _allUsers.find(x => x.id === uid);
     audit('rename', { targetUid: uid, oldName: u?.displayName, newName: name.trim() });
     if (u) u.displayName = name.trim();
