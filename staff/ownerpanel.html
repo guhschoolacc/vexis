@@ -346,6 +346,10 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',-apple-system,sans-s
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
         <span>Audit</span>
       </div>
+      <div class="nav-pill" id="pill-submissions" onclick="go('submissions')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <span>Submissions</span><span class="nav-badge" id="badge-submissions" style="display:none"></span>
+      </div>
       <div class="nav-pill" id="pill-platform" onclick="go('platform')">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
         <span>Platform</span>
@@ -465,6 +469,15 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',-apple-system,sans-s
         <button class="btn btn-sm" onclick="loadAudit(true)">Refresh</button>
       </div>
       <div id="auditList"><div class="spin"></div></div>
+    </div>
+
+    <!-- SUBMISSIONS -->
+    <div class="section" id="sec-submissions">
+      <div class="page-hd" style="display:flex;align-items:flex-end;justify-content:space-between">
+        <div><div class="page-title">App Submissions</div><div class="page-sub">User-submitted apps and games awaiting review</div></div>
+        <button class="btn btn-sm" onclick="loadSubmissions(true)">Refresh</button>
+      </div>
+      <div id="submissionsList"><div class="spin"></div></div>
     </div>
 
     <!-- PLATFORM -->
@@ -634,8 +647,9 @@ function go(sec) {
     bugs:     loadBugs,
     chat:     () => {},
     announce: loadAnnouncements,
-    audit:    loadAudit,
-    platform: loadPlatform,
+    audit:       loadAudit,
+    submissions: loadSubmissions,
+    platform:    loadPlatform,
   }[sec] || (() => {}))();
 }
 
@@ -1133,6 +1147,75 @@ async function loadAudit(force) {
       el.appendChild(row);
     });
   } catch(e) { handleErr(e, () => { el.innerHTML = '<div class="empty"><div class="empty-txt">Could not load audit log.</div></div>'; }); }
+}
+
+/* ── SUBMISSIONS ── */
+async function loadSubmissions(force) {
+  if (!stale('submissions') && !force) return;
+  const el = document.getElementById('submissionsList');
+  el.innerHTML = '<div class="spin"></div>';
+  try {
+    const snap = await db.collection('submissions').orderBy('timestamp','desc').limit(80).get();
+    fresh('submissions');
+    const pending = snap.docs.filter(d => d.data().status === 'pending');
+    const badge = document.getElementById('badge-submissions');
+    if (badge) { badge.textContent = pending.length; badge.style.display = pending.length ? '' : 'none'; }
+    if (snap.empty) { el.innerHTML = '<div class="empty"><div class="empty-txt">No submissions yet.</div></div>'; return; }
+    el.innerHTML = '';
+    snap.docs.forEach(d => {
+      const s = d.data();
+      const ts = s.timestamp?.toDate ? s.timestamp.toDate() : new Date(s.timestamp || 0);
+      const time = ts.toLocaleString([],{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+      const isPending = s.status === 'pending';
+      const row = document.createElement('div');
+      row.className = 'card'; row.style.marginBottom = '6px';
+      row.innerHTML = `
+        <div style="display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap">
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+              <span style="font-weight:700;color:var(--white);font-size:.82rem">${esc(s.name||'Unnamed')}</span>
+              <span style="font-size:.62rem;padding:1px 7px;border-radius:20px;background:${s.category==='game'?'rgba(88,166,255,.12)':s.category==='app'?'rgba(86,211,100,.12)':'rgba(227,179,65,.12)'};color:${s.category==='game'?'var(--info)':s.category==='app'?'var(--success)':'var(--accent)'};">${esc(s.category||'app')}</span>
+              <span style="font-size:.62rem;color:${isPending?'var(--accent)':'var(--dim)'}">${isPending?'Pending':esc(s.status)}</span>
+            </div>
+            ${s.description?`<div style="font-size:.76rem;color:var(--dim);margin-top:3px">${esc(s.description)}</div>`:''}
+            <div style="font-size:.68rem;color:var(--muted);margin-top:4px">
+              <a href="${esc(s.url||'')}" target="_blank" rel="noopener" style="color:var(--info)">${esc(s.url||'')}</a>
+              · by <strong style="color:var(--dim)">${esc(s.submittedByName||'?')}</strong> · ${time}
+            </div>
+          </div>
+          ${isPending ? `
+          <div style="display:flex;gap:6px;flex-shrink:0">
+            <button class="btn btn-accent btn-sm" onclick="approveSubmission('${d.id}',${JSON.stringify(s).replace(/'/g,"&#39;")})">Approve</button>
+            <button class="btn btn-danger btn-sm" onclick="rejectSubmission('${d.id}')">Reject</button>
+          </div>` : ''}
+        </div>`;
+      el.appendChild(row);
+    });
+  } catch(e) { handleErr(e, () => { el.innerHTML = '<div class="empty"><div class="empty-txt">Could not load submissions.</div></div>'; }); }
+}
+
+async function approveSubmission(id, s) {
+  try {
+    const items = _siteConfig.items || { games:[], apps:[], tools:[] };
+    const cat = s.category === 'game' ? 'games' : s.category === 'tool' ? 'tools' : 'apps';
+    items[cat] = items[cat] || [];
+    items[cat].push({ name: s.name, url: s.url, desc: s.description || '' });
+    await db.collection('siteSettings').doc('main').set({ items }, { merge: true });
+    await db.collection('submissions').doc(id).update({ status: 'approved' });
+    audit('submission_approved', { name: s.name, category: s.category });
+    bust('submissions'); bust('platform');
+    loadSubmissions(true);
+    toast('Approved and added to the platform');
+  } catch(e) { toast('Failed: ' + e.message); }
+}
+
+async function rejectSubmission(id) {
+  try {
+    await db.collection('submissions').doc(id).update({ status: 'rejected' });
+    audit('submission_rejected', { id });
+    bust('submissions'); loadSubmissions(true);
+    toast('Submission rejected');
+  } catch(e) { toast('Failed: ' + e.message); }
 }
 
 /* ── PLATFORM ── */
