@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profile — Vexis</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#000;--surf:#0a0a0a;--raise:#111;--raise2:#181818;
+  --bdr:#222;--bdrhi:#333;--dim:#555;--text:#ccc;--bright:#eee;--white:#fff;
+  --accent:#58a6ff;--danger:#f85149;--success:#56d364;--warn:#e3b341;--r:10px;
+}
+html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);}
+body{display:flex;flex-direction:column;align-items:center;padding:0 16px 40px;}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--bdr);border-radius:3px}
+
+/* ── HEADER ── */
+.page-header{width:100%;max-width:680px;display:flex;align-items:center;gap:10px;padding:14px 0;border-bottom:1px solid var(--bdr);flex-shrink:0;}
+.back-btn{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;border:1px solid var(--bdr);background:var(--raise);cursor:pointer;color:var(--dim);transition:color .14s,border-color .14s;}
+.back-btn:hover{color:var(--bright);border-color:var(--bdrhi)}
+.back-btn svg{width:16px;height:16px}
+.page-title{font-size:.88rem;font-weight:600;color:var(--bright)}
+
+/* ── CARD ── */
+.profile-card{width:100%;max-width:680px;margin-top:24px;background:var(--surf);border:1px solid var(--bdr);border-radius:14px;overflow:hidden;}
+
+.profile-banner{height:90px;background:linear-gradient(135deg,#1a2a3a,#0d1a2a);}
+
+.profile-body{padding:0 24px 24px;position:relative;}
+
+.avatar-wrap{position:absolute;top:-38px;left:24px;width:76px;height:76px;border-radius:50%;border:3px solid var(--bg);overflow:hidden;background:var(--raise2);}
+.avatar-wrap img{width:100%;height:100%;object-fit:cover;display:block;}
+.avatar-initials{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.5rem;color:#fff;}
+
+.profile-actions{display:flex;justify-content:flex-end;padding:10px 0 0;}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:7px;font-size:.78rem;font-weight:600;cursor:pointer;border:1px solid var(--bdrhi);background:var(--raise);color:var(--text);transition:all .14s;}
+.btn:hover{background:var(--raise2);color:var(--bright)}
+.btn.danger{border-color:var(--danger);color:var(--danger)}
+.btn.danger:hover{background:rgba(248,81,73,.12)}
+
+.display-name{font-size:1.2rem;font-weight:700;color:var(--bright);margin-top:8px}
+.username{font-size:.78rem;color:var(--dim);margin-top:2px}
+
+.role-badge{display:inline-flex;align-items:center;gap:5px;margin-top:10px;padding:3px 10px;border-radius:20px;font-size:.7rem;font-weight:600;letter-spacing:.03em;}
+.role-badge.user    {background:rgba(90,90,90,.18);color:#888;border:1px solid #333}
+.role-badge.moderator{background:rgba(88,166,255,.12);color:var(--accent);border:1px solid rgba(88,166,255,.25)}
+.role-badge.owner   {background:rgba(227,179,65,.12);color:var(--warn);border:1px solid rgba(227,179,65,.25)}
+.role-badge.main_owner{background:rgba(248,81,73,.12);color:var(--danger);border:1px solid rgba(248,81,73,.25)}
+.role-badge.banned  {background:rgba(248,81,73,.12);color:var(--danger);border:1px solid rgba(248,81,73,.25)}
+.role-dot{width:6px;height:6px;border-radius:50%;background:currentColor;}
+
+/* ── PRESENCE ── */
+.presence-row{display:flex;align-items:center;gap:6px;margin-top:8px;font-size:.75rem;color:var(--dim);}
+.presence-dot{width:8px;height:8px;border-radius:50%;background:var(--dim);flex-shrink:0;}
+.presence-dot.online{background:var(--success);box-shadow:0 0 5px var(--success)}
+.presence-dot.away{background:var(--warn)}
+
+/* ── STATS ── */
+.stats-row{display:flex;gap:24px;margin-top:18px;padding-top:18px;border-top:1px solid var(--bdr);}
+.stat-item{display:flex;flex-direction:column;gap:3px}
+.stat-val{font-size:1.1rem;font-weight:700;color:var(--bright)}
+.stat-label{font-size:.68rem;color:var(--dim);text-transform:uppercase;letter-spacing:.05em}
+
+/* ── SECTIONS ── */
+.section{width:100%;max-width:680px;margin-top:16px;background:var(--surf);border:1px solid var(--bdr);border-radius:14px;padding:20px 24px;}
+.section-title{font-size:.72rem;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px}
+
+.info-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--bdr);font-size:.82rem;}
+.info-row:last-child{border-bottom:none;padding-bottom:0}
+.info-label{color:var(--dim)}
+.info-val{color:var(--bright);font-weight:500}
+
+/* ── RECENT MESSAGES ── */
+.msg-preview{display:flex;flex-direction:column;gap:10px;}
+.msg-p-item{background:var(--raise);border:1px solid var(--bdr);border-radius:8px;padding:10px 12px;font-size:.8rem;color:var(--text);line-height:1.45;word-break:break-word;}
+.msg-p-time{font-size:.65rem;color:var(--dim);margin-top:5px}
+
+/* ── BAN NOTICE ── */
+.ban-notice{width:100%;max-width:680px;margin-top:16px;background:rgba(248,81,73,.08);border:1px solid rgba(248,81,73,.3);border-radius:14px;padding:16px 20px;}
+.ban-notice-title{font-size:.82rem;font-weight:700;color:var(--danger);margin-bottom:4px}
+.ban-notice-body{font-size:.78rem;color:var(--dim)}
+
+/* ── LOADING / NOT FOUND ── */
+.state-center{width:100%;max-width:680px;margin-top:60px;text-align:center;color:var(--dim);font-size:.88rem;}
+.state-center .big{font-size:2.5rem;margin-bottom:12px}
+
+@media(max-width:500px){
+  .stats-row{gap:14px}
+  .profile-body{padding:0 16px 20px}
+  .avatar-wrap{left:16px}
+  .section{padding:16px}
+}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="back-btn" onclick="history.back()" title="Back">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+  </div>
+  <span class="page-title">Profile</span>
+</div>
+
+<div id="root"></div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey:"AIzaSyCR8I5eOiZbHzVZJDEQHYpyxXbcClk_rxA",
+  authDomain:"goon-7ddc3.firebaseapp.com",
+  projectId:"goon-7ddc3",
+  storageBucket:"goon-7ddc3.firebasestorage.app",
+  messagingSenderId:"117099331820",
+  appId:"1:117099331820:web:3af984b15a843d3d7b65c9"
+});
+const db = firebase.firestore(), auth = firebase.auth();
+
+const params = new URLSearchParams(location.search);
+const targetUid = params.get('uid');
+
+const ROLE_LABELS = { user:'User', moderator:'Moderator', owner:'Owner', main_owner:'Main Owner', banned:'Banned' };
+
+function initials(name) {
+  return (name || '?').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+}
+
+function avatarColor(name) {
+  const colors = ['#58a6ff','#56d364','#e3b341','#f78166','#bc8cff','#79c0ff','#ffab70'];
+  let h = 0;
+  for (const c of name || '') h = (h * 31 + c.charCodeAt(0)) & 0xffff;
+  return colors[h % colors.length];
+}
+
+function fmtDate(ts) {
+  if (!ts) return '—';
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  return d.toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+}
+
+function fmtRelative(ts) {
+  if (!ts) return '';
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  const diff = Date.now() - d.getTime();
+  if (diff < 60000) return 'just now';
+  if (diff < 3600000) return `${Math.floor(diff/60000)}m ago`;
+  if (diff < 86400000) return `${Math.floor(diff/3600000)}h ago`;
+  return `${Math.floor(diff/86400000)}d ago`;
+}
+
+function renderNotFound() {
+  document.getElementById('root').innerHTML = `
+    <div class="state-center">
+      <div class="big">👤</div>
+      <div>User not found</div>
+    </div>`;
+}
+
+function renderLoading() {
+  document.getElementById('root').innerHTML = `
+    <div class="state-center">
+      <div style="color:var(--dim);font-size:.82rem">Loading…</div>
+    </div>`;
+}
+
+async function renderProfile(uid, viewerUid) {
+  const [userSnap, presenceSnap] = await Promise.all([
+    db.collection('users').doc(uid).get(),
+    db.collection('presence').doc(uid).get().catch(() => null),
+  ]);
+
+  if (!userSnap.exists) { renderNotFound(); return; }
+
+  const u = userSnap.data();
+  const pres = presenceSnap?.data();
+  const role = u.role || 'user';
+  const displayName = u.displayName || u.email?.split('@')[0] || 'Unknown';
+  const email = u.email || '';
+  const photoURL = u.photoURL || null;
+  const joinedAt = u.createdAt || u.joinedAt || null;
+  const msgCount = u.messageCount || 0;
+  const isOnline = pres?.online === true;
+  const lastSeen = pres?.lastSeen || null;
+  const isSelf = uid === viewerUid;
+
+  // Fetch recent messages
+  let recentMsgs = [];
+  try {
+    const q = db.collection('socialMessages')
+      .where('userId', '==', uid)
+      .orderBy('timestamp', 'desc')
+      .limit(5);
+    const snap = await q.get();
+    recentMsgs = snap.docs.map(d => d.data());
+  } catch(e) {}
+
+  const roleClass = ['user','moderator','owner','main_owner','banned'].includes(role) ? role : 'user';
+  const avatarBg = avatarColor(displayName);
+
+  const banBlock = (role === 'banned' && u.banReason) ? `
+    <div class="ban-notice">
+      <div class="ban-notice-title">This account is banned</div>
+      <div class="ban-notice-body">${escHtml(u.banReason)}${u.bannedAt ? ` — ${fmtDate(u.bannedAt)}` : ''}</div>
+    </div>` : '';
+
+  const recentBlock = recentMsgs.length ? recentMsgs.map(m => `
+    <div class="msg-p-item">
+      ${escHtml(m.text || '')}
+      <div class="msg-p-time">${fmtRelative(m.timestamp)}</div>
+    </div>`).join('') : '<div style="color:var(--dim);font-size:.8rem">No public messages yet.</div>';
+
+  const actionBtn = !isSelf && viewerUid ? `
+    <button class="btn" onclick="startDM('${escHtml(uid)}','${escHtml(displayName)}')">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      Message
+    </button>` : '';
+
+  document.getElementById('root').innerHTML = `
+    <div class="profile-card">
+      <div class="profile-banner"></div>
+      <div class="profile-body">
+        <div class="avatar-wrap">
+          ${photoURL
+            ? `<img src="${escHtml(photoURL)}" alt="">`
+            : `<div class="avatar-initials" style="background:${avatarBg}">${initials(displayName)}</div>`}
+        </div>
+        <div class="profile-actions">${actionBtn}</div>
+        <div class="display-name">${escHtml(displayName)}</div>
+        ${email && isSelf ? `<div class="username">${escHtml(email)}</div>` : ''}
+        <div class="role-badge ${roleClass}">
+          <span class="role-dot"></span>
+          ${ROLE_LABELS[role] || 'User'}
+        </div>
+        <div class="presence-row">
+          <span class="presence-dot ${isOnline ? 'online' : ''}"></span>
+          ${isOnline ? 'Online now' : lastSeen ? `Last seen ${fmtRelative(lastSeen)}` : 'Offline'}
+        </div>
+        <div class="stats-row">
+          <div class="stat-item">
+            <span class="stat-val">${msgCount.toLocaleString()}</span>
+            <span class="stat-label">Messages</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-val">${joinedAt ? fmtDate(joinedAt).split(',')[0].split(' ')[1] + ' ' + fmtDate(joinedAt).split(' ')[2] : '—'}</span>
+            <span class="stat-label">Joined</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    ${banBlock}
+
+    <div class="section">
+      <div class="section-title">Info</div>
+      <div class="info-row"><span class="info-label">Display name</span><span class="info-val">${escHtml(displayName)}</span></div>
+      <div class="info-row"><span class="info-label">Role</span><span class="info-val">${ROLE_LABELS[role] || 'User'}</span></div>
+      <div class="info-row"><span class="info-label">Member since</span><span class="info-val">${fmtDate(joinedAt)}</span></div>
+      <div class="info-row"><span class="info-label">Status</span><span class="info-val">${isOnline ? '🟢 Online' : '⚫ Offline'}</span></div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Recent Messages</div>
+      <div class="msg-preview">${recentBlock}</div>
+    </div>`;
+}
+
+function escHtml(s) {
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function startDM(uid, name) {
+  // Navigate to DM page with the target user pre-selected
+  window.location.href = `/social/dm.html?uid=${encodeURIComponent(uid)}&name=${encodeURIComponent(name)}`;
+}
+
+// ── Boot ──────────────────────────────────────────────────────────────────────
+if (!targetUid) {
+  // No UID in URL — show own profile once auth resolves
+  renderLoading();
+  auth.onAuthStateChanged(user => {
+    if (!user) {
+      window.location.href = '/';
+      return;
+    }
+    renderProfile(user.uid, user.uid);
+  });
+} else {
+  renderLoading();
+  auth.onAuthStateChanged(user => {
+    renderProfile(targetUid, user?.uid || null);
+  });
+}
+</script>
+</body>
+</html>
