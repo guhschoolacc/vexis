@@ -424,10 +424,21 @@
   .ni-time { font-size: .59rem; color: var(--muted); margin-top: 2px; }
 
   .u-info { display: flex; align-items: center; gap: 10px; padding-bottom: 12px; margin-bottom: 8px; border-bottom: 1px solid var(--bdr); }
-  .u-av { width: 34px; height: 34px; border-radius: 50%; background: var(--raise2); border: 1px solid var(--bdrhi); display: flex; align-items: center; justify-content: center; font-size: .75rem; font-weight: 700; color: var(--bright); }
+  .u-av { width: 34px; height: 34px; border-radius: 50%; background: var(--raise2); border: 1px solid var(--bdrhi); display: flex; align-items: center; justify-content: center; font-size: .75rem; font-weight: 700; color: var(--bright); flex-shrink: 0; background-size: cover; background-position: center; }
   .u-name { font-size: .76rem; font-weight: 600; color: var(--white); }
   .u-plan { font-size: .61rem; color: var(--muted); margin-top: 1px; }
   .mi { display: flex; align-items: center; gap: 9px; padding: 8px 6px; border-radius: 7px; font-size: .73rem; color: var(--dim); cursor: pointer; transition: background .12s, color .12s; }
+  .saved-accounts { border-top: 1px solid var(--bdr); margin-top: 6px; padding-top: 8px; }
+  .saved-accounts-label { font-size: .6rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); padding: 0 6px; margin-bottom: 4px; }
+  .sa-row { display: flex; align-items: center; gap: 8px; padding: 5px 6px; border-radius: 7px; cursor: pointer; transition: background .12s; }
+  .sa-row:hover { background: var(--raise); }
+  .sa-av { width: 26px; height: 26px; border-radius: 50%; background: var(--raise2); border: 1px solid var(--bdrhi); display: flex; align-items: center; justify-content: center; font-size: .65rem; font-weight: 700; color: var(--bright); flex-shrink: 0; background-size: cover; background-position: center; }
+  .sa-info { flex: 1; min-width: 0; }
+  .sa-name { font-size: .72rem; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sa-email { font-size: .6rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sa-rm { width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; border-radius: 4px; opacity: 0; transition: opacity .12s, background .12s; flex-shrink: 0; }
+  .sa-row:hover .sa-rm { opacity: 1; }
+  .sa-rm:hover { background: var(--raise2); }
   .mi:hover { background: var(--raise); color: var(--text); }
 
   /* ═══════════════ SETTINGS PANEL ═══════════════ */
@@ -529,6 +540,54 @@
   .theme-swatch-fire    { background: linear-gradient(135deg, #150200 0%, #2a0800 50%, #150400 100%); }
   .theme-swatch-matrix  { background: linear-gradient(135deg, #000800 0%, #001000 50%, #000500 100%); }
   .theme-swatch-sakura  { background: linear-gradient(135deg, #100010 0%, #1a0515 50%, #0d0008 100%); }
+
+  /* ═══════════════ SUBMIT MODAL ═══════════════ */
+  #submitOverlay {
+    position: fixed; inset: 0; z-index: 500;
+    background: rgba(0,0,0,.65); backdrop-filter: blur(6px);
+    display: flex; align-items: center; justify-content: center; padding: 16px;
+    opacity: 0; pointer-events: none; transition: opacity .18s;
+  }
+  #submitOverlay.open { opacity: 1; pointer-events: all; }
+  #submitOverlay .sm-box {
+    background: var(--surf); border: 1px solid var(--bdrhi);
+    border-radius: 16px; width: 380px; max-width: 100%; padding: 22px;
+    transform: translateY(-10px) scale(.97);
+    transition: transform .22s cubic-bezier(.34,1.4,.64,1);
+  }
+  #submitOverlay.open .sm-box { transform: translateY(0) scale(1); }
+  .sm-title { font-size: .95rem; font-weight: 700; color: var(--white); margin-bottom: 16px; }
+  .sm-field { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; }
+  .sm-label { font-size: .63rem; color: var(--dim); text-transform: uppercase; letter-spacing: .07em; font-weight: 700; }
+  .sm-input, .sm-select {
+    background: var(--raise); border: 1px solid var(--bdr); border-radius: 8px;
+    padding: 8px 11px; color: var(--bright); font-size: .82rem;
+    font-family: inherit; outline: none; width: 100%;
+    transition: border-color .14s;
+  }
+  .sm-input:focus, .sm-select:focus { border-color: var(--accent); }
+  .sm-input::placeholder { color: var(--muted); }
+  .sm-textarea {
+    background: var(--raise); border: 1px solid var(--bdr); border-radius: 8px;
+    padding: 8px 11px; color: var(--bright); font-size: .75rem;
+    font-family: 'DM Mono', monospace; outline: none; width: 100%;
+    resize: vertical; min-height: 90px; line-height: 1.5;
+    transition: border-color .14s;
+  }
+  .sm-textarea:focus { border-color: var(--accent); }
+  .sm-textarea::placeholder { color: var(--muted); font-family: inherit; font-size: .8rem; }
+  .sm-tabs { display: flex; gap: 6px; margin-bottom: 12px; }
+  .sm-tab {
+    flex: 1; padding: 6px; border-radius: 7px; border: 1px solid var(--bdr);
+    background: var(--raise); color: var(--dim); font-size: .75rem;
+    font-weight: 600; cursor: pointer; text-align: center; transition: all .13s;
+  }
+  .sm-tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .sm-note { font-size: .68rem; color: var(--dim); margin-top: -6px; margin-bottom: 10px; line-height: 1.5; }
+  .sm-actions { display: flex; gap: 8px; margin-top: 4px; }
+  .sm-cancel { flex: 1; padding: 9px; border-radius: 9px; border: 1px solid var(--bdrhi); background: var(--raise); color: var(--text); font-size: .8rem; cursor: pointer; }
+  .sm-submit { flex: 1; padding: 9px; border-radius: 9px; border: none; background: var(--accent); color: #fff; font-size: .8rem; font-weight: 600; cursor: pointer; transition: filter .13s; }
+  .sm-submit:hover { filter: brightness(1.15); }
 
   /* ═══════════════ PROFILE MODAL ═══════════════ */
   #profileModal {
@@ -1474,6 +1533,47 @@
   </div>
 </div>
 
+<!-- SUBMIT MODAL -->
+<div id="submitOverlay" onclick="if(event.target===this)closeSubmitModal()">
+  <div class="sm-box">
+    <div class="sm-title">Submit an App, Game or Tool</div>
+    <div class="sm-field">
+      <div class="sm-label">Name</div>
+      <input class="sm-input" id="smName" placeholder="What's it called?">
+    </div>
+    <div class="sm-field">
+      <div class="sm-label">Category</div>
+      <select class="sm-select" id="smCat">
+        <option value="game">Game</option>
+        <option value="app">App</option>
+        <option value="tool">Tool</option>
+      </select>
+    </div>
+    <div class="sm-label" style="margin-bottom:6px">How do you want to add it?</div>
+    <div class="sm-tabs">
+      <div class="sm-tab active" id="smTabUrl" onclick="setSubmitTab('url')">Link / URL</div>
+      <div class="sm-tab" id="smTabHtml" onclick="setSubmitTab('html')">Paste HTML Code</div>
+    </div>
+    <div class="sm-field" id="smUrlField">
+      <div class="sm-label">URL</div>
+      <input class="sm-input" id="smUrl" placeholder="https://…">
+    </div>
+    <div class="sm-field" id="smHtmlField" style="display:none">
+      <div class="sm-label">HTML Code</div>
+      <textarea class="sm-textarea" id="smHtml" placeholder="Paste your full HTML here…"></textarea>
+      <div class="sm-note">Your code runs in a sandboxed iframe. No external libraries required.</div>
+    </div>
+    <div class="sm-field">
+      <div class="sm-label">Description</div>
+      <input class="sm-input" id="smDesc" placeholder="What does it do?">
+    </div>
+    <div class="sm-actions">
+      <button class="sm-cancel" onclick="closeSubmitModal()">Cancel</button>
+      <button class="sm-submit" id="smSubmitBtn" onclick="doSubmitApp()">Send to Owner</button>
+    </div>
+  </div>
+</div>
+
 <!-- PROFILE MODAL -->
 <div id="profileModal" onclick="if(event.target===this)closeProfileModal()">
   <div class="modal-box">
@@ -1496,6 +1596,14 @@
       <div class="modal-field">
         <label class="modal-label">Display Name</label>
         <input class="modal-input" id="profileName" placeholder="Your name" onkeydown="if(event.key==='Enter')saveProfile()">
+      </div>
+      <div class="modal-field">
+        <label class="modal-label">Custom Status</label>
+        <input class="modal-input" id="profileStatus" placeholder="e.g. Building something cool…" maxlength="60">
+      </div>
+      <div class="modal-field">
+        <label class="modal-label">Bio</label>
+        <textarea class="modal-input" id="profileBio" placeholder="Tell people a bit about yourself…" maxlength="200" rows="3" style="resize:vertical;min-height:68px;font-family:inherit;font-size:.8rem;line-height:1.5"></textarea>
       </div>
     </div>
     <div class="modal-footer">
@@ -1658,8 +1766,9 @@
       = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js");
 
     const { getFirestore, doc: fsDoc, onSnapshot: fsSnap, setDoc: fsSet, updateDoc: fsUpdate,
-            increment: fsInc, collection: fsCol, query: fsQuery, orderBy: fsOrder, limit: fsLimit,
-            getDoc: fsGet, getDocs: fsGetAll, where: fsWhere, deleteDoc: fsDel, addDoc: fsAdd }
+            increment: fsInc, arrayUnion: fsArrayUnion, collection: fsCol, query: fsQuery,
+            orderBy: fsOrder, limit: fsLimit, getDoc: fsGet, getDocs: fsGetAll,
+            where: fsWhere, deleteDoc: fsDel, addDoc: fsAdd, serverTimestamp: fsST }
       = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
 
     const app     = initializeApp(FIREBASE_CONFIG);
@@ -1683,6 +1792,30 @@
       ready: true,
       clearNotifs: async (uid) => {
         try { await fsUpdate(fsDoc(fdb,'notifications',uid),{unread:0}); } catch(e){}
+      },
+      acceptFriend: async (reqId, fromUid, myUid) => {
+        await Promise.all([
+          fsUpdate(fsDoc(fdb,'friendRequests',reqId), {status:'accepted'}),
+          fsSet(fsDoc(fdb,'friends',myUid),   {list: fsArrayUnion(fromUid)}, {merge:true}),
+          fsSet(fsDoc(fdb,'friends',fromUid), {list: fsArrayUnion(myUid)},   {merge:true}),
+        ]);
+      },
+      declineFriend: async (reqId) => {
+        await fsUpdate(fsDoc(fdb,'friendRequests',reqId), {status:'declined'});
+      },
+      updateUserDoc: async (uid, data) => {
+        await fsSet(fsDoc(fdb,'users',uid), data, {merge:true});
+      },
+      getUserDoc: async (uid) => {
+        const snap = await fsGet(fsDoc(fdb,'users',uid));
+        return snap.exists() ? snap.data() : null;
+      },
+      submitApp: async (payload) => {
+        await fsAdd(fsCol(fdb,'submissions'), {
+          ...payload,
+          status: 'pending',
+          timestamp: fsST(),
+        });
       },
 
       // ── Staff panel ops ──────────────────────────────
@@ -1812,7 +1945,7 @@
     // Global notification dot updater (accessible outside this closure via window)
     window.updateNotifDot = function(dmCount) {
       if (dmCount !== null && dmCount !== undefined) window._notifCount = dmCount || 0;
-      const total = (window._notifCount || 0) + (window._gcHasNew ? 1 : 0);
+      const total = (window._notifCount || 0) + (window._gcHasNew ? 1 : 0) + (window._frCount || 0);
       const ndot = document.querySelector('.ndot');
       if (ndot) ndot.classList.toggle('active', total > 0);
       // Update DM card badge
@@ -1829,7 +1962,8 @@
       }
     };
 
-    let _notifUnsub = null, _gcUnsub = null;
+    let _notifUnsub = null, _gcUnsub = null, _frUnsub = null;
+    window._friendRequests = []; window._frCount = 0;
 
     onAuthStateChanged(auth, async user => {
       if (user) {
@@ -1857,6 +1991,18 @@
           if (buildNotifs) buildNotifs();
         });
 
+        // Listen for pending friend requests
+        if (_frUnsub) _frUnsub();
+        _frUnsub = fsSnap(
+          fsQuery(fsCol(fdb,'friendRequests'), fsWhere('to','==',user.uid), fsWhere('status','==','pending')),
+          snap => {
+            window._friendRequests = snap.docs.map(d => ({id:d.id,...d.data()}));
+            window._frCount = snap.size;
+            window.updateNotifDot(null);
+            if (buildNotifs) buildNotifs();
+          }
+        );
+
         // Listen for new global chat messages
         if (_gcUnsub) _gcUnsub();
         const gcQ = fsQuery(fsCol(fdb,'socialMessages'), fsOrder('timestamp','desc'), fsLimit(1));
@@ -1875,6 +2021,8 @@
       } else {
         if (_notifUnsub) { _notifUnsub(); _notifUnsub = null; }
         if (_gcUnsub)    { _gcUnsub();    _gcUnsub    = null; }
+        if (_frUnsub)    { _frUnsub();    _frUnsub    = null; }
+        window._friendRequests = []; window._frCount = 0;
         window._fbUser = null;
         if (!window._guestMode) {
           document.getElementById('loginScreen').classList.remove('hidden');
@@ -2142,6 +2290,7 @@ window.onFirebaseLogin = function(user) {
   if (user.photoURL)   window.setAvatarPhoto(user.photoURL);
   else if (savedPhoto) window.setAvatarPhoto(savedPhoto);
 
+  if (user.uid !== 'guest') saveAccountToHistory(user);
   buildUserMenu(user);
 
   const ls = document.getElementById('loginScreen');
@@ -2173,12 +2322,14 @@ function clearAvatarPhoto(initial) {
   });
 }
 
-function openProfile() {
+async function openProfile() {
   _profilePhotoFile = null;
   const name = document.getElementById('panelName').textContent;
   document.getElementById('profileName').value = name === 'Vexis User' ? '' : name;
   document.getElementById('profileCurrentName').textContent = name;
   document.getElementById('profileUploadStatus').textContent = '';
+  document.getElementById('profileStatus').value = localStorage.getItem('vexis-profile-status') || '';
+  document.getElementById('profileBio').value = localStorage.getItem('vexis-profile-bio') || '';
 
   const savedPhoto = localStorage.getItem('vexis-profile-photo');
   const preview  = document.getElementById('profilePicPreview');
@@ -2194,6 +2345,16 @@ function openProfile() {
   }
   document.getElementById('profilePhotoInput').value = '';
   document.getElementById('profileModal').classList.add('open');
+
+  if (window._fb && window._fb.ready && window._fbUser && !window._guestMode) {
+    try {
+      const data = await window._fb.getUserDoc(window._fbUser.uid);
+      if (data) {
+        if (data.status !== undefined) document.getElementById('profileStatus').value = data.status;
+        if (data.bio    !== undefined) document.getElementById('profileBio').value    = data.bio;
+      }
+    } catch(e) {}
+  }
 }
 
 function closeProfileModal() {
@@ -2243,15 +2404,89 @@ async function saveProfile() {
   if (photoURL) { window.setAvatarPhoto(photoURL); }
   else          { clearAvatarPhoto(initial); }
 
+  const status = document.getElementById('profileStatus').value.trim();
+  const bio    = document.getElementById('profileBio').value.trim();
+
   if (window._fb && window._fb.ready && window._fbUser && !window._guestMode) {
     try { await window._fb.updateProfile(window._fbUser, {displayName: name, ...(photoURL ? {photoURL} : {})}); } catch(e) {}
+    try {
+      await window._fb.updateUserDoc(window._fbUser.uid, {
+        displayName: name,
+        status,
+        bio,
+        ...(photoURL ? {photoURL} : {})
+      });
+    } catch(e) {}
   }
 
   localStorage.setItem('vexis-profile-name', name);
   localStorage.setItem('vexis-profile-initial', initial);
+  localStorage.setItem('vexis-profile-status', status);
+  localStorage.setItem('vexis-profile-bio', bio);
   btn.disabled = false; btn.textContent = 'Save Changes';
   closeProfileModal();
   toast('Profile updated');
+}
+
+/* ══════════════════════════════════════════════
+   SUBMIT MODAL
+══════════════════════════════════════════════ */
+function openSubmitModal() {
+  if (!window._fbUser || window._guestMode) { toast('Sign in to submit'); return; }
+  ['smName','smUrl','smHtml','smDesc'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('smCat').value = 'game';
+  setSubmitTab('url');
+  document.getElementById('submitOverlay').classList.add('open');
+}
+
+function closeSubmitModal() {
+  document.getElementById('submitOverlay').classList.remove('open');
+}
+
+function setSubmitTab(tab) {
+  document.getElementById('smTabUrl').classList.toggle('active', tab === 'url');
+  document.getElementById('smTabHtml').classList.toggle('active', tab === 'html');
+  document.getElementById('smUrlField').style.display  = tab === 'url'  ? '' : 'none';
+  document.getElementById('smHtmlField').style.display = tab === 'html' ? '' : 'none';
+}
+
+async function doSubmitApp() {
+  const name = document.getElementById('smName').value.trim();
+  const cat  = document.getElementById('smCat').value;
+  const desc = document.getElementById('smDesc').value.trim();
+  const isHtml = document.getElementById('smTabHtml').classList.contains('active');
+  const url    = document.getElementById('smUrl').value.trim();
+  const html   = document.getElementById('smHtml').value.trim();
+
+  if (!name) { toast('Please enter a name'); return; }
+  if (isHtml && !html) { toast('Please paste your HTML code'); return; }
+  if (!isHtml && !url) { toast('Please enter a URL'); return; }
+
+  const btn = document.getElementById('smSubmitBtn');
+  btn.disabled = true; btn.textContent = 'Sending…';
+
+  try {
+    const finalUrl = isHtml
+      ? 'data:text/html;charset=utf-8,' + encodeURIComponent(html)
+      : url;
+
+    await window._fb.submitApp({
+      name,
+      category: cat,
+      description: desc,
+      url: finalUrl,
+      hasHtml: isHtml,
+      submittedBy: window._fbUser.uid,
+      submittedByName: window._fbUser.displayName || 'Anonymous',
+    });
+
+    closeSubmitModal();
+    toast('Submitted! The owner will review it.');
+  } catch(e) {
+    toast('Failed to submit — try again');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Send to Owner';
+  }
 }
 
 async function doSignOut() {
@@ -2286,12 +2521,17 @@ function buildHome() {
       <div class="nav-circle">${ico('bolt', 22)}</div>
       <span class="nav-circle-label">AI</span>
     </div>`;
+  const submitBtn = `
+    <div class="nav-circle-wrap" onclick="openSubmitModal()">
+      <div class="nav-circle">${ico('plus', 22)}</div>
+      <span class="nav-circle-label">Submit</span>
+    </div>`;
   document.getElementById('navCircles').innerHTML = NAV_SECTIONS.map(s => `
     <div class="nav-circle-wrap" onclick="navigateTo('${s.key}')">
       <div class="nav-circle">${ico(s.icon, 22)}</div>
       <span class="nav-circle-label">${s.label}</span>
     </div>
-  `).join('') + aiBtn;
+  `).join('') + aiBtn + submitBtn;
 }
 
 /* ══════════════════════════════════════════════
@@ -2417,14 +2657,54 @@ async function buildStats() {
    NOTIFS & USER MENU
 ══════════════════════════════════════════════ */
 function buildNotifs() {
-  const items = [
-    {icon:'apps',   body:'Vexis updated to v4.2.1 — faster performance.',  time:'2 min ago'},
-    {icon:'stats',  body:'CPU usage spike detected and resolved.',          time:'14 min ago'},
-    {icon:'shield', body:'Security scan complete — all clear.',             time:'1 hr ago'},
-  ];
-  document.getElementById('notifList').innerHTML = items.map(n =>
-    `<div class="ni">${ico(n.icon,15)}<div><div class="ni-body">${n.body}</div><div class="ni-time">${n.time}</div></div></div>`
-  ).join('');
+  const list = document.getElementById('notifList');
+  if (!list) return;
+  const rows = [];
+
+  // Friend requests
+  (window._friendRequests || []).forEach(req => {
+    const name = req.fromName || 'Someone';
+    rows.push(`<div class="ni" style="align-items:center">
+      <div style="width:28px;height:28px;border-radius:50%;background:hsl(${Math.abs(name.split('').reduce((h,c)=>((h<<5)-h)+c.charCodeAt(0),0))%360},55%,45%);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;color:#fff;flex-shrink:0">${name[0].toUpperCase()}</div>
+      <div style="flex:1;min-width:0">
+        <div class="ni-body"><strong>${name}</strong> sent you a friend request</div>
+        <div style="display:flex;gap:6px;margin-top:5px">
+          <button onclick="acceptFriendReq('${req.id}','${req.from}')" style="padding:3px 10px;border-radius:6px;border:none;background:var(--accent);color:#fff;font-size:.72rem;font-weight:600;cursor:pointer">Accept</button>
+          <button onclick="declineFriendReq('${req.id}')" style="padding:3px 10px;border-radius:6px;border:1px solid var(--bdrhi);background:var(--raise);color:var(--text);font-size:.72rem;cursor:pointer">Decline</button>
+        </div>
+      </div>
+    </div>`);
+  });
+
+  // Unread DMs
+  const dmc = window._notifCount || 0;
+  if (dmc > 0) rows.push(`<div class="ni">${ico('social',15)}<div><div class="ni-body">You have ${dmc} unread message${dmc>1?'s':''}</div><div class="ni-time"><span onclick="openApp('social/dm.html')" style="color:var(--accent);cursor:pointer">Open DMs</span></div></div></div>`);
+
+  // New global chat
+  if (window._gcHasNew) rows.push(`<div class="ni">${ico('social',15)}<div><div class="ni-body">New messages in Global Chat</div><div class="ni-time"><span onclick="openApp('social/globalchat.html')" style="color:var(--accent);cursor:pointer">Open chat</span></div></div></div>`);
+
+  if (!rows.length) rows.push(`<div class="ni" style="color:var(--dim);justify-content:center;padding:16px 0">No new notifications</div>`);
+  list.innerHTML = rows.join('');
+}
+
+async function acceptFriendReq(reqId, fromUid) {
+  if (!window._fb?.ready) return;
+  const uid = window._fbUser?.uid; if (!uid) return;
+  try {
+    await window._fb.acceptFriend(reqId, fromUid, uid);
+    buildNotifs();
+  } catch(e) { console.error('acceptFriend:', e); }
+}
+
+async function declineFriendReq(reqId) {
+  if (!window._fb?.ready) return;
+  try { await window._fb.declineFriend(reqId); } catch(e) {}
+}
+
+function openApp(url) {
+  // Find and click the matching item card, or open in current frame
+  const card = document.querySelector(`.item-card[data-url="${url}"]`);
+  if (card) { card.click(); toggleNotif(); }
 }
 
 function buildUserMenu(user) {
@@ -2441,9 +2721,88 @@ function buildUserMenu(user) {
     items.push({icon:'star', label:'Owner Panel', cb:"openIframe('Owner Panel','staff/ownerpanel.html',_currentPage);toggleUser()", accent:'#ffb84a'});
   }
   items.push({icon:'signout', label: isGuest ? 'Exit Guest' : 'Sign out', cb:"doSignOut()", dim:true});
-  document.getElementById('userMenu').innerHTML = items.map(m =>
+
+  let html = items.map(m =>
     `<div class="mi" onclick="${m.cb}" style="${m.dim?'color:var(--muted);margin-top:2px':m.accent?`color:${m.accent}`:''}">${ico(m.icon,14)} ${m.label}</div>`
   ).join('');
+
+  const currentUid = user?.uid;
+  const accounts = getSavedAccounts().filter(a => a.uid !== currentUid);
+  if (accounts.length) {
+    html += `<div class="saved-accounts">
+      <div class="saved-accounts-label">Saved accounts</div>
+      ${accounts.map(a => {
+        const avStyle = a.photoURL
+          ? `background-image:url('${a.photoURL}');background-size:cover;color:transparent;`
+          : `background:${strColorSimple(a.uid)};`;
+        const init = (a.displayName||a.email||'?')[0].toUpperCase();
+        return `<div class="sa-row" onclick="switchToAccount('${a.uid}','${(a.provider||'password').replace(/'/g,'')}',' ${(a.email||'').replace(/'/g,'')}')">
+          <div class="sa-av" style="${avStyle}">${a.photoURL?'':init}</div>
+          <div class="sa-info">
+            <div class="sa-name">${a.displayName||a.email||'Unknown'}</div>
+            <div class="sa-email">${a.email||''}</div>
+          </div>
+          <div class="sa-rm" onclick="event.stopPropagation();removeStoredAccount('${a.uid}')" title="Remove">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="1" y1="1" x2="9" y2="9"/><line x1="9" y1="1" x2="1" y2="9"/></svg>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }
+
+  document.getElementById('userMenu').innerHTML = html;
+}
+
+function strColorSimple(uid) {
+  let h = 0;
+  for (let i = 0; i < (uid||'').length; i++) h = (h * 31 + uid.charCodeAt(i)) & 0xffffffff;
+  return `hsl(${Math.abs(h) % 360},40%,28%)`;
+}
+
+function getSavedAccounts() {
+  try { return JSON.parse(localStorage.getItem('vexis-saved-accounts') || '[]'); } catch { return []; }
+}
+
+function saveAccountToHistory(user) {
+  const accounts = getSavedAccounts();
+  const idx = accounts.findIndex(a => a.uid === user.uid);
+  const entry = {
+    uid: user.uid,
+    displayName: user.displayName || null,
+    email: user.email || null,
+    photoURL: user.photoURL || null,
+    provider: user.providerData?.[0]?.providerId || 'password',
+  };
+  if (idx >= 0) accounts[idx] = entry; else accounts.unshift(entry);
+  localStorage.setItem('vexis-saved-accounts', JSON.stringify(accounts.slice(0, 5)));
+}
+
+function removeStoredAccount(uid) {
+  const accounts = getSavedAccounts().filter(a => a.uid !== uid);
+  localStorage.setItem('vexis-saved-accounts', JSON.stringify(accounts));
+  buildUserMenu(window._fbUser);
+}
+
+async function switchToAccount(uid, provider, email) {
+  await doSignOut();
+  if (provider === 'google.com') {
+    setLoginLoading(true);
+    try {
+      const cred = await window._fb.googleSignIn();
+      window.onFirebaseLogin(cred.user);
+    } catch(e) {
+      setLoginLoading(false);
+    }
+  } else {
+    const ls = document.getElementById('loginScreen');
+    ls.style.display = 'flex'; ls.style.opacity = '0';
+    setTimeout(() => { ls.classList.remove('hidden'); ls.style.opacity = ''; }, 10);
+    setLoginTab('sign');
+    const emailInput = document.getElementById('loginEmail');
+    if (emailInput) { emailInput.value = email.trim(); emailInput.focus(); }
+    const passInput = document.getElementById('loginPass');
+    if (passInput) setTimeout(() => passInput.focus(), 50);
+  }
 }
 
 /* ══════════════════════════════════════════════
