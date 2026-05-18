@@ -259,38 +259,6 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
 .mbtn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
 .mbtn.primary:hover{filter:brightness(1.1)}
 
-/* ── CALL UI ── */
-.call-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(8px);}
-.call-overlay.open{display:flex}
-.call-box{background:var(--surf);border:1px solid var(--bdr);border-radius:18px;padding:32px 24px;min-width:280px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:16px;box-shadow:0 30px 80px rgba(0,0,0,.9);}
-.call-av{width:72px;height:72px;border-radius:50%;background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.5rem;color:#fff;margin:0 auto;}
-.call-name{font-size:1.1rem;font-weight:700;color:var(--bright)}
-.call-status{font-size:.78rem;color:var(--dim)}
-.call-timer{font-size:.85rem;color:var(--success);font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
-.call-actions{display:flex;gap:16px;margin-top:8px;}
-.call-btn{width:52px;height:52px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.2rem;transition:all .15s;}
-.call-btn svg{width:22px;height:22px}
-.call-btn.accept{background:var(--success);color:#fff}.call-btn.accept:hover{filter:brightness(1.1)}
-.call-btn.decline,.call-btn.end{background:var(--danger);color:#fff}.call-btn.decline:hover,.call-btn.end:hover{filter:brightness(1.1)}
-.call-btn.mute{background:var(--raise2);color:var(--text);border:1px solid var(--bdr)}.call-btn.mute:hover{background:var(--raise)}
-.call-btn.mute.on{background:rgba(248,81,73,.2);color:var(--danger);border-color:var(--danger)}
-.call-wave{display:flex;align-items:center;gap:4px;height:30px;}
-.call-wave span{width:4px;background:var(--success);border-radius:2px;animation:wave 1s ease-in-out infinite;}
-.call-wave span:nth-child(2){animation-delay:.15s}.call-wave span:nth-child(3){animation-delay:.3s}.call-wave span:nth-child(4){animation-delay:.45s}.call-wave span:nth-child(5){animation-delay:.6s}
-@keyframes wave{0%,100%{height:8px}50%{height:24px}}
-audio{display:none}
-
-/* Incoming call banner */
-.incoming-banner{display:none;position:fixed;top:10px;left:50%;transform:translateX(-50%);background:var(--surf);border:1px solid var(--bdr);border-radius:12px;padding:10px 14px;z-index:300;box-shadow:0 8px 30px rgba(0,0,0,.8);min-width:260px;max-width:340px;}
-.incoming-banner.on{display:flex;align-items:center;gap:10px;}
-.inc-av{width:36px;height:36px;border-radius:50%;flex-shrink:0;background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.82rem;color:#fff;}
-.inc-info{flex:1;min-width:0}
-.inc-name{font-size:.82rem;font-weight:700;color:var(--bright);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.inc-sub{font-size:.68rem;color:var(--dim)}
-.inc-btns{display:flex;gap:6px;flex-shrink:0}
-.inc-btn{width:30px;height:30px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;}
-.inc-btn svg{width:14px;height:14px}
-.inc-btn.accept{background:var(--success);color:#fff}.inc-btn.decline{background:var(--danger);color:#fff}
 
 /* Lightbox */
 .lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:400;align-items:center;justify-content:center;cursor:zoom-out;}
@@ -300,6 +268,15 @@ audio{display:none}
 /* Toast */
 #toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(6px);background:var(--raise2);border:1px solid var(--bdr);color:var(--bright);padding:7px 15px;border-radius:8px;font-size:.78rem;pointer-events:none;opacity:0;transition:all .25s;z-index:999;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.7);}
 #toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+/* ── VEXIS AI in DMs ── */
+.msg-row.vexis-ai .msg-bubble{background:linear-gradient(135deg,rgba(59,130,246,.14),rgba(139,92,246,.14));border-color:rgba(139,92,246,.35);}
+.msg-row.vexis-ai .msg-name{color:var(--accent)!important}
+.vexis-badge{display:inline-flex;align-items:center;padding:1px 6px;border-radius:4px;font-size:.58rem;font-weight:700;background:linear-gradient(90deg,#3b82f6,#8b5cf6);color:#fff;margin-left:4px;letter-spacing:.04em}
+.vexis-typing{display:flex;gap:3px;align-items:center;padding:2px 0}
+.vexis-typing span{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:vt .9s ease-in-out infinite}
+.vexis-typing span:nth-child(2){animation-delay:.18s}
+.vexis-typing span:nth-child(3){animation-delay:.36s}
+@keyframes vt{0%,80%,100%{transform:scale(.7);opacity:.5}40%{transform:scale(1.1);opacity:1}}
 
 /* Loading */
 .load-row{display:flex;align-items:center;justify-content:center;gap:10px;padding:40px;color:var(--dim);font-size:.82rem;}
@@ -357,6 +334,7 @@ audio{display:none}
     <!-- Chat area (hidden until conv selected) -->
     <div id="chatArea" style="display:none;flex:1;flex-direction:column;min-height:0;">
       <div class="dm-header" id="dmHeader"></div>
+
       <div class="dm-messages" id="dmMessages">
         <button class="scroll-fab" id="scrollFab" onclick="scrollToBottom()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
@@ -435,45 +413,6 @@ audio{display:none}
   </div>
 </div>
 
-<!-- CALL OVERLAY (active call) -->
-<div class="call-overlay" id="callOverlay">
-  <div class="call-box">
-    <div class="call-av" id="callAv"></div>
-    <div class="call-name" id="callName">Calling…</div>
-    <div class="call-status" id="callStatus">Connecting…</div>
-    <div class="call-timer" id="callTimer" style="display:none"></div>
-    <div class="call-wave" id="callWave" style="display:none">
-      <span></span><span></span><span></span><span></span><span></span>
-    </div>
-    <div class="call-actions">
-      <button class="call-btn mute" id="muteBtn" onclick="toggleMute()" title="Mute">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
-      </button>
-      <button class="call-btn end" onclick="endCall()" title="End call">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45c1.12.45 2.3.78 3.53.98a2 2 0 0 1 1.7 2v3a2 2 0 0 1-2.18 2C9.76 21.43 2.57 14.24 1.12 5.18A2 2 0 0 1 3.1 3h3a2 2 0 0 1 2 1.72c.2 1.23.53 2.41.98 3.53a2 2 0 0 1-.45 2.11L7.36 11.53c.95 1.66 2.11 3.2 3.32 4.41z"/></svg>
-      </button>
-    </div>
-    <audio id="remoteAudio" autoplay></audio>
-  </div>
-</div>
-
-<!-- INCOMING CALL BANNER -->
-<div class="incoming-banner" id="incomingBanner">
-  <div class="inc-av" id="incAv"></div>
-  <div class="inc-info">
-    <div class="inc-name" id="incName">Someone</div>
-    <div class="inc-sub">Incoming voice call…</div>
-  </div>
-  <div class="inc-btns">
-    <button class="inc-btn decline" onclick="declineCall()" title="Decline">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-    </button>
-    <button class="inc-btn accept" onclick="acceptCall()" title="Accept">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.42 2 2 0 0 1 3.6 1.25h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.29 6.29l1.92-1.92a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-    </button>
-  </div>
-</div>
-
 <div class="lightbox" id="lightbox" onclick="closeLightbox()">
   <img id="lbImg" src="" alt="" onclick="event.stopPropagation()">
 </div>
@@ -509,7 +448,6 @@ firebase.initializeApp({
 });
 const db=firebase.firestore(), auth=firebase.auth(), FS=firebase.firestore;
 const TENOR="LIVDSRZULELA";
-const STUN={iceServers:[{urls:"stun:stun.l.google.com:19302"},{urls:"stun:stun1.l.google.com:19302"}]};
 
 // ── STATE ──────────────────────────────────────────────────────────────────────
 let me=null;
@@ -524,11 +462,6 @@ let selectedGroupMembers={};  // uid → userData
 let groupUserSearchTimer=null, dmUserSearchTimer=null;
 let gifTimer=null, activeCat=0;
 
-// WebRTC
-let pc=null, localStream=null, callDocId=null, isCaller=false;
-let callTimerInterval=null, callStartTime=null;
-let incomingCallData=null, incomingCallUnsub=null;
-let unsubIncoming=null;
 
 // ── SVG ICONS ─────────────────────────────────────────────────────────────────
 const SVG={
@@ -536,7 +469,6 @@ const SVG={
   reply:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg>`,
   react:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9" stroke-width="3"/><line x1="15" y1="9" x2="15.01" y2="9" stroke-width="3"/></svg>`,
   trash:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>`,
-  phone:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.42 2 2 0 0 1 3.6 1.25h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.29 6.29l1.92-1.92a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>`,
 };
 
 // ── EMOJI ─────────────────────────────────────────────────────────────────────
@@ -637,6 +569,49 @@ async function notifyUser(uid){
 }
 
 // ── SEND ──────────────────────────────────────────────────────────────────────
+// ── VEXIS AI (DMs) ───────────────────────────────────────────────────────────
+const _vexisHistory={};
+const VEXIS_SRV='https://vexis-ai.stievercaden.workers.dev';
+
+async function vexisChat(query, convId, col){
+  if(!me||me.isGuest){toast('Sign in to use Vexis AI');return;}
+  const hist=(_vexisHistory[convId]||[]);
+  const messages=[...hist,{role:'user',content:query}];
+
+  // Typing indicator — local only, not persisted
+  const typingId='vtyping-'+Date.now();
+  const anchor=document.getElementById('scrollFab');
+  const typingRow=document.createElement('div');
+  typingRow.id=typingId; typingRow.className='msg-row vexis-ai';
+  const av=document.createElement('div'); av.className='msg-avatar';
+  av.style.cssText='background:linear-gradient(135deg,#3b82f6,#8b5cf6);font-size:.7rem'; av.textContent='✦';
+  const colEl=document.createElement('div'); colEl.className='msg-col';
+  const meta=document.createElement('div'); meta.className='msg-meta';
+  meta.innerHTML='<span class="msg-name" style="color:var(--accent)">Vexis AI</span><span class="vexis-badge">AI</span>';
+  const bubble=document.createElement('div'); bubble.className='msg-bubble';
+  bubble.innerHTML='<div class="vexis-typing"><span></span><span></span><span></span></div>';
+  colEl.append(meta,bubble); typingRow.append(av,colEl);
+  msgsEl.insertBefore(typingRow,anchor);
+  scrollToBottom();
+
+  try{
+    const res=await fetch(VEXIS_SRV+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages})});
+    const data=await res.json();
+    const reply=data.message||data.content||data.choices?.[0]?.message?.content||'Sorry, I couldn\'t respond right now.';
+    _vexisHistory[convId]=hist.concat([{role:'user',content:query},{role:'assistant',content:reply}]).slice(-40);
+    typingRow.remove();
+    await col.add({
+      senderId:'vexis-ai', senderName:'Vexis AI', senderPhoto:null,
+      text:reply, gifUrl:null, imageUrl:null,
+      timestamp:FS.FieldValue.serverTimestamp(), reactions:{}, replyTo:null,
+      isVexisAI:true,
+    });
+  }catch(e){
+    typingRow.remove();
+    toast('Vexis AI failed to respond');
+  }
+}
+
 async function sendMsg(gifUrl, forceText){
   if(!activeConv||!me)return;
   const inp=document.getElementById('msgInput');
@@ -647,6 +622,20 @@ async function sendMsg(gifUrl, forceText){
   const col=activeConv.type==='group'
     ? db.collection('groupChats').doc(activeConv.id).collection('messages')
     : db.collection('directMessages').doc(activeConv.id).collection('messages');
+
+  // /vexis command
+  if(text&&(text.toLowerCase().startsWith('/vexis ')||text.toLowerCase()==='/vexis')){
+    const query=text.slice(7).trim();
+    if(!query){toast('Usage: /vexis [your message]');document.getElementById('sendBtn').disabled=false;return;}
+    inp.value='';resizeTA(inp);clearReply();
+    await col.add({
+      senderId:me.uid,senderName:me.displayName||'Anonymous',senderPhoto:me.photoURL||null,
+      text,gifUrl:null,imageUrl:null,timestamp:FS.FieldValue.serverTimestamp(),reactions:{},replyTo:null,
+    });
+    document.getElementById('sendBtn').disabled=false;
+    vexisChat(query,activeConv.id,col);
+    return;
+  }
 
   const payload={
     senderId:me.uid,
@@ -726,9 +715,7 @@ function openConversation(conv){
   }
 
   // Track online status for DMs
-  if(conv.type==='dm'){
-    trackOtherOnline(conv.otherId);
-  }
+  if(conv.type==='dm') trackOtherOnline(conv.otherId);
 
   // Mark conv active
   document.querySelectorAll('.conv-item').forEach(el=>el.classList.toggle('active',el.dataset.id===conv.id));
@@ -759,9 +746,7 @@ function renderHeader(conv){
       <div class="dm-hdr-name">${esc(conv.name)}</div>
       <div class="dm-hdr-status${isOnline?' online':''}" id="hdrStatus">${conv.type==='group'?`${conv.members?.length||0} members`:(isOnline?'Online':'Offline')}</div>
     </div>
-    <div class="hdr-actions">
-      ${conv.type==='dm'?`<button class="icon-btn" onclick="startCall()" title="Voice call" style="width:34px;height:34px">${SVG.phone}</button>`:''}
-    </div>`;
+    <div class="hdr-actions"></div>`;
 }
 
 let onlineUnsub=null;
@@ -797,14 +782,16 @@ function addMsgEl(id,data){
     }
   }
 
-  const row=document.createElement('div');row.id='m-'+id;row.className='msg-row'+(isOwn?' own':'');
+  const isAI=!!data.isVexisAI;
+  const row=document.createElement('div');row.id='m-'+id;row.className='msg-row'+(isOwn?' own':'')+(isAI?' vexis-ai':'');
   if(data.timestamp) row.dataset.ts=data.timestamp.toMillis?.()??0;
 
   if(!isOwn){
     const av=document.createElement('div');av.className='msg-avatar';
-    if(data.senderPhoto){av.style.backgroundImage=`url('${data.senderPhoto}')`;av.style.color='transparent';}
+    if(isAI){av.style.cssText='background:linear-gradient(135deg,#3b82f6,#8b5cf6);font-size:.7rem';av.textContent='✦';}
+    else if(data.senderPhoto){av.style.backgroundImage=`url('${data.senderPhoto}')`;av.style.color='transparent';}
     else{av.textContent=(data.senderName||'?')[0].toUpperCase();av.style.background=strColor(data.senderId||'');}
-    av.style.cursor='pointer';av.onclick=()=>openDmProfile(data.senderId,data);
+    if(!isAI){av.style.cursor='pointer';av.onclick=()=>openDmProfile(data.senderId,data);}
     row.appendChild(av);
   }
 
@@ -1136,150 +1123,6 @@ async function createGroup(){
   }catch(err){toast('Failed to create group: '+err.message);}
 }
 
-// ── CALLING (WebRTC) ──────────────────────────────────────────────────────────
-async function startCall(){
-  if(!activeConv||activeConv.type!=='dm'){toast('Calls are only available in DMs');return;}
-  if(pc){toast('Already in a call');return;}
-  try{localStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true},video:false});}
-  catch(err){toast('Microphone access denied');return;}
-  isCaller=true;callDocId='call_'+activeConv.id;
-  pc=new RTCPeerConnection(STUN);
-  localStream.getTracks().forEach(t=>pc.addTrack(t,localStream));
-  pc.ontrack=e=>{if(e.track.kind==='audio'){document.getElementById('remoteAudio').srcObject=e.streams[0];}};
-  pc.onicecandidate=e=>{if(e.candidate)db.collection('calls').doc(callDocId).collection('callerCandidates').add(e.candidate.toJSON());};
-  const offer=await pc.createOffer();
-  await pc.setLocalDescription(offer);
-  await db.collection('calls').doc(callDocId).set({
-    offer:{type:offer.type,sdp:offer.sdp},
-    callerUid:me.uid,callerName:me.displayName||'Someone',callerPhoto:me.photoURL||null,
-    calleeUid:activeConv.otherId,status:'calling',
-    createdAt:FS.FieldValue.serverTimestamp(),
-  });
-
-  showCallOverlay(activeConv.name,activeConv.photoURL,'Calling…');
-
-  // Listen for answer
-  db.collection('calls').doc(callDocId).onSnapshot(async snap=>{
-    const d=snap.data();if(!d)return;
-    if(d.answer&&pc.signalingState!=='stable'){
-      await pc.setRemoteDescription(new RTCSessionDescription(d.answer));
-    }
-    if(d.status==='declined'){hangupCall('Declined');return;}
-    if(d.status==='connected')onCallConnected();
-    if(d.status==='ended')hangupCall();
-  });
-
-  // Listen for callee ICE
-  db.collection('calls').doc(callDocId).collection('calleeCandidates').onSnapshot(snap=>{
-    snap.docChanges().forEach(ch=>{if(ch.type==='added')pc.addIceCandidate(new RTCIceCandidate(ch.doc.data())).catch(()=>{});});
-  });
-}
-
-async function acceptCall(){
-  if(!incomingCallData)return;
-  document.getElementById('incomingBanner').classList.remove('on');
-  const d=incomingCallData;
-  callDocId=d.docId;isCaller=false;
-  try{localStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true},video:false});}
-  catch{toast('Microphone access denied');declineCall();return;}
-  pc=new RTCPeerConnection(STUN);
-  localStream.getTracks().forEach(t=>pc.addTrack(t,localStream));
-  pc.ontrack=e=>{if(e.track.kind==='audio'){document.getElementById('remoteAudio').srcObject=e.streams[0];}};
-  pc.onicecandidate=e=>{if(e.candidate)db.collection('calls').doc(callDocId).collection('calleeCandidates').add(e.candidate.toJSON());};
-  await pc.setRemoteDescription(new RTCSessionDescription(d.offer));
-  const answer=await pc.createAnswer();
-  await pc.setLocalDescription(answer);
-  await db.collection('calls').doc(callDocId).update({answer:{type:answer.type,sdp:answer.sdp},status:'connected'});
-  // Listen for caller ICE
-  db.collection('calls').doc(callDocId).collection('callerCandidates').onSnapshot(snap=>{
-    snap.docChanges().forEach(ch=>{if(ch.type==='added')pc.addIceCandidate(new RTCIceCandidate(ch.doc.data())).catch(()=>{});});
-  });
-  showCallOverlay(d.callerName,d.callerPhoto,'Connected');
-  onCallConnected();
-
-  // Listen for ended
-  db.collection('calls').doc(callDocId).onSnapshot(snap=>{if(snap.data()?.status==='ended')hangupCall();});
-}
-
-function declineCall(){
-  document.getElementById('incomingBanner').classList.remove('on');
-  if(incomingCallData){db.collection('calls').doc(incomingCallData.docId).update({status:'declined'}).catch(()=>{});}
-  incomingCallData=null;
-}
-
-function showCallOverlay(name,photo,status){
-  const av=document.getElementById('callAv');
-  if(photo){av.style.backgroundImage=`url('${photo}')`;av.style.color='transparent';av.textContent='';}
-  else{av.style.backgroundImage='';av.style.color='#fff';av.textContent=name[0]?.toUpperCase()||'?';av.style.background=strColor(name);}
-  document.getElementById('callName').textContent=name;
-  document.getElementById('callStatus').textContent=status;
-  document.getElementById('callOverlay').classList.add('open');
-}
-
-function onCallConnected(){
-  document.getElementById('callStatus').textContent='';
-  document.getElementById('callTimer').style.display='block';
-  document.getElementById('callWave').style.display='flex';
-  callStartTime=Date.now();
-  callTimerInterval=setInterval(()=>{
-    const s=Math.floor((Date.now()-callStartTime)/1000);
-    const m=Math.floor(s/60),sec=s%60;
-    document.getElementById('callTimer').textContent=`${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
-  },1000);
-}
-
-let isMuted=false;
-function toggleMute(){
-  if(!localStream)return;
-  isMuted=!isMuted;
-  localStream.getAudioTracks().forEach(t=>t.enabled=!isMuted);
-  document.getElementById('muteBtn').classList.toggle('on',isMuted);
-}
-
-function endCall(){
-  if(callDocId)db.collection('calls').doc(callDocId).update({status:'ended'}).catch(()=>{});
-  hangupCall();
-}
-
-function hangupCall(msg){
-  if(pc){pc.close();pc=null;}
-  if(localStream){localStream.getTracks().forEach(t=>t.stop());localStream=null;}
-  clearInterval(callTimerInterval);callTimerInterval=null;
-  document.getElementById('callOverlay').classList.remove('open');
-  document.getElementById('callTimer').style.display='none';
-  document.getElementById('callWave').style.display='none';
-  document.getElementById('callTimer').textContent='';
-  isMuted=false;document.getElementById('muteBtn').classList.remove('on');
-  callDocId=null;
-  if(msg)toast(msg);
-}
-
-function startIncomingCallListener(){
-  if(!me)return;
-  unsubIncoming=db.collection('calls')
-    .where('calleeUid','==',me.uid)
-    .where('status','==','calling')
-    .onSnapshot(snap=>{
-      snap.docChanges().forEach(ch=>{
-        if(ch.type==='added'){
-          const d=ch.doc.data();
-          if(!d.createdAt)return;
-          const age=Date.now()-(d.createdAt.toMillis?.()??0);
-          if(age>30000)return; // stale
-          if(pc)return; // already in call
-          incomingCallData={docId:ch.doc.id,...d};
-          const av=document.getElementById('incAv');
-          if(d.callerPhoto){av.style.backgroundImage=`url('${d.callerPhoto}')`;av.style.color='transparent';av.textContent='';}
-          else{av.style.backgroundImage='';av.style.color='#fff';av.textContent=(d.callerName||'?')[0].toUpperCase();av.style.background=strColor(d.callerName||'');}
-          document.getElementById('incName').textContent=d.callerName||'Someone';
-          document.getElementById('incomingBanner').classList.add('on');
-          // Auto-decline after 30s
-          setTimeout(()=>{if(incomingCallData?.docId===ch.doc.id)declineCall();},30000);
-        }
-      });
-    });
-}
-
 // ── MODALS ────────────────────────────────────────────────────────────────────
 function openNewDmModal(){
   document.getElementById('dmUserSearch').value='';
@@ -1367,7 +1210,6 @@ auth.onAuthStateChanged(async user=>{
     me=user;
     await upsertUserDoc(user);
     startConvListeners();
-    startIncomingCallListener();
     // Auto-open DM if navigated from a profile
     const params=new URLSearchParams(location.search);
     const targetUid=params.get('uid'),targetName=params.get('name');
