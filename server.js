@@ -357,6 +357,170 @@ app.get('/api/proxy', async (req, res) => {
 // ── Health / config endpoints ─────────────────
 app.get('/api/proxy-port', (_req, res) => res.json({ port: INTERSTELLAR_PORT }));
 
+// ── Code Editor API ──────────────────────────
+const EDIT_ROOT  = __dirname;
+const EDIT_EXTS  = new Set(['.html', '.css', '.js', '.json', '.md', '.txt', '.svg']);
+const EDIT_BLOCK = ['node_modules', '.git', 'interstellar/node_modules'];
+
+function editSafePath(rel) {
+  if (!rel || typeof rel !== 'string') return null;
+  const abs = path.resolve(EDIT_ROOT, rel.replace(/\\/g, '/'));
+  if (!abs.startsWith(EDIT_ROOT + path.sep) && abs !== EDIT_ROOT) return null;
+  const relNorm = path.relative(EDIT_ROOT, abs);
+  for (const b of EDIT_BLOCK) {
+    if (relNorm === b || relNorm.startsWith(b + path.sep) || relNorm.startsWith(b + '/')) return null;
+  }
+  if (!EDIT_EXTS.has(path.extname(abs).toLowerCase())) return null;
+  return { abs, rel: relNorm.replace(/\\/g, '/') };
+}
+
+function buildFileTree(dir, base) {
+  const out = [];
+  let items;
+  try { items = fs.readdirSync(dir); } catch { return out; }
+  for (const name of items) {
+    if (name.startsWith('.') || name === 'node_modules') continue;
+    const absItem = path.join(dir, name);
+    const rel     = base ? base + '/' + name : name;
+    let stat;
+    try { stat = fs.statSync(absItem); } catch { continue; }
+    if (stat.isDirectory()) {
+      if (rel === 'interstellar') continue;
+      const children = buildFileTree(absItem, rel);
+      if (children.length) out.push({ name, path: rel, type: 'dir', children });
+    } else if (EDIT_EXTS.has(path.extname(name).toLowerCase())) {
+      out.push({ name, path: rel, type: 'file' });
+    }
+  }
+  return out.sort((a, b) => {
+    if (a.type !== b.type) return a.type === 'dir' ? -1 : 1;
+    return a.name.localeCompare(b.name);
+  });
+}
+
+// SSE clients for live-reload broadcast
+const _sseClients = new Set();
+
+app.get('/api/editor/events', (req, res) => {
+  res.set({ 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive' });
+  res.flushHeaders();
+  res.write('data: connected\n\n');
+  _sseClients.add(res);
+  req.on('close', () => _sseClients.delete(res));
+});
+
+app.get('/api/editor/files', (_req, res) => {
+  res.json(buildFileTree(EDIT_ROOT, ''));
+});
+
+app.get('/api/editor/file', (req, res) => {
+  const p = editSafePath(req.query.path);
+  if (!p) return res.status(400).json({ error: 'Invalid path' });
+  try {
+    res.json({ content: fs.readFileSync(p.abs, 'utf8') });
+  } catch {
+    res.status(404).json({ error: 'File not found' });
+  }
+});
+
+app.post('/api/editor/file', express.json({ limit: '10mb' }), (req, res) => {
+  const p = editSafePath(req.body?.path);
+  if (!p) return res.status(400).json({ error: 'Invalid path' });
+  if (typeof req.body?.content !== 'string') return res.status(400).json({ error: 'content required' });
+  try {
+    fs.writeFileSync(p.abs, req.body.content, 'utf8');
+    const msg = `data: ${JSON.stringify({ file: p.rel })}\n\n`;
+    _sseClients.forEach(r => { try { r.write(msg); } catch (_) {} });
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// ── Cloudflare Pages Deploy ───────────────────
+const CF_CONFIG_PATH = path.join(__dirname, '.cf-config.json');
+const os = require('os');
+
+function readCfConfig() {
+  try { return JSON.parse(fs.readFileSync(CF_CONFIG_PATH, 'utf8')); } catch { return {}; }
+}
+
+app.get('/api/editor/cf-config', (_req, res) => {
+  const c = readCfConfig();
+  res.json({ accountId: c.accountId || '', projectName: c.projectName || '', hasToken: !!c.apiToken });
+});
+
+app.post('/api/editor/cf-config', express.json(), (req, res) => {
+  const { accountId, apiToken, projectName } = req.body || {};
+  const existing = readCfConfig();
+  const next = { ...existing };
+  if (accountId !== undefined)   next.accountId   = accountId;
+  if (projectName !== undefined) next.projectName = projectName;
+  if (apiToken && apiToken !== '••••••••') next.apiToken = apiToken;
+  try { fs.writeFileSync(CF_CONFIG_PATH, JSON.stringify(next), 'utf8'); res.json({ ok: true }); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+function copyForDeploy(src, dest, skip = new Set(['node_modules', '.git', '.cf-config.json'])) {
+  let items;
+  try { items = fs.readdirSync(src); } catch { return; }
+  for (const item of items) {
+    if (skip.has(item) || (item.startsWith('.') && item !== '.well-known')) continue;
+    const s = path.join(src, item), d = path.join(dest, item);
+    let stat;
+    try { stat = fs.statSync(s); } catch { continue; }
+    if (stat.isDirectory()) { fs.mkdirSync(d, { recursive: true }); copyForDeploy(s, d, new Set(['node_modules'])); }
+    else { try { fs.copyFileSync(s, d); } catch {} }
+  }
+}
+
+app.post('/api/editor/deploy', (_req, res) => {
+  const cfg = readCfConfig();
+  if (!cfg.apiToken || !cfg.projectName) {
+    return res.status(400).json({ error: 'Cloudflare credentials not configured. Click the ⚙ icon first.' });
+  }
+
+  res.set({ 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive' });
+  res.flushHeaders();
+
+  const send = msg => { try { res.write(`data: ${JSON.stringify({ msg })}\n\n`); } catch {} };
+  const done  = (ok, url) => { try { res.write(`data: ${JSON.stringify({ done: true, ok, url })}\n\n`); res.end(); } catch {} };
+
+  const tmpDir = path.join(os.tmpdir(), 'vexis-deploy-' + Date.now());
+  try {
+    fs.mkdirSync(tmpDir, { recursive: true });
+    send('Preparing files…');
+    copyForDeploy(__dirname, tmpDir);
+    send('Uploading to Cloudflare Pages…');
+  } catch (e) {
+    done(false);
+    return;
+  }
+
+  const args = ['wrangler', 'pages', 'deploy', tmpDir,
+    '--project-name', cfg.projectName,
+    '--commit-dirty', 'true',
+  ];
+  if (cfg.accountId) args.push('--account-id', cfg.accountId);
+
+  const proc = spawn('npx', args, {
+    env: { ...process.env, CLOUDFLARE_API_TOKEN: cfg.apiToken, CI: '1' },
+  });
+
+  let output = '';
+  const onData = d => { const s = d.toString(); output += s; send(s.trim()); };
+  proc.stdout.on('data', onData);
+  proc.stderr.on('data', onData);
+
+  proc.on('close', code => {
+    try { fs.rmSync(tmpDir, { recursive: true, force: true }); } catch {}
+    const urlMatch = output.match(/https:\/\/[^\s]+\.pages\.dev[^\s]*/);
+    done(code === 0, urlMatch ? urlMatch[0] : null);
+  });
+
+  proc.on('error', e => { send('Error: ' + e.message); done(false); });
+});
+
 app.listen(PORT, () => {
   console.log(`\n  ✦ Vexis running      → http://localhost:${PORT}`);
   console.log(`  ✦ Interstellar proxy → http://localhost:${INTERSTELLAR_PORT}\n`);
