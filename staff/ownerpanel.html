@@ -296,6 +296,8 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',-apple-system,sans-s
   .nav-pill>span:not(.nav-badge){display:none}
   .nav-pill{padding:0 10px;gap:0}
 }
+
+
 @media(max-width:380px){
   .content{padding:8px}
   .stat-card{padding:12px 13px}
@@ -526,6 +528,7 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',-apple-system,sans-s
     </div>
 
   </div><!-- /content -->
+
 </div><!-- /app -->
 
 <div class="toast" id="toast"></div>
@@ -641,12 +644,12 @@ function go(sec) {
   document.getElementById('pill-' + sec)?.classList.add('active');
   document.getElementById('sec-' + sec)?.classList.add('active');
   ({
-    dash:     loadDash,
-    users:    loadUsers,
-    reports:  loadReports,
-    bugs:     loadBugs,
-    chat:     () => {},
-    announce: loadAnnouncements,
+    dash:        loadDash,
+    users:       loadUsers,
+    reports:     loadReports,
+    bugs:        loadBugs,
+    chat:        () => {},
+    announce:    loadAnnouncements,
     audit:       loadAudit,
     submissions: loadSubmissions,
     platform:    loadPlatform,
@@ -1406,6 +1409,7 @@ function toast(msg) {
   el.textContent = msg; el.classList.add('show');
   clearTimeout(_tt); _tt = setTimeout(() => el.classList.remove('show'), 2400);
 }
+
 </script>
 </body>
 </html>
