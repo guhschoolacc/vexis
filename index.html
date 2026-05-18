@@ -669,18 +669,7 @@
   }
   #cashFab:hover { background: var(--raise2); transform: translateY(-2px); box-shadow: 0 8px 26px rgba(0,0,0,.5); color: var(--text); }
 
-  /* ═══════════════ TOAST ═══════════════ */
-  #toast {
-    position: fixed; bottom: 20px; left: 50%;
-    transform: translateX(-50%) translateY(8px);
-    background: var(--surf); border: 1px solid var(--bdrhi);
-    border-radius: 8px; padding: 9px 18px;
-    font-size: .72rem; color: var(--text);
-    z-index: 9999; opacity: 0; transition: all .16s ease; pointer-events: none;
-    box-shadow: 0 6px 24px rgba(0,0,0,.4), 0 0 0 1px rgba(255,255,255,.04);
-    white-space: nowrap;
-  }
-  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  /* ═══════════════ TOAST (legacy stub, replaced by #toastStack) ═══════════════ */
 
   @keyframes up      { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
   @keyframes spin    { to { transform: rotate(360deg); } }
@@ -1089,11 +1078,165 @@
     .nav-circles { gap: 14px; }
     .inner { padding: 12px 10px 50px; }
   }
+
+  /* ═══════════════ QUICK LAUNCH BAR ═══════════════ */
+  .quick-launch {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 28px; animation: up .5s ease .1s both;
+    flex-wrap: wrap; justify-content: center; max-width: 480px;
+  }
+  .ql-item {
+    display: flex; align-items: center; gap: 7px;
+    padding: 5px 12px 5px 8px; border-radius: 20px;
+    background: var(--surf); border: 1px solid var(--bdr);
+    cursor: pointer; transition: all .2s ease;
+    font-size: .68rem; font-weight: 500; color: var(--dim);
+    position: relative;
+  }
+  .ql-item:hover { background: var(--raise); border-color: var(--bdrhi); color: var(--text);
+    transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,.3); }
+  .ql-item .ql-ico { width: 22px; height: 22px; border-radius: 8px; background: var(--raise2);
+    border: 1px solid var(--bdr); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .ql-item .ql-rm { position: absolute; top: -5px; right: -5px; width: 14px; height: 14px;
+    border-radius: 50%; background: #f85149; display: none; align-items: center; justify-content: center;
+    cursor: pointer; border: 1.5px solid var(--bg); }
+  .ql-item:hover .ql-rm { display: flex; }
+  .ql-item .ql-rm svg { color: #fff; }
+  .ql-add-btn { display: flex; align-items: center; gap: 5px; padding: 5px 12px;
+    border-radius: 20px; background: transparent; border: 1.5px dashed var(--bdr);
+    cursor: pointer; font-size: .68rem; color: var(--muted); transition: all .16s;
+  }
+  .ql-add-btn:hover { border-color: var(--bdrhi); color: var(--text); background: var(--surf); }
+
+  /* ═══════════════ RECENTLY PLAYED ═══════════════ */
+  .recently-played { margin-top: 32px; animation: up .5s ease .18s both; text-align: center; }
+  .recently-played-label { font-size: .58rem; font-weight: 600; text-transform: uppercase;
+    letter-spacing: .14em; color: var(--muted); margin-bottom: 12px; }
+  .rp-row { display: flex; align-items: center; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .rp-chip {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 13px 7px 9px; border-radius: 10px;
+    background: var(--surf); border: 1px solid var(--bdr);
+    cursor: pointer; transition: all .22s cubic-bezier(.34,1.56,.64,1);
+    font-size: .7rem; font-weight: 500; color: var(--dim);
+  }
+  .rp-chip:hover { background: var(--raise); border-color: var(--bdrhi); color: var(--text);
+    transform: translateY(-3px); box-shadow: 0 8px 22px rgba(0,0,0,.3), 0 0 0 1px rgba(var(--accent-rgb),.15), inset 0 0 16px rgba(var(--accent-rgb),.05); }
+  .rp-chip .rp-ico { width: 26px; height: 26px; border-radius: 8px; background: var(--raise2);
+    border: 1px solid var(--bdr); display: flex; align-items: center; justify-content: center; }
+
+  /* ═══════════════ WEATHER WIDGET ═══════════════ */
+  .weather-widget {
+    margin-top: 20px; padding: 14px 20px; border-radius: 14px;
+    background: var(--surf); border: 1px solid var(--bdr);
+    display: flex; align-items: center; gap: 20px;
+    animation: up .5s ease .22s both; max-width: 420px; width: 100%;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .weather-widget:hover { border-color: var(--bdrhi); box-shadow: 0 8px 28px rgba(0,0,0,.25); }
+  .weather-main { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+  .weather-temp { font-family: 'DM Mono', monospace; font-size: 2rem; font-weight: 400; color: var(--white); line-height: 1; }
+  .weather-desc { font-size: .68rem; color: var(--dim); margin-top: 3px; }
+  .weather-loc  { font-size: .6rem; color: var(--muted); margin-top: 2px; }
+  .weather-ico  { font-size: 2.2rem; line-height: 1; flex-shrink: 0; }
+  .weather-extra { display: flex; flex-direction: column; gap: 4px; border-left: 1px solid var(--bdr); padding-left: 16px; flex-shrink: 0; }
+  .weather-row  { font-size: .63rem; color: var(--dim); white-space: nowrap; }
+  .weather-row strong { color: var(--text); }
+  .weather-loading { font-size: .7rem; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+
+  /* ═══════════════ ITEM CARD GLOW ═══════════════ */
+  .item-card:hover {
+    box-shadow: 0 16px 40px rgba(0,0,0,.38),
+      0 0 0 1px rgba(255,255,255,.05),
+      inset 0 0 24px rgba(var(--accent-rgb, 136,136,136),.06),
+      0 0 0 1px rgba(var(--accent-rgb, 136,136,136),.12);
+  }
+
+  /* ═══════════════ OMNIBAR DROPDOWN ═══════════════ */
+  .omni-wrap { flex: 1; position: relative; }
+  .omni-dropdown {
+    position: absolute; top: calc(100% + 6px); left: 0; right: 0; z-index: 300;
+    background: var(--surf); border: 1px solid var(--bdrhi); border-radius: 10px;
+    overflow: hidden; display: none;
+    box-shadow: 0 12px 40px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.03);
+  }
+  .omni-dropdown.open { display: block; }
+  .od-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 12px; cursor: pointer; transition: background .1s;
+  }
+  .od-item:hover, .od-item.focused { background: var(--raise); }
+  .od-item-text { flex: 1; min-width: 0; }
+  .od-item-name { font-size: .74rem; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .od-item-sub  { font-size: .6rem; color: var(--muted); margin-top: 1px; }
+  .od-item-tag  { font-family: 'DM Mono', monospace; font-size: .55rem; color: var(--dim); background: var(--raise2); border: 1px solid var(--bdr); border-radius: 4px; padding: 1px 6px; flex-shrink: 0; }
+  .od-item-ico  { width: 24px; height: 24px; border-radius: 7px; background: var(--raise2); border: 1px solid var(--bdr); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+  /* ═══════════════ IFRAME SKELETON ═══════════════ */
+  .iframe-skeleton { width: 100%; max-width: 600px; padding: 0 32px; display: flex; flex-direction: column; gap: 14px; }
+  .sk-line { border-radius: 5px; background: var(--raise); animation: skshimmer 1.6s ease-in-out infinite; }
+  .sk-h { height: 28px; width: 45%; }
+  .sk-row { display: flex; gap: 10px; }
+  .sk-sm { height: 14px; width: 20%; border-radius: 5px; background: var(--raise); animation: skshimmer 1.6s ease-in-out infinite .1s; }
+  .sk-md { height: 14px; flex: 1; border-radius: 5px; background: var(--raise); animation: skshimmer 1.6s ease-in-out infinite .2s; }
+  .sk-block { height: 140px; width: 100%; border-radius: 8px; background: var(--raise); animation: skshimmer 1.6s ease-in-out infinite .15s; }
+  .sk-lg { height: 14px; flex: 2; border-radius: 5px; background: var(--raise); animation: skshimmer 1.6s ease-in-out infinite .25s; }
+  .sk-xs { height: 14px; width: 15%; border-radius: 5px; background: var(--raise); animation: skshimmer 1.6s ease-in-out infinite .3s; }
+  @keyframes skshimmer { 0%,100% { opacity:.4; } 50% { opacity:.8; } }
+
+  /* ═══════════════ TOAST ENHANCEMENT ═══════════════ */
+  #toastStack {
+    position: fixed; bottom: 20px; left: 50%;
+    transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    z-index: 9999; pointer-events: none;
+  }
+  .toast-item {
+    display: flex; align-items: center; gap: 9px;
+    background: var(--surf); border: 1px solid var(--bdrhi);
+    border-radius: 8px; padding: 9px 16px;
+    font-size: .72rem; color: var(--text);
+    box-shadow: 0 6px 24px rgba(0,0,0,.4), 0 0 0 1px rgba(255,255,255,.04);
+    white-space: nowrap; pointer-events: all;
+    opacity: 0; transform: translateY(6px);
+    transition: opacity .16s ease, transform .16s ease;
+  }
+  .toast-item.show { opacity: 1; transform: translateY(0); }
+  .toast-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .toast-dot.success { background: #56d364; }
+  .toast-dot.error   { background: #f85149; }
+  .toast-dot.info    { background: var(--accent); }
+  .toast-dot.default { background: var(--dim); }
+
+  /* ═══════════════ CUSTOM THEME SETTINGS ═══════════════ */
+  .ct-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+  .ct-label { font-size: .62rem; color: var(--dim); flex: 1; }
+  .ct-swatch { width: 28px; height: 28px; border-radius: 7px; border: 1px solid var(--bdrhi); cursor: pointer; overflow: hidden; padding: 0; }
+  .ct-file-label {
+    display: flex; align-items: center; gap: 7px; padding: 7px 12px;
+    border-radius: 8px; background: var(--raise); border: 1px solid var(--bdr);
+    font-size: .71rem; color: var(--dim); cursor: pointer; transition: all .14s;
+  }
+  .ct-file-label:hover { background: var(--raise2); color: var(--text); border-color: var(--bdrhi); }
+  #customBgPreview {
+    width: 100%; height: 56px; border-radius: 9px; object-fit: cover;
+    border: 1px solid var(--bdr); margin-bottom: 6px; display: none;
+  }
+  #customBgVideo {
+    width: 100%; height: 56px; border-radius: 9px; object-fit: cover;
+    border: 1px solid var(--bdr); margin-bottom: 6px; display: none; pointer-events: none;
+  }
+  #customThemeBg {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    object-fit: cover; width: 100%; height: 100%; opacity: 0; transition: opacity .5s;
+  }
 </style>
 </head>
 <body style="display:flex;flex-direction:column;height:100%">
 
 <canvas id="themeCanvas"></canvas>
+<img id="customThemeBg" src="" alt="">
+<video id="customThemeBgVid" autoplay loop muted playsinline style="position:fixed;inset:0;z-index:0;width:100%;height:100%;object-fit:cover;pointer-events:none;opacity:0;transition:opacity .5s"></video>
 
 <!-- LOGIN SCREEN -->
 <div id="loginScreen">
@@ -1189,9 +1332,12 @@
     <button class="nav-btn" onclick="goBack()" title="Back"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
     <button class="nav-btn" onclick="goForward()" title="Forward"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
     <button class="nav-btn" id="reloadBtn" onclick="reload(this)" title="Reload"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></button>
-    <div class="omnibar" onclick="document.getElementById('omni').focus()">
-      <span class="ico" id="omniLockIcon"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
-      <input class="modal-input omnibar-input" id="omni" value="vexis://newtab" spellcheck="false" onkeydown="if(event.key==='Enter')omniNav(this.value)" style="background:transparent;border:none;border-radius:0;padding:0;box-shadow:none">
+    <div class="omni-wrap">
+      <div class="omnibar" onclick="document.getElementById('omni').focus()">
+        <span class="ico" id="omniLockIcon"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+        <input class="modal-input omnibar-input" id="omni" value="vexis://newtab" spellcheck="false" onkeydown="omniKeydown(event)" oninput="omniInput(this.value)" onfocus="omniInput(this.value)" style="background:transparent;border:none;border-radius:0;padding:0;box-shadow:none">
+      </div>
+      <div class="omni-dropdown" id="omniDropdown"></div>
     </div>
     <div class="chrome-right">
       <button class="cr-btn" onclick="toggleSearch()" title="Search"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
@@ -1212,8 +1358,23 @@
       <div class="home-time" id="homeClock">--:--</div>
       <div class="home-date"  id="homeDate">--</div>
       <div class="home-motd" id="homeMOTD"></div>
+      <div class="quick-launch" id="quickLaunch" style="display:none"></div>
       <div class="nav-circles" id="navCircles"></div>
-
+      <div class="recently-played" id="recentlyPlayed" style="display:none">
+        <div class="recently-played-label">Recently Played</div>
+        <div class="rp-row" id="rpRow"></div>
+      </div>
+      <div id="weatherWidget" style="display:none">
+        <div class="weather-widget">
+          <div class="weather-ico" id="weatherIco">🌡️</div>
+          <div class="weather-main">
+            <div class="weather-temp" id="weatherTemp">--°</div>
+            <div class="weather-desc" id="weatherDesc">Loading weather…</div>
+            <div class="weather-loc"  id="weatherLoc"></div>
+          </div>
+          <div class="weather-extra" id="weatherExtra"></div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1405,7 +1566,13 @@
   <!-- IFRAME VIEWER -->
   <div id="page-iframe">
     <div id="iframeSpinner" class="iframe-spinner">
-      <div class="spin-large"></div>
+      <div class="iframe-skeleton">
+        <div class="sk-line sk-h"></div>
+        <div class="sk-row"><div class="sk-sm"></div><div class="sk-md"></div></div>
+        <div class="sk-block"></div>
+        <div class="sk-row"><div class="sk-xs"></div><div class="sk-lg"></div></div>
+        <div class="sk-row"><div class="sk-md"></div><div class="sk-sm"></div></div>
+      </div>
     </div>
     <!-- shown when URL exists -->
     <iframe id="mainIframe" src="about:blank" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-pointer-lock" allow="autoplay; fullscreen"></iframe>
@@ -1513,6 +1680,27 @@
     <input type="range" class="font-slider" id="fontSlider" min="12" max="18" value="14" step="1">
     <div style="display:flex;justify-content:space-between;font-size:.6rem;color:var(--muted);margin-top:4px">
       <span>12px</span><span>18px</span>
+    </div>
+  </div>
+  <div class="settings-section" style="border-top:1px solid var(--bdr);padding-top:14px;margin-top:4px">
+    <div class="settings-section-title">Custom Theme</div>
+    <img id="customBgPreview" src="" alt="">
+    <video id="customBgVideo" autoplay loop muted playsinline></video>
+    <label class="ct-file-label" for="customBgUpload">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      Upload image, GIF, or video background
+      <input type="file" id="customBgUpload" accept="image/*,video/*" style="display:none" onchange="applyCustomBg(this)">
+    </label>
+    <div class="ct-row" style="margin-top:10px">
+      <span class="ct-label">Accent color</span>
+      <input type="color" class="ct-swatch" id="customAccentPicker" value="#888888" oninput="applyCustomAccent(this.value)" title="Accent color">
+    </div>
+    <div class="ct-row">
+      <span class="ct-label">Background dim</span>
+      <input type="range" min="0" max="90" value="0" id="customBgDim" style="flex:1;accent-color:var(--accent)" oninput="applyCustomBgDim(this.value)">
+    </div>
+    <div style="display:flex;gap:6px;margin-top:6px">
+      <button onclick="clearCustomTheme()" style="flex:1;padding:6px;border-radius:7px;background:var(--raise);border:1px solid var(--bdr);color:var(--dim);font-family:'DM Sans',sans-serif;font-size:.7rem;cursor:pointer;transition:all .14s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--dim)'">Reset</button>
     </div>
   </div>
   <div class="settings-section" style="border-top:1px solid var(--bdr);padding-top:14px;margin-top:4px">
@@ -1654,7 +1842,7 @@
   </svg>
 </a>
 
-<div id="toast"></div>
+<div id="toastStack"></div>
 
 <!-- STAFF PANEL -->
 <div id="staffPanel" onclick="if(event.target===this)closeStaffPanel()">
@@ -1820,8 +2008,8 @@
       resetPassword:  (email)       => sendPasswordResetEmail(auth, email),
       uploadPhoto: async (file, uid) => {
         const storageRef = ref(storage, `profile-pictures/${uid}/avatar`);
-        await uploadBytes(storageRef, file);
-        return getDownloadURL(storageRef);
+        const snapshot = await uploadBytes(storageRef, file, { contentType: file.type });
+        return getDownloadURL(snapshot.ref);
       },
       ready: true,
       clearNotifs: async (uid) => {
@@ -2144,8 +2332,9 @@ const BASE_ITEMS = {
     {icon:'rocket', name:'Geometry Dash',  desc:'A Geometry Dash web-port', url:'games/gdwebport.html'},
     {icon:'rocket', name:'Noob Royale',  desc:'A competitive FPS game', url:'games/noobroyale.html'},
     {icon:'rocket', name:'Noob Royale 2D',  desc:'A competitive 2D FPS game', url:'games/noobroyale2d.html'},
-    
-    
+    {icon:'rocket', name:'People Playground',  desc:'a people playground web port.', url:'games/people-playground/index.html'},
+    {icon:'rocket', name:'Getting Over It',  desc:'a getting over it web port.', url:'games/gettingoverit/index.html'},
+    {icon:'rocket', name:'Baldis Basics',  desc:'a baldis basics it web port.', url:'games/baldisbasics/index.html'},
   ],
   apps:   [
 
@@ -2173,6 +2362,7 @@ let _iframeReturnPage = 'home';
 
 function openIframe(name, url, returnPage, displayUrl) {
   _iframeReturnPage = returnPage || 'home';
+  if (name && url) trackRecentlyPlayed(name, url);
   const iframePage = document.getElementById('page-iframe');
   const iframe     = document.getElementById('mainIframe');
   const spinner    = document.getElementById('iframeSpinner');
@@ -2334,6 +2524,16 @@ window.onFirebaseLogin = function(user) {
   if (user.photoURL)   window.setAvatarPhoto(user.photoURL);
   else if (savedPhoto) window.setAvatarPhoto(savedPhoto);
 
+  // Async Firestore fallback to get the latest uploaded photo
+  if (!user.photoURL && window._fb && window._fb.ready && user.uid !== 'guest') {
+    window._fb.getUserDoc(user.uid).then(data => {
+      if (data?.photoURL) {
+        window.setAvatarPhoto(data.photoURL);
+        localStorage.setItem('vexis-profile-photo', data.photoURL);
+      }
+    }).catch(() => {});
+  }
+
   if (user.uid !== 'guest') saveAccountToHistory(user);
   buildUserMenu(user);
 
@@ -2342,6 +2542,19 @@ window.onFirebaseLogin = function(user) {
   setTimeout(() => { ls.style.display = 'none'; }, 420);
 
   setLoginLoading(false);
+
+  setTimeout(() => {
+    if (user.uid !== 'guest') {
+      loadPrefsFromCloud(user.uid).then(() => {
+        buildRecentlyPlayed();
+        buildQuickLaunch();
+      });
+    } else {
+      buildRecentlyPlayed();
+      buildQuickLaunch();
+    }
+    initWeather();
+  }, 300);
 };
 
 let _profilePhotoFile = null;
@@ -2396,6 +2609,12 @@ async function openProfile() {
       if (data) {
         if (data.status !== undefined) document.getElementById('profileStatus').value = data.status;
         if (data.bio    !== undefined) document.getElementById('profileBio').value    = data.bio;
+        if (data.photoURL) {
+          preview.src = data.photoURL;
+          preview.style.display = 'block';
+          initial.style.display = 'none';
+          localStorage.setItem('vexis-profile-photo', data.photoURL);
+        }
       }
     } catch(e) {}
   }
@@ -2429,8 +2648,14 @@ async function saveProfile() {
   if (_profilePhotoFile) {
     if (window._fb && window._fb.ready && window._fb.uploadPhoto && window._fbUser && !window._guestMode) {
       try {
+        btn.textContent = 'Uploading…';
         photoURL = await window._fb.uploadPhoto(_profilePhotoFile, window._fbUser.uid);
-      } catch(e) { toast('Photo upload failed — name saved'); }
+      } catch(e) {
+        console.error('Photo upload error:', e);
+        toast('Photo upload failed: ' + (e.message || e.code || 'Unknown error'));
+        btn.disabled = false; btn.textContent = 'Save Changes';
+        return;
+      }
     } else {
       photoURL = await new Promise(res => {
         const reader = new FileReader();
@@ -2576,6 +2801,9 @@ function buildHome() {
       <span class="nav-circle-label">${s.label}</span>
     </div>
   `).join('') + aiBtn + submitBtn;
+
+  buildRecentlyPlayed();
+  buildQuickLaunch();
 }
 
 /* ══════════════════════════════════════════════
@@ -2868,33 +3096,33 @@ const THEME_CHROME_COLORS = {
 
 // Animated theme chrome colors + full CSS var sets so every button/tab updates
 const ANIM_CHROME_COLORS = {
-  space:  { chrome:'rgba(8,4,24,.97)',   omni:'rgba(2,1,12,.98)',   bdr:'rgba(55,45,110,.45)', text:'rgba(200,210,255,.88)',
+  space:  { chrome:'rgba(8,4,24,.97)',   omni:'rgba(2,1,12,.98)',   bdr:'rgba(55,45,110,.45)', text:'rgba(200,210,255,.88)', accent:'#7a8fff',
     vars:{'--bg':'#00000f','--surf':'#060420','--raise':'#0d0930','--raise2':'#131040','--bdr':'#25205a','--bdrhi':'#302870','--muted':'#302870','--dim':'#5858a0','--text':'#a0aae0','--bright':'#c0caf5','--white':'#e0e6ff'} },
-  aurora: { chrome:'rgba(0,18,10,.96)',  omni:'rgba(0,10,6,.98)',   bdr:'rgba(0,110,70,.35)',  text:'rgba(160,245,210,.88)',
+  aurora: { chrome:'rgba(0,18,10,.96)',  omni:'rgba(0,10,6,.98)',   bdr:'rgba(0,110,70,.35)',  text:'rgba(160,245,210,.88)', accent:'#4dd890',
     vars:{'--bg':'#010d06','--surf':'#041a0e','--raise':'#082515','--raise2':'#0c301a','--bdr':'#143d22','--bdrhi':'#1e5030','--muted':'#1e5030','--dim':'#3a7a4a','--text':'#80c898','--bright':'#a8e0b8','--white':'#cceedd'} },
-  sunset: { chrome:'rgba(28,6,2,.97)',   omni:'rgba(16,3,1,.98)',   bdr:'rgba(140,50,15,.4)',  text:'rgba(255,195,155,.88)',
+  sunset: { chrome:'rgba(28,6,2,.97)',   omni:'rgba(16,3,1,.98)',   bdr:'rgba(140,50,15,.4)',  text:'rgba(255,195,155,.88)', accent:'#ff7a40',
     vars:{'--bg':'#0d0300','--surf':'#1a0600','--raise':'#260900','--raise2':'#300c00','--bdr':'#3d1200','--bdrhi':'#501800','--muted':'#501800','--dim':'#804020','--text':'#d09070','--bright':'#e8b898','--white':'#ffd8c0'} },
-  ocean:  { chrome:'rgba(0,8,26,.97)',   omni:'rgba(0,4,18,.98)',   bdr:'rgba(18,70,165,.4)',  text:'rgba(150,205,255,.88)',
+  ocean:  { chrome:'rgba(0,8,26,.97)',   omni:'rgba(0,4,18,.98)',   bdr:'rgba(18,70,165,.4)',  text:'rgba(150,205,255,.88)', accent:'#4090d8',
     vars:{'--bg':'#000610','--surf':'#000e22','--raise':'#001330','--raise2':'#001840','--bdr':'#002050','--bdrhi':'#002868','--muted':'#002868','--dim':'#184888','--text':'#6090c8','--bright':'#88b8e8','--white':'#b0d8f5'} },
-  neon:   { chrome:'rgba(5,0,14,.97)',   omni:'rgba(2,0,8,.98)',    bdr:'rgba(110,35,185,.4)', text:'rgba(215,175,255,.88)',
+  neon:   { chrome:'rgba(5,0,14,.97)',   omni:'rgba(2,0,8,.98)',    bdr:'rgba(110,35,185,.4)', text:'rgba(215,175,255,.88)', accent:'#c060e8',
     vars:{'--bg':'#030008','--surf':'#08001a','--raise':'#100028','--raise2':'#160030','--bdr':'#240050','--bdrhi':'#300068','--muted':'#300068','--dim':'#600090','--text':'#b060e0','--bright':'#d090f0','--white':'#eec8ff'} },
-  rain:   { chrome:'rgba(0,6,18,.97)',   omni:'rgba(0,3,12,.98)',   bdr:'rgba(20,65,130,.4)',  text:'rgba(140,195,255,.88)',
+  rain:   { chrome:'rgba(0,6,18,.97)',   omni:'rgba(0,3,12,.98)',   bdr:'rgba(20,65,130,.4)',  text:'rgba(140,195,255,.88)', accent:'#5090d8',
     vars:{'--bg':'#00060f','--surf':'#000d1e','--raise':'#001228','--raise2':'#001530','--bdr':'#001c3a','--bdrhi':'#002450','--muted':'#002450','--dim':'#1a4070','--text':'#5888b8','--bright':'#80b0d8','--white':'#a8d0ef'} },
-  fire:   { chrome:'rgba(12,2,0,.97)',   omni:'rgba(6,1,0,.98)',    bdr:'rgba(130,40,5,.4)',   text:'rgba(255,185,130,.88)',
+  fire:   { chrome:'rgba(12,2,0,.97)',   omni:'rgba(6,1,0,.98)',    bdr:'rgba(130,40,5,.4)',   text:'rgba(255,185,130,.88)', accent:'#e06030',
     vars:{'--bg':'#0a0100','--surf':'#180400','--raise':'#230600','--raise2':'#2c0800','--bdr':'#3a0c00','--bdrhi':'#4c1000','--muted':'#4c1000','--dim':'#7a3010','--text':'#c07040','--bright':'#e09868','--white':'#ffcc99'} },
-  matrix: { chrome:'rgba(0,8,0,.97)',    omni:'rgba(0,4,0,.98)',    bdr:'rgba(0,80,0,.4)',     text:'rgba(80,210,80,.88)',
+  matrix: { chrome:'rgba(0,8,0,.97)',    omni:'rgba(0,4,0,.98)',    bdr:'rgba(0,80,0,.4)',     text:'rgba(80,210,80,.88)',  accent:'#40d060',
     vars:{'--bg':'#000800','--surf':'#001000','--raise':'#001800','--raise2':'#001f00','--bdr':'#002800','--bdrhi':'#003300','--muted':'#003300','--dim':'#206020','--text':'#50c050','--bright':'#80e080','--white':'#b0ffb0'} },
-  sakura:      { chrome:'rgba(12,0,14,.97)',  omni:'rgba(6,0,8,.98)',    bdr:'rgba(100,20,80,.4)',  text:'rgba(225,165,200,.88)',
+  sakura:      { chrome:'rgba(12,0,14,.97)',  omni:'rgba(6,0,8,.98)',    bdr:'rgba(100,20,80,.4)',  text:'rgba(225,165,200,.88)', accent:'#e880b8',
     vars:{'--bg':'#0c000e','--surf':'#180014','--raise':'#220018','--raise2':'#2a001e','--bdr':'#380028','--bdrhi':'#460032','--muted':'#460032','--dim':'#7a2060','--text':'#d080a8','--bright':'#e8a8c8','--white':'#ffcce0'} },
-  vaporwave:   { chrome:'rgba(8,0,28,.97)',   omni:'rgba(4,0,16,.98)',   bdr:'rgba(160,30,200,.4)', text:'rgba(255,100,240,.88)',
+  vaporwave:   { chrome:'rgba(8,0,28,.97)',   omni:'rgba(4,0,16,.98)',   bdr:'rgba(160,30,200,.4)', text:'rgba(255,100,240,.88)', accent:'#e060f0',
     vars:{'--bg':'#060014','--surf':'#0d0028','--raise':'#160040','--raise2':'#1c004c','--bdr':'#280060','--bdrhi':'#320080','--muted':'#320080','--dim':'#7020a0','--text':'#c050e0','--bright':'#e080f8','--white':'#ffb0ff'} },
-  midnight:    { chrome:'rgba(0,4,20,.97)',   omni:'rgba(0,2,12,.98)',   bdr:'rgba(30,60,160,.4)',  text:'rgba(140,180,255,.88)',
+  midnight:    { chrome:'rgba(0,4,20,.97)',   omni:'rgba(0,2,12,.98)',   bdr:'rgba(30,60,160,.4)',  text:'rgba(140,180,255,.88)', accent:'#6080d8',
     vars:{'--bg':'#00040f','--surf':'#000820','--raise':'#000c30','--raise2':'#00103c','--bdr':'#001550','--bdrhi':'#001c68','--muted':'#001c68','--dim':'#103880','--text':'#5080c8','--bright':'#80a8e8','--white':'#b0ccff'} },
-  petergriffin:{ chrome:'rgba(6,8,14,.97)',  omni:'rgba(3,4,8,.98)',    bdr:'rgba(80,90,120,.4)',  text:'rgba(210,200,170,.88)',
+  petergriffin:{ chrome:'rgba(6,8,14,.97)',  omni:'rgba(3,4,8,.98)',    bdr:'rgba(80,90,120,.4)',  text:'rgba(210,200,170,.88)', accent:'#8899bb',
     vars:{'--bg':'#060810','--surf':'#0c1020','--raise':'#121828','--raise2':'#181f30','--bdr':'#202840','--bdrhi':'#2a3350','--muted':'#2a3350','--dim':'#506080','--text':'#a0a8c0','--bright':'#c8c8d8','--white':'#e8e0cc'} },
-  galaxy:      { chrome:'rgba(2,0,12,.97)',   omni:'rgba(1,0,7,.98)',    bdr:'rgba(80,40,160,.4)',  text:'rgba(200,170,255,.88)',
+  galaxy:      { chrome:'rgba(2,0,12,.97)',   omni:'rgba(1,0,7,.98)',    bdr:'rgba(80,40,160,.4)',  text:'rgba(200,170,255,.88)', accent:'#9060d8',
     vars:{'--bg':'#020008','--surf':'#060018','--raise':'#0c0028','--raise2':'#100030','--bdr':'#1a0048','--bdrhi':'#220060','--muted':'#220060','--dim':'#502890','--text':'#9060c0','--bright':'#c090e8','--white':'#e0c0ff'} },
-  lofi:        { chrome:'rgba(10,7,0,.97)',   omni:'rgba(5,3,0,.98)',    bdr:'rgba(100,72,20,.4)',  text:'rgba(220,188,120,.88)',
+  lofi:        { chrome:'rgba(10,7,0,.97)',   omni:'rgba(5,3,0,.98)',    bdr:'rgba(100,72,20,.4)',  text:'rgba(220,188,120,.88)', accent:'#c09040',
     vars:{'--bg':'#0a0700','--surf':'#160e00','--raise':'#1e1400','--raise2':'#261a00','--bdr':'#332000','--bdrhi':'#402800','--muted':'#402800','--dim':'#6a4a10','--text':'#b08840','--bright':'#d0a858','--white':'#f0cc80'} },
 };
 
@@ -2913,6 +3141,18 @@ function applyChromePalette(colors) {
   if (colors.vars) {
     Object.entries(colors.vars).forEach(([k,v]) => root.style.setProperty(k, v));
   }
+  if (colors.accent) {
+    root.style.setProperty('--accent', colors.accent);
+    const [ar,ag,ab] = hexToRgb(colors.accent);
+    root.style.setProperty('--accent-rgb', `${ar},${ag},${ab}`);
+  }
+}
+
+function hexToRgb(hex) {
+  hex = hex.replace('#','');
+  if (hex.length === 3) hex = hex.split('').map(c=>c+c).join('');
+  const n = parseInt(hex,16);
+  return [(n>>16)&255,(n>>8)&255,n&255];
 }
 
 /* ══════════════════════════════════════════════
@@ -3662,6 +3902,7 @@ function startAnimTheme(name) {
   }
   loop();
   localStorage.setItem('vexis-atheme', name);
+  scheduleSync();
 
   // Apply chrome colors for this animated theme
   if (ANIM_CHROME_COLORS[name]) applyChromePalette(ANIM_CHROME_COLORS[name]);
@@ -3731,6 +3972,17 @@ function applyTheme(theme) {
   const keys = ['--bg','--surf','--raise','--raise2','--bdr','--bdrhi','--muted','--dim','--text','--bright','--white'];
   keys.forEach((k,i) => root.style.setProperty(k, vals[i]));
   localStorage.setItem('vexis-theme', theme);
+  scheduleSync();
+
+  // Per-theme accent color
+  const ACCENT_MAP = {
+    dark:'#888888', light:'#555555', oled:'#aaaaaa', sepia:'#8b7a5c',
+    midnight:'#6a9cbf', forest:'#4db06a', rose:'#d46b8a', slate:'#7a9ac8',
+  };
+  const acc = ACCENT_MAP[theme] || '#888888';
+  root.style.setProperty('--accent', acc);
+  const [ar,ag,ab] = hexToRgb(acc);
+  root.style.setProperty('--accent-rgb', `${ar},${ag},${ab}`);
 
   // Apply matching chrome colors
   if (THEME_CHROME_COLORS[theme]) applyChromePalette(THEME_CHROME_COLORS[theme]);
@@ -3744,6 +3996,7 @@ function applyDensity(density) {
   document.documentElement.style.setProperty('--r', density === 'compact' ? '6px' : '10px');
   document.documentElement.dataset.density = density;
   localStorage.setItem('vexis-density', density);
+  scheduleSync();
   document.querySelectorAll('.density-option').forEach(o =>
     o.classList.toggle('active', o.dataset.density === density));
 }
@@ -3751,6 +4004,7 @@ function applyDensity(density) {
 function applyFontSize(size) {
   document.documentElement.style.fontSize = size + 'px';
   localStorage.setItem('vexis-fontsize', size);
+  scheduleSync();
 }
 
 function loadSettings() {
@@ -3763,6 +4017,7 @@ function loadSettings() {
   applyFontSize(fontSize);
   document.getElementById('fontSlider').value = fontSize;
   if (atheme) setTimeout(() => startAnimTheme(atheme), 400);
+  loadCustomTheme();
 
   const savedName  = localStorage.getItem('vexis-profile-name');
   const savedPhoto = localStorage.getItem('vexis-profile-photo');
@@ -4151,11 +4406,420 @@ setInterval(() => { const v=Math.floor(18+Math.random()*55)+'%'; const e=documen
 /* ══════════════════════════════════════════════
    TOAST
 ══════════════════════════════════════════════ */
-let _tt;
-function toast(msg) {
-  const el=document.getElementById('toast');
-  el.textContent=msg; el.classList.add('show');
-  clearTimeout(_tt); _tt=setTimeout(()=>el.classList.remove('show'),1800);
+function toast(msg, type='default') {
+  const stack = document.getElementById('toastStack');
+  const el = document.createElement('div');
+  el.className = 'toast-item';
+  el.innerHTML = `<div class="toast-dot ${type}"></div><span>${msg}</span>`;
+  stack.appendChild(el);
+  requestAnimationFrame(() => el.classList.add('show'));
+  setTimeout(() => {
+    el.classList.remove('show');
+    setTimeout(() => el.remove(), 200);
+  }, 2200);
+}
+
+/* ══════════════════════════════════════════════
+   CROSS-DEVICE SYNC
+══════════════════════════════════════════════ */
+let _syncTimer = null;
+
+function scheduleSync() {
+  if (!window._fb?.ready || !window._fbUser || window._guestMode) return;
+  clearTimeout(_syncTimer);
+  _syncTimer = setTimeout(pushPrefsToCloud, 1500);
+}
+
+async function pushPrefsToCloud() {
+  if (!window._fb?.ready || !window._fbUser || window._guestMode) return;
+  const prefs = {
+    theme:          localStorage.getItem('vexis-theme')          || 'dark',
+    density:        localStorage.getItem('vexis-density')        || 'comfortable',
+    fontSize:       localStorage.getItem('vexis-fontsize')       || '14',
+    atheme:         localStorage.getItem('vexis-atheme')         || null,
+    customAccent:   localStorage.getItem('vexis-custom-accent')  || null,
+    customBgDim:    localStorage.getItem('vexis-custom-bg-dim')  || null,
+    quickLaunch:    localStorage.getItem('vexis-quicklaunch')    || '[]',
+    recentlyPlayed: localStorage.getItem('vexis-recently-played')|| '[]',
+  };
+  try {
+    await window._fb.updateUserDoc(window._fbUser.uid, { prefs });
+  } catch(e) {}
+}
+
+async function loadPrefsFromCloud(uid) {
+  if (!window._fb?.ready || window._guestMode) return;
+  try {
+    const data = await window._fb.getUserDoc(uid);
+    const p = data?.prefs;
+    if (!p) return;
+    if (p.theme)    { localStorage.setItem('vexis-theme', p.theme);       applyTheme(p.theme); }
+    if (p.density)  { localStorage.setItem('vexis-density', p.density);   applyDensity(p.density); document.getElementById('fontSlider') && (document.getElementById('fontSlider').value = p.fontSize || '14'); }
+    if (p.fontSize) { localStorage.setItem('vexis-fontsize', p.fontSize); applyFontSize(p.fontSize); const sl = document.getElementById('fontSlider'); if (sl) sl.value = p.fontSize; }
+    if (p.quickLaunch)    localStorage.setItem('vexis-quicklaunch', p.quickLaunch);
+    if (p.recentlyPlayed) localStorage.setItem('vexis-recently-played', p.recentlyPlayed);
+    if (p.customAccent) { localStorage.setItem('vexis-custom-accent', p.customAccent); applyCustomAccent(p.customAccent); }
+    if (p.customBgDim)  { localStorage.setItem('vexis-custom-bg-dim', p.customBgDim); applyCustomBgDim(parseInt(p.customBgDim)); }
+    if (p.atheme) { localStorage.setItem('vexis-atheme', p.atheme); setTimeout(() => startAnimTheme(p.atheme), 600); }
+    buildRecentlyPlayed();
+    buildQuickLaunch();
+    toast('Settings synced from cloud', 'info');
+  } catch(e) {}
+}
+
+/* ══════════════════════════════════════════════
+   RECENTLY PLAYED
+══════════════════════════════════════════════ */
+function trackRecentlyPlayed(name, url) {
+  let rp = [];
+  try { rp = JSON.parse(localStorage.getItem('vexis-recently-played') || '[]'); } catch {}
+  rp = rp.filter(r => r.url !== url);
+  rp.unshift({name, url});
+  rp = rp.slice(0, 5);
+  localStorage.setItem('vexis-recently-played', JSON.stringify(rp));
+  scheduleSync();
+  buildRecentlyPlayed();
+}
+
+function buildRecentlyPlayed() {
+  let rp = [];
+  try { rp = JSON.parse(localStorage.getItem('vexis-recently-played') || '[]'); } catch {}
+  const wrap = document.getElementById('recentlyPlayed');
+  const row  = document.getElementById('rpRow');
+  if (!wrap || !row) return;
+  if (!rp.length) { wrap.style.display = 'none'; return; }
+  wrap.style.display = '';
+  row.innerHTML = rp.map(r => {
+    const allItems = [
+      ...(BASE_ITEMS.games||[]), ...(BASE_ITEMS.tools||[]),
+      ...SOCIAL_FIXED, ...(CUSTOM.games||[]), ...(CUSTOM.tools||[]),
+      ...(CUSTOM.apps||[]), ...(CUSTOM.social||[]),
+    ];
+    const match = allItems.find(i => i.url === r.url);
+    const iconName = match?.icon || 'rocket';
+    return `<div class="rp-chip" onclick="openIframe(${JSON.stringify(r.name)},${JSON.stringify(r.url)},'home')">
+      <div class="rp-ico">${ico(iconName, 14)}</div>
+      <span>${r.name}</span>
+    </div>`;
+  }).join('');
+}
+
+/* ══════════════════════════════════════════════
+   QUICK LAUNCH BAR
+══════════════════════════════════════════════ */
+function getQuickLaunch() {
+  try { return JSON.parse(localStorage.getItem('vexis-quicklaunch') || '[]'); } catch { return []; }
+}
+function saveQuickLaunch(items) {
+  localStorage.setItem('vexis-quicklaunch', JSON.stringify(items));
+  scheduleSync();
+}
+
+function buildQuickLaunch() {
+  const items = getQuickLaunch();
+  const wrap  = document.getElementById('quickLaunch');
+  if (!wrap) return;
+  if (!items.length) { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'flex';
+  const chips = items.map((item, i) => {
+    const allItems = [
+      ...(BASE_ITEMS.games||[]), ...(BASE_ITEMS.tools||[]),
+      ...SOCIAL_FIXED, ...(CUSTOM.games||[]), ...(CUSTOM.tools||[]),
+    ];
+    const match = allItems.find(it => it.url === item.url);
+    const iconName = match?.icon || 'custom';
+    return `<div class="ql-item" onclick="openIframe(${JSON.stringify(item.name)},${JSON.stringify(item.url)},'home')">
+      <div class="ql-ico">${ico(iconName, 13)}</div>
+      <span>${item.name}</span>
+      <div class="ql-rm" onclick="event.stopPropagation();removeQuickLaunch(${i})" title="Unpin">
+        <svg width="7" height="7" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="1" y1="1" x2="9" y2="9"/><line x1="9" y1="1" x2="1" y2="9"/></svg>
+      </div>
+    </div>`;
+  }).join('');
+  wrap.innerHTML = chips + `<div class="ql-add-btn" onclick="openQuickLaunchPicker()">
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    Pin
+  </div>`;
+}
+
+function removeQuickLaunch(idx) {
+  const items = getQuickLaunch();
+  items.splice(idx, 1);
+  saveQuickLaunch(items);
+  buildQuickLaunch();
+  toast('Unpinned', 'info');
+}
+
+function pinToQuickLaunch(name, url) {
+  const items = getQuickLaunch();
+  if (items.find(i => i.url === url)) { toast('Already pinned', 'info'); return; }
+  items.push({name, url});
+  saveQuickLaunch(items);
+  buildQuickLaunch();
+  toast(`"${name}" pinned`, 'success');
+}
+
+function openQuickLaunchPicker() {
+  const all = [
+    ...(BASE_ITEMS.games||[]), ...(BASE_ITEMS.apps||[]),
+    ...(BASE_ITEMS.tools||[]), ...SOCIAL_FIXED,
+    ...(CUSTOM.games||[]), ...(CUSTOM.apps||[]), ...(CUSTOM.tools||[]),
+  ].filter(i => i.url);
+  const current = getQuickLaunch().map(i => i.url);
+  const available = all.filter(i => !current.includes(i.url));
+  if (!available.length) { toast('All items pinned already', 'info'); return; }
+
+  const existing = document.getElementById('qlPickerModal');
+  if (existing) existing.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'qlPickerModal';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;';
+  modal.innerHTML = `<div style="background:var(--surf);border:1px solid var(--bdrhi);border-radius:14px;padding:20px;width:320px;max-height:420px;display:flex;flex-direction:column;box-shadow:0 24px 64px rgba(0,0,0,.6)">
+    <div style="font-size:.84rem;font-weight:600;color:var(--white);margin-bottom:14px">Pin to Quick Launch</div>
+    <div style="overflow-y:auto;display:flex;flex-direction:column;gap:4px;flex:1">
+      ${available.map(item => `<div onclick="pinToQuickLaunch(${JSON.stringify(item.name)},${JSON.stringify(item.url)});this.closest('#qlPickerModal').remove()" style="display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;transition:background .12s" onmouseover="this.style.background='var(--raise)'" onmouseout="this.style.background=''">
+        <div style="width:28px;height:28px;border-radius:8px;background:var(--raise2);border:1px solid var(--bdr);display:flex;align-items:center;justify-content:center">${ico(item.icon||'custom',14)}</div>
+        <span style="font-size:.76rem;color:var(--text)">${item.name}</span>
+      </div>`).join('')}
+    </div>
+    <button onclick="this.closest('#qlPickerModal').remove()" style="margin-top:14px;width:100%;padding:8px;border-radius:8px;background:var(--raise);border:1px solid var(--bdr);color:var(--dim);font-family:'DM Sans',sans-serif;font-size:.76rem;cursor:pointer">Cancel</button>
+  </div>`;
+  modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+  document.body.appendChild(modal);
+}
+
+/* ══════════════════════════════════════════════
+   WEATHER WIDGET
+══════════════════════════════════════════════ */
+const WX_CODES = {
+  0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',
+  51:'🌦️',53:'🌦️',55:'🌧️',61:'🌧️',63:'🌧️',65:'🌧️',
+  71:'🌨️',73:'🌨️',75:'❄️',80:'🌦️',81:'🌧️',82:'⛈️',
+  95:'⛈️',96:'⛈️',99:'⛈️',
+};
+const WX_DESC = {
+  0:'Clear sky',1:'Mainly clear',2:'Partly cloudy',3:'Overcast',
+  45:'Foggy',48:'Icy fog',51:'Light drizzle',53:'Drizzle',55:'Heavy drizzle',
+  61:'Light rain',63:'Rain',65:'Heavy rain',71:'Light snow',73:'Snow',75:'Heavy snow',
+  80:'Showers',81:'Heavy showers',82:'Violent showers',95:'Thunderstorm',
+  96:'Thunderstorm w/ hail',99:'Thunderstorm w/ heavy hail',
+};
+
+async function initWeather() {
+  const widget = document.getElementById('weatherWidget');
+  if (!widget) return;
+  if (!navigator.geolocation) return;
+
+  const cached = localStorage.getItem('vexis-weather-cache');
+  if (cached) {
+    try {
+      const d = JSON.parse(cached);
+      if (Date.now() - d.ts < 30 * 60 * 1000) { renderWeather(d); widget.style.display = ''; return; }
+    } catch {}
+  }
+
+  widget.style.display = '';
+  document.getElementById('weatherDesc').textContent = 'Locating…';
+
+  navigator.geolocation.getCurrentPosition(async pos => {
+    const {latitude: lat, longitude: lon} = pos.coords;
+    try {
+      const [wxRes, geoRes] = await Promise.all([
+        fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weathercode,windspeed_10m,relativehumidity_2m&daily=temperature_2m_max,temperature_2m_min,weathercode&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=auto&forecast_days=2`),
+        fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`),
+      ]);
+      const wx  = await wxRes.json();
+      const geo = await geoRes.json();
+      const city = geo.address?.city || geo.address?.town || geo.address?.village || geo.address?.county || '';
+      const state = geo.address?.state || '';
+      const data = {
+        ts: Date.now(), temp: Math.round(wx.current.temperature_2m),
+        code: wx.current.weathercode, wind: Math.round(wx.current.windspeed_10m),
+        humidity: wx.current.relativehumidity_2m,
+        tomorrowHi: Math.round(wx.daily.temperature_2m_max[1]),
+        tomorrowLo: Math.round(wx.daily.temperature_2m_min[1]),
+        tomorrowCode: wx.daily.weathercode[1],
+        city, state,
+      };
+      localStorage.setItem('vexis-weather-cache', JSON.stringify(data));
+      renderWeather(data);
+    } catch { document.getElementById('weatherDesc').textContent = 'Weather unavailable'; }
+  }, () => { widget.style.display = 'none'; });
+}
+
+function renderWeather(d) {
+  document.getElementById('weatherIco').textContent  = WX_CODES[d.code] || '🌡️';
+  document.getElementById('weatherTemp').textContent = `${d.temp}°F`;
+  document.getElementById('weatherDesc').textContent = WX_DESC[d.code] || 'Unknown';
+  document.getElementById('weatherLoc').textContent  = [d.city, d.state].filter(Boolean).join(', ');
+  document.getElementById('weatherExtra').innerHTML  =
+    `<div class="weather-row"><strong>💨</strong> ${d.wind} mph</div>` +
+    `<div class="weather-row"><strong>💧</strong> ${d.humidity}%</div>` +
+    `<div class="weather-row" style="margin-top:4px;border-top:1px solid var(--bdr);padding-top:4px"><strong>Tomorrow</strong></div>` +
+    `<div class="weather-row">${WX_CODES[d.tomorrowCode]||'🌡️'} ${d.tomorrowLo}°–${d.tomorrowHi}°F</div>`;
+}
+
+/* ══════════════════════════════════════════════
+   OMNIBAR INLINE SEARCH
+══════════════════════════════════════════════ */
+let _odIdx = -1;
+
+function buildOmniData() {
+  const pages = [
+    {icon:'games', name:'Games',   sub:'Game library',    tag:'Page', action:()=>navigateTo('games')},
+    {icon:'apps',  name:'Apps',    sub:'Applications',    tag:'Page', action:()=>navigateTo('apps')},
+    {icon:'tools', name:'Tools',   sub:'Utilities',       tag:'Page', action:()=>navigateTo('tools')},
+    {icon:'social',name:'Social',  sub:'Messages',        tag:'Page', action:()=>navigateTo('social')},
+    {icon:'stats', name:'Stats',   sub:'Analytics',       tag:'Page', action:()=>navigateTo('stats')},
+  ];
+  const items = [
+    ...(BASE_ITEMS.games||[]).map(i=>({...i, tag:'Game',   action:()=>openIframe(i.name,i.url,'games')})),
+    ...(BASE_ITEMS.tools||[]).map(i=>({...i, tag:'Tool',   action:()=>openIframe(i.name,i.url,'tools')})),
+    ...SOCIAL_FIXED.map(i=>           ({...i, tag:'Social', action:()=>openIframe(i.name,i.url,'social')})),
+    ...(CUSTOM.games||[]).map(i=>     ({...i, tag:'Game',   action:()=>openIframe(i.name,i.url,'games')})),
+    ...(CUSTOM.tools||[]).map(i=>     ({...i, tag:'Tool',   action:()=>openIframe(i.name,i.url,'tools')})),
+    ...(CUSTOM.apps||[]).map(i=>      ({...i, tag:'App',    action:()=>openIframe(i.name,i.url,'apps')})),
+  ];
+  return [...pages, ...items];
+}
+
+function omniInput(val) {
+  const dd = document.getElementById('omniDropdown');
+  const q  = val.trim().toLowerCase();
+  if (!q || val.startsWith('vexis://') || val.startsWith('http')) { dd.classList.remove('open'); _odIdx=-1; return; }
+  const results = buildOmniData().filter(d =>
+    d.name.toLowerCase().includes(q) || (d.sub||d.desc||'').toLowerCase().includes(q)
+  ).slice(0, 7);
+  if (!results.length) { dd.classList.remove('open'); return; }
+  _odIdx = -1;
+  dd.innerHTML = results.map((r,i) =>
+    `<div class="od-item" data-idx="${i}" onclick="omniPickItem(${i})">
+      <div class="od-item-ico">${ico(r.icon||'custom',13)}</div>
+      <div class="od-item-text">
+        <div class="od-item-name">${r.name}</div>
+        <div class="od-item-sub">${r.sub||r.desc||''}</div>
+      </div>
+      <span class="od-item-tag">${r.tag||''}</span>
+    </div>`
+  ).join('');
+  dd._results = results;
+  dd.classList.add('open');
+}
+
+function omniPickItem(idx) {
+  const dd = document.getElementById('omniDropdown');
+  const results = dd._results || [];
+  if (results[idx]) { results[idx].action(); dd.classList.remove('open'); document.getElementById('omni').blur(); }
+}
+
+function omniKeydown(e) {
+  const dd = document.getElementById('omniDropdown');
+  const open = dd.classList.contains('open');
+  const items = dd.querySelectorAll('.od-item');
+  if (open && e.key === 'ArrowDown') {
+    e.preventDefault(); _odIdx = Math.min(_odIdx+1, items.length-1);
+    items.forEach((el,i)=>el.classList.toggle('focused',i===_odIdx));
+  } else if (open && e.key === 'ArrowUp') {
+    e.preventDefault(); _odIdx = Math.max(_odIdx-1, -1);
+    items.forEach((el,i)=>el.classList.toggle('focused',i===_odIdx));
+  } else if (e.key === 'Enter') {
+    if (open && _odIdx >= 0) { e.preventDefault(); omniPickItem(_odIdx); }
+    else { dd.classList.remove('open'); omniNav(e.target.value); }
+  } else if (e.key === 'Escape') {
+    dd.classList.remove('open'); _odIdx = -1;
+  }
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.omni-wrap')) {
+    const dd = document.getElementById('omniDropdown');
+    if (dd) dd.classList.remove('open');
+  }
+});
+
+/* ══════════════════════════════════════════════
+   CUSTOM THEME
+══════════════════════════════════════════════ */
+let _customBgObjectUrl = null;
+
+function applyCustomBg(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (_customBgObjectUrl) URL.revokeObjectURL(_customBgObjectUrl);
+  _customBgObjectUrl = URL.createObjectURL(file);
+  const isVideo = file.type.startsWith('video/');
+  const bgImg = document.getElementById('customThemeBg');
+  const bgVid = document.getElementById('customThemeBgVid');
+  const prevImg = document.getElementById('customBgPreview');
+  const prevVid = document.getElementById('customBgVideo');
+
+  if (isVideo) {
+    bgImg.style.opacity = '0'; bgVid.src = _customBgObjectUrl; bgVid.style.opacity = '.18';
+    prevImg.style.display = 'none'; prevVid.src = _customBgObjectUrl; prevVid.style.display = '';
+    localStorage.setItem('vexis-custom-bg-type', 'video');
+  } else {
+    bgVid.style.opacity = '0'; bgImg.src = _customBgObjectUrl; bgImg.style.opacity = '.18';
+    prevVid.style.display = 'none'; prevImg.src = _customBgObjectUrl; prevImg.style.display = '';
+    localStorage.setItem('vexis-custom-bg-type', 'image');
+  }
+
+  const reader = new FileReader();
+  reader.onload = ev => localStorage.setItem('vexis-custom-bg-data', ev.target.result);
+  reader.readAsDataURL(file);
+  toast('Background applied', 'success');
+}
+
+function applyCustomBgDim(val) {
+  const opacity = (100 - parseInt(val)) / 100 * 0.28;
+  document.getElementById('customThemeBg').style.opacity    = opacity;
+  document.getElementById('customThemeBgVid').style.opacity = opacity;
+  localStorage.setItem('vexis-custom-bg-dim', val);
+}
+
+function applyCustomAccent(hex) {
+  const root = document.documentElement;
+  root.style.setProperty('--accent', hex);
+  const [r,g,b] = hexToRgb(hex);
+  root.style.setProperty('--accent-rgb', `${r},${g},${b}`);
+  localStorage.setItem('vexis-custom-accent', hex);
+  scheduleSync();
+}
+
+function clearCustomTheme() {
+  document.getElementById('customThemeBg').src = '';
+  document.getElementById('customThemeBg').style.opacity = '0';
+  document.getElementById('customThemeBgVid').src = '';
+  document.getElementById('customThemeBgVid').style.opacity = '0';
+  document.getElementById('customBgPreview').style.display = 'none';
+  document.getElementById('customBgVideo').style.display   = 'none';
+  localStorage.removeItem('vexis-custom-bg-data');
+  localStorage.removeItem('vexis-custom-bg-type');
+  localStorage.removeItem('vexis-custom-accent');
+  localStorage.removeItem('vexis-custom-bg-dim');
+  toast('Custom theme cleared', 'info');
+}
+
+function loadCustomTheme() {
+  const data = localStorage.getItem('vexis-custom-bg-data');
+  const type = localStorage.getItem('vexis-custom-bg-type');
+  const dim  = localStorage.getItem('vexis-custom-bg-dim') || '0';
+  const acc  = localStorage.getItem('vexis-custom-accent');
+  if (data && type) {
+    const opacity = (100 - parseInt(dim)) / 100 * 0.28;
+    if (type === 'video') {
+      const v = document.getElementById('customThemeBgVid');
+      v.src = data; v.style.opacity = opacity;
+    } else {
+      const i = document.getElementById('customThemeBg');
+      i.src = data; i.style.opacity = opacity;
+    }
+    document.getElementById('customBgDim').value = dim;
+  }
+  if (acc) {
+    applyCustomAccent(acc);
+    document.getElementById('customAccentPicker').value = acc;
+  }
 }
 
 /* ══════════════════════════════════════════════
